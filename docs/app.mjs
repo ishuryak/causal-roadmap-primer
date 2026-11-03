@@ -272,6 +272,19 @@ $("#expand-all").addEventListener("click", (e) => {
   e.currentTarget.textContent = open ? "Collapse all details" : "Expand all details";
   rerenders.forEach((f) => f());
 });
+// Printing shows everything: open all collapsed sections, then restore them.
+let openBeforePrint = null;
+window.addEventListener("beforeprint", () => {
+  const all = [...document.querySelectorAll("details")];
+  openBeforePrint = all.map((d) => d.open);
+  all.forEach((d) => (d.open = true));
+  rerenders.forEach((f) => f());
+});
+window.addEventListener("afterprint", () => {
+  if (!openBeforePrint) return;
+  document.querySelectorAll("details").forEach((d, i) => (d.open = openBeforePrint[i] ?? d.open));
+  openBeforePrint = null;
+});
 // A link to an anchor inside a closed section opens that section first.
 function openTo(hash) {
   const el = hash && hash.length > 1 ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
