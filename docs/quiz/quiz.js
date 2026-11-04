@@ -20,7 +20,9 @@
   const LETTERS = ["A", "B", "C", "D", "E"];
   const EMOJI = ["🎉", "🌟", "👏", "💪", "✅", "🎯", "🙌", "👍", "🧠"];
   // Primer section anchors, in roadmap order, with the label the report shows.
-  const SECTIONS = {
+  // A bank may bring its own list ("sections": [[anchor, label], ...]), as the
+  // causal-diagram self-test in ../dag-quiz/ does.
+  let SECTIONS = {
     questions: "0 · Which question?",
     question: "1 · The question and the data",
     trial: "2 · The target trial",
@@ -248,6 +250,7 @@
     const problem = bankProblem(data);
     if (problem) return fail(`the question bank is invalid: ${problem}`);
     DATA = data;
+    if (Array.isArray(data.sections) && data.sections.length) SECTIONS = Object.fromEntries(data.sections);
     $("glossary").innerHTML = (data.glossary || []).map(([a, full]) => `<dt>${esc(a)}</dt><dd>${esc(full)}</dd>`).join("");
     const b = $("start");
     b.disabled = false;

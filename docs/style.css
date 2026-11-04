@@ -166,6 +166,21 @@ figcaption { font-size: 0.9rem; color: var(--muted); margin-top: 10px; line-heig
 .dag text { font-family: var(--body); font-size: 15px; fill: var(--ink); }
 .dag .small { font-size: 13px; fill: var(--muted); }
 
+/* Optional section on causal diagrams */
+section.part.optional { background: var(--wash); }
+.mini-dags svg { width: 100%; max-width: 46rem; height: auto; display: block; margin: 0 auto; }
+.mini-dags text { font-family: var(--body); }
+.pc-set { border: 1px solid var(--line); border-radius: 6px; padding: 10px 16px 12px; margin: 14px 0; }
+.pc-set legend { font-weight: 600; padding: 0 4px; }
+.pc-set label { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; }
+.pc-paths { list-style: none; padding: 0; margin: 10px 0 0; font-size: 0.95rem; }
+.pc-paths li { padding: 3px 0; }
+.pc-kind { color: var(--muted); }
+#dag-checker .answer { background: var(--teal-wash); border-radius: 4px; padding: 14px 16px; }
+#dag-checker .answer p { margin: 0 0 8px; }
+dl.gloss dt { font-weight: 600; margin-top: 10px; }
+dl.gloss dd { margin: 2px 0 0 0; }
+
 /* Chooser */
 .chooser { border: 1px solid var(--line); border-radius: 6px; padding: 18px; margin: 1.8rem 0; }
 .chooser fieldset { border: 0; padding: 0; margin: 0 0 14px; }

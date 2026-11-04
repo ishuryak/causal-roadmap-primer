@@ -7,33 +7,53 @@ export const SECTIONS = ["questions", "question", "trial", "dag", "estimand", "i
 
 // Abbreviations a reader may meet in the questions. Shown on the quiz start page.
 export const GLOSSARY = [
+  ["AAM", "Advanced airway management"],
   ["AIPW", "Augmented inverse probability of treatment weighting"],
+  ["ALL", "Acute lymphoblastic leukemia"],
+  ["ARDS", "Acute respiratory distress syndrome"],
   ["ATE", "Average treatment effect"],
   ["ATT", "Average treatment effect in the treated"],
+  ["BVM", "Bag-valve-mask ventilation"],
   ["CAST", "Causal Analysis for Survival Trajectories"],
   ["CATE", "Conditional average treatment effect"],
   ["CHHiP", "Randomized trial of conventional versus hypofractionated radiotherapy for prostate cancer"],
   ["CI", "Confidence interval"],
+  ["COVID", "Coronavirus disease (COVID-19)"],
   ["CSF", "Causal survival forest"],
   ["DAG", "Directed acyclic graph"],
   ["DML", "Double machine learning"],
+  ["ECOG", "Eastern Cooperative Oncology Group"],
   ["EHR", "Electronic health record"],
+  ["EM", "Emergency medicine"],
+  ["EMS", "Emergency medical services"],
   ["FDA", "US Food and Drug Administration"],
+  ["HLA", "Human leukocyte antigen"],
   ["HR", "Hazard ratio"],
+  ["ICU", "Intensive care unit"],
   ["IPTW", "Inverse probability of treatment weighting"],
+  ["IVIG", "Intravenous immunoglobulin"],
   ["LMTP", "Longitudinal modified treatment policy"],
   ["NCDB", "National Cancer Database"],
+  ["NSCLC", "Non-small cell lung cancer"],
+  ["OHCA", "Out-of-hospital cardiac arrest"],
+  ["OS", "Overall survival"],
+  ["OSA", "Obstructive sleep apnea"],
   ["PATH", "Predictive Approaches to Treatment effect Heterogeneity statement"],
+  ["PFS", "Progression-free survival"],
+  ["PS", "Performance status"],
   ["RCT", "Randomized controlled trial"],
   ["RMST", "Restricted mean survival time"],
   ["RTOG", "Radiation Therapy Oncology Group"],
   ["SEER", "Surveillance, Epidemiology, and End Results program"],
   ["SHAP", "SHapley Additive exPlanations"],
+  ["STI", "Sexually transmitted infection"],
+  ["STSS", "Streptococcal toxic shock syndrome"],
+  ["TBI", "Traumatic brain injury"],
   ["TMLE", "Targeted maximum likelihood estimation"],
   ["WHI", "Women's Health Initiative"],
 ];
 // Capitalized tokens that are not abbreviations needing a gloss.
-const NOT_ACRONYMS = new Set(["Gy", "II", "III", "IIIA", "IIIB", "US", "A", "B", "C", "D", "E", "I", "R2", "R²"]);
+const NOT_ACRONYMS = new Set(["Gy", "II", "III", "IIIA", "IIIB", "IV", "NOT", "US", "A", "B", "C", "D", "E", "I", "R2", "R²"]);
 
 // Strip tags, then decode the few entities the primer's reference list uses, so
 // the quiz (which escapes on output) never shows "&amp;amp;".
@@ -50,7 +70,9 @@ export function primerRefs(html) {
   });
 }
 
-export function validateBank(bank, primer) {
+// `sections` is the list of anchors the bank must cover: the roadmap sections by
+// default, or a bank's own list (the causal-diagram self-test).
+export function validateBank(bank, primer, sections = SECTIONS) {
   const errors = [];
   const qs = bank.questions;
   const N = qs.length;
@@ -66,7 +88,7 @@ export function validateBank(bank, primer) {
     if (c.length !== 5 || new Set(c.map((x) => plain(x).trim().toLowerCase())).size !== 5) { errors.push(`${q.id}: needs 5 unique choices`); continue; }
     if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer > 4) { errors.push(`${q.id}: answer out of range`); continue; }
     answerCounts[q.answer]++;
-    if (!SECTIONS.includes(q.section)) errors.push(`${q.id}: unknown section ${q.section}`);
+    if (!sections.includes(q.section)) errors.push(`${q.id}: unknown section ${q.section}`);
     if (!q.explanation || !q.refs?.length) errors.push(`${q.id}: missing explanation or refs`);
     for (const r of q.refs || []) if (!primerNums.has(r)) errors.push(`${q.id}: ref ${r} is not in the primer's reference list`);
     if (!q.evidence?.length) errors.push(`${q.id}: no evidence quote`);
@@ -89,6 +111,6 @@ export function validateBank(bank, primer) {
   if (longest > 7) errors.push(`correct answer is uniquely longest in ${longest}/${N}`);
   if (shortest > 7) errors.push(`correct answer is uniquely shortest in ${shortest}/${N}`);
   if (Math.max(...answerCounts) > 10) errors.push(`answer positions unbalanced: ${answerCounts.join(",")}`);
-  for (const id of SECTIONS) if (!qs.some((q) => q.section === id)) errors.push(`no question on primer section ${id}`);
-  return { errors, stats: { longest, shortest, answerCounts: answerCounts.join(","), perSection: SECTIONS.map((s) => `${s}:${qs.filter((q) => q.section === s).length}`).join(" ") } };
+  for (const id of sections) if (!qs.some((q) => q.section === id)) errors.push(`no question on primer section ${id}`);
+  return { errors, stats: { longest, shortest, answerCounts: answerCounts.join(","), perSection: sections.map((s) => `${s}:${qs.filter((q) => q.section === s).length}`).join(" ") } };
 }

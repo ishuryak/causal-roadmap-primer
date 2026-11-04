@@ -65,19 +65,21 @@ const sectionHtml = (id) => { const a = html.indexOf(`id="${id}"`); return html.
 
 // ---------- Page contract: style, citations, links, acronyms ----------
 {
-  check("page: no em dash anywhere", !/—/.test(html + app));
+  const dagPaths = readFileSync(join(dir, "dag_paths.mjs"), "utf8");
+  check("page: no em dash anywhere", !/—/.test(html + app + dagPaths));
   check("page: no semicolon-joined prose in visible text", !/[a-z]; [a-z]/.test(text));
   const order = [];
   for (const m of body.matchAll(/href="#ref-(\d+)"/g)) { const n = +m[1]; if (!order.includes(n)) order.push(n); }
   const listed = [...html.matchAll(/<li id="ref-(\d+)"/g)].map((m) => +m[1]);
   check("page: citations appear in first-use order", order.every((n, i) => n === i + 1), order.join(","));
   check("page: every listed reference is cited and every cite is listed", listed.length === order.length && listed.every((n) => order.includes(n)));
-  const hit = findGuardedTerms(html + app + readFileSync(join(dir, "trial_argument.mjs"), "utf8"));
+  const hit = findGuardedTerms(html + app + dagPaths + readFileSync(join(dir, "trial_argument.mjs"), "utf8"));
   check("page: no unpublished project material or names (hashed guard list)", hit.length === 0 && !/Unpublished/.test(html + app), `${hit.length} hit(s)`);
   const hosts = [...html.matchAll(/(?:href|src)="(https?:\/\/[^/"]+)/g)].map((m) => m[1]);
   const allowed = ["https://ishuryak.github.io", "https://doi.org", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://miguelhernan.org",
     "https://www.fda.gov", "https://arxiv.org", "https://bayes.cs.ucla.edu", "https://www.fox.temple.edu", "https://hsph.harvard.edu",
-    "https://vanderlaan-lab.org", "https://causalai.net", "https://www.mit.edu", "https://www.gsb.stanford.edu"];
+    "https://vanderlaan-lab.org", "https://causalai.net", "https://www.mit.edu", "https://www.gsb.stanford.edu",
+    "https://ftp.cs.ucla.edu"];
   const bad = hosts.filter((h) => !allowed.includes(h));
   check("page: external links only to the CAST site, DOIs, fonts, sources and the listed researchers' pages", bad.length === 0, bad.join(", "));
   const missing = [];

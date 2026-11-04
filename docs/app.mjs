@@ -1,5 +1,6 @@
 import { runSim1, runSim2, SIM1_INDIRECT, SIM2 } from "./sims.mjs";
 import { trialArgument } from "./trial_argument.mjs";
+import { TEACHING_DAG, explanationHtml } from "./dag_paths.mjs";
 
 const $ = (s) => document.querySelector(s);
 const fmt = (x, d = 1) => {
@@ -120,6 +121,72 @@ $("#quiz").addEventListener("click", (e) => {
     <text class="small" x="430" y="388" style="fill:var(--caution)">unmeasured confounding</text>
   </svg>`;
   $("#dag-figure").innerHTML = out;
+})();
+
+// =====================================================================
+// Causal-diagram checker (optional section 3d): tick variables to adjust
+// for, and see which paths from schedule to survival are open or blocked.
+// =====================================================================
+(function pathChecker() {
+  const fig = $("#pc-figure");
+  if (!fig) return;
+  const D = TEACHING_DAG;
+  const NAMES = { ...D.nodes, A: "Schedule", u: "Unrecorded factor U" };
+  // Node centers and half-sizes. Confounders sit in one column between
+  // schedule and survival, so no two arrows cross.
+  const POS = { A: [120, 250], Y: [800, 250], age: [460, 40], stage: [460, 112], ps: [460, 184], tox: [460, 330], u: [460, 430] };
+  const HW = { A: 90, Y: 90 }, HH = 24;
+  const hw = (v) => HW[v] || 120;
+  // Arrows from the confounder column leave from the side of the box facing
+  // their target, so they never pass behind the box below.
+  const SIDE = new Set(["age", "stage", "ps"]);
+  const clip = (from, to) => {
+    let [x0, y0] = POS[from];
+    const [x1, y1] = POS[to];
+    if (SIDE.has(from)) {
+      x0 += x1 < x0 ? -hw(from) : hw(from);
+      const dx = x1 - x0, dy = y1 - y0, b = Math.min(hw(to) / Math.abs(dx), HH / Math.abs(dy || 1e-9)) + 8 / Math.hypot(dx, dy);
+      return [x0, y0, x1 - dx * b, y1 - dy * b];
+    }
+    const dx = x1 - x0, dy = y1 - y0;
+    const s = (v) => Math.min(hw(v) / Math.abs(dx || 1e-9), HH / Math.abs(dy || 1e-9));
+    const a = s(from), b = s(to);
+    return [x0 + dx * a, y0 + dy * a, x1 - dx * (b + 8 / Math.hypot(dx, dy)), y1 - dy * (b + 8 / Math.hypot(dx, dy))];
+  };
+  function draw(adjusted) {
+    let edges = "", nodes = "";
+    for (const [a, b] of D.edges) {
+      const [x0, y0, x1, y1] = clip(a, b);
+      const dashed = a === "u";
+      edges += `<path d="M${x0.toFixed(1)},${y0.toFixed(1)} L${x1.toFixed(1)},${y1.toFixed(1)}" stroke="var(--muted)" stroke-width="2"${dashed ? ' stroke-dasharray="6 5"' : ""} marker-end="url(#pc-ah)"/>`;
+    }
+    for (const v of Object.keys(POS)) {
+      const [x, y] = POS[v], w = hw(v);
+      const adj = adjusted.includes(v);
+      const style = v === "A" ? 'fill="var(--teal-wash)" stroke="var(--teal)"' : v === "Y" ? 'fill="var(--paper)" stroke="var(--ink)"'
+        : v === "u" ? 'fill="var(--caution-wash)" stroke="var(--caution)" stroke-dasharray="6 5"' : 'fill="var(--wash)" stroke="var(--line)"';
+      nodes += `<rect x="${x - w}" y="${y - HH}" width="${2 * w}" height="${2 * HH}" rx="6" ${style} stroke-width="${adj ? 5 : 1.5}"/>`;
+      nodes += `<text x="${x}" y="${y + 7}" text-anchor="middle"${adj ? ' style="font-weight:600"' : ""}>${esc(NAMES[v])}${adj ? " (adjusted)" : ""}</text>`;
+    }
+    const label = `Causal diagram. Age, stage and performance status each affect both the schedule and survival. The schedule affects survival directly and through acute toxicity. An unrecorded factor U affects acute toxicity and survival. Adjusted for: ${adjusted.length ? adjusted.map((v) => NAMES[v]).join(", ") : "nothing"}.`;
+    fig.innerHTML = `<svg viewBox="0 0 920 470" role="img" aria-label="${esc(label)}">
+      <defs><marker id="pc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+      <g fill="none">${edges}</g><g>${nodes}</g></svg>`;
+  }
+  function explain(adjusted) {
+    const { verdict, list } = explanationHtml(D, adjusted, NAMES);
+    $("#pc-answer").innerHTML = verdict;
+    $("#pc-list").innerHTML = list;
+  }
+  $("#pc-boxes").innerHTML = D.adjustable.map((v) =>
+    `<label><input type="checkbox" value="${v}"> ${esc(NAMES[v])}${v === "ps" ? " (often not recorded)" : v === "tox" ? " (happens after treatment starts)" : ""}</label>`).join("");
+  const update = () => {
+    const adjusted = [...document.querySelectorAll("#pc-boxes input:checked")].map((x) => x.value);
+    draw(adjusted);
+    explain(adjusted);
+  };
+  $("#pc-boxes").addEventListener("change", update);
+  update();
 })();
 
 const rerenders = [];
@@ -289,6 +356,7 @@ window.addEventListener("afterprint", () => {
 function openTo(hash) {
   const el = hash && hash.length > 1 ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
   for (let d = el?.closest("details"); d; d = d.parentElement?.closest("details")) d.open = true;
+  el?.scrollIntoView();
 }
 window.addEventListener("hashchange", () => openTo(location.hash));
 openTo(location.hash);

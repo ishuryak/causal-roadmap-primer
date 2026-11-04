@@ -1,6 +1,5 @@
-# Checks for the resident causal roadmap primer and its self-test
-# (docs/). Separate from tests.yml so that workflow and the
-# CAST site it covers are untouched. Runs the three Node suites only: the
+# Checks for the resident causal roadmap primer, its optional section on
+# causal diagrams, and the two self-tests (docs/). Runs the Node suites only: the
 # full-text evidence check needs copyrighted sources that are not in the
 # repository, and the browser play-through needs a local Chrome, so both run
 # locally (see development/2026_11_03_resident-guide-revision.md).
@@ -40,3 +39,15 @@ jobs:
           cp docs/quiz/bank.json /tmp/bank.saved.json
           node docs/quiz/build_bank.mjs docs/quiz/questions_source.json
           diff -q /tmp/bank.saved.json docs/quiz/bank.json
+
+      - name: Causal-diagram path logic (hand-worked paths, self-test keys)
+        run: node tests/test_dag_paths.mjs
+
+      - name: Optional causal-diagram section and its self-test
+        run: node tests/test_dag_quiz.mjs
+
+      - name: Causal-diagram bank is current with its source
+        run: |
+          cp docs/dag-quiz/bank.json /tmp/dag-bank.saved.json
+          node docs/quiz/build_bank.mjs docs/dag-quiz/questions_source.json docs/dag-quiz
+          diff -q /tmp/dag-bank.saved.json docs/dag-quiz/bank.json
