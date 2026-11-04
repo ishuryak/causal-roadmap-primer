@@ -24,8 +24,20 @@ check("sim3.json equals a fresh build field for field (regenerate with build_sim
 check("sim3 build is deterministic (two builds give the same text)", JSON.stringify(serializeSim3(runSim3())) === JSON.stringify(fresh));
 {
   const s = saved, d = s.design;
-  const nums = JSON.stringify(s).match(/-?\d+(\.\d+)?(e-?\d+)?/g).map(Number);
-  check("sim3: every number is finite", nums.every(Number.isFinite));
+  // Every leaf of the parsed file must be a finite number, except named text
+  // fields. A regex over the JSON text missed null (what NaN and Infinity become)
+  // and counted digits inside prose (review H03).
+  const TEXT_FIELDS = new Set(["note", "tuning"]);
+  const badLeaves = (o, path = "") => {
+    if (Array.isArray(o)) return o.flatMap((v, i) => badLeaves(v, `${path}[${i}]`));
+    if (o && typeof o === "object") return Object.entries(o).flatMap(([k, v]) => (TEXT_FIELDS.has(k) && typeof v === "string" ? [] : badLeaves(v, path ? `${path}.${k}` : k)));
+    return typeof o === "number" && Number.isFinite(o) ? [] : [path];
+  };
+  check("sim3: every numeric field is a finite number", badLeaves(s).length === 0, badLeaves(s).slice(0, 5).join(","));
+  const corrupt = (f) => { const c = JSON.parse(savedText); f(c); return badLeaves(c).length > 0; };
+  check("sim3 control: null, NaN, Infinity and a numeric string are each caught",
+    corrupt((c) => (c.dml.se = null)) && corrupt((c) => (c.path[3].r2 = NaN)) && corrupt((c) => (c.truth = Infinity)) && corrupt((c) => (c.n = "10000")));
+  check("sim3 control: digits inside the note do not matter", !corrupt((c) => (c.note += " 12 3.4")));
   check("sim3: design and counts agree", s.seed === SIM3_SEED && JSON.stringify(d) === JSON.stringify(SIM3) && s.n === d.n && s.truth === d.truth && s.p === d.pStrong + d.pWeak + d.pNoise);
   check("sim3: fitting and holdout samples partition the cohort", s.nTrain + s.nTest === s.n && s.nTrain > 0 && s.nTest > 0);
   check("sim3: allocation block matches the counts it discloses", s.allocation.lassoPathFit === s.nTrain && s.allocation.predictionHoldout === s.nTest && s.allocation.dmlEstimation === s.n);

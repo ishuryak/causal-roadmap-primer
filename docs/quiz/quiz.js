@@ -224,14 +224,28 @@
   }
 
   // A bank the engine can run: 30-ish questions, five choices each, a valid key.
+  // A bank the engine can run. Checks every nested record the page reads, so a
+  // malformed bank shows an error instead of a broken quiz (review H04).
   function bankProblem(d) {
     if (!d || typeof d !== "object") return "the file is not a question bank";
     if (!Array.isArray(d.questions) || d.questions.length === 0) return "it has no questions";
     if (!Array.isArray(d.refs)) return "it has no reference list";
+    for (const r of d.refs) {
+      if (!r || !Number.isInteger(r.n) || typeof r.citation !== "string" || typeof r.url !== "string") return "a reference record is malformed";
+    }
+    const refNums = new Set(d.refs.map((r) => r.n));
+    if (d.sections !== undefined) {
+      if (!Array.isArray(d.sections) || !d.sections.every((x) => Array.isArray(x) && x.length === 2 && x.every((v) => typeof v === "string"))) return "its section list is malformed";
+    }
+    const ids = new Set();
     for (const q of d.questions) {
-      if (!q || typeof q.stem !== "string" || !Array.isArray(q.choices) || q.choices.length !== 5 ||
-          !Number.isInteger(q.answer) || q.answer < 0 || q.answer > 4 || typeof q.explanation !== "string" ||
-          !Array.isArray(q.refs)) return `question ${q && q.id ? q.id : "?"} is incomplete`;
+      const id = q && typeof q.id === "string" ? q.id : "?";
+      if (!q || typeof q.id !== "string" || typeof q.stem !== "string" || !Array.isArray(q.choices) || q.choices.length !== 5 ||
+          !q.choices.every((c) => typeof c === "string") || !Number.isInteger(q.answer) || q.answer < 0 || q.answer > 4 ||
+          typeof q.explanation !== "string" || typeof q.section !== "string" || !Array.isArray(q.refs)) return `question ${id} is incomplete`;
+      if (ids.has(q.id)) return `question ${id} appears twice`;
+      ids.add(q.id);
+      if (!q.refs.every((n) => refNums.has(n))) return `question ${id} cites a reference the bank does not list`;
     }
     return "";
   }
@@ -261,9 +275,11 @@
   // Exposed for the headless play-through test only.
   window.__quiz = { pick: (k) => pick(k), submit: () => submit(), next: () => next(), start: () => start(), get state() { return state; } };
 
-  if (window.QUIZ_DATA !== undefined) ready(window.QUIZ_DATA);
+  // Any error while setting up from inline data shows the same message as a failed fetch.
+  const guardedReady = (d) => { try { ready(d); } catch (e) { fail(`the question bank could not be read (${e && e.message ? e.message : "unknown error"})`); } };
+  if (window.QUIZ_DATA !== undefined) guardedReady(window.QUIZ_DATA);
   else fetch("bank.json", { signal: AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined })
     .then((r) => { if (!r.ok) throw new Error(`bank.json returned HTTP ${r.status}`); return r.text(); })
-    .then((t) => { let d; try { d = JSON.parse(t); } catch (e) { throw new Error("bank.json is not valid JSON"); } ready(d); })
+    .then((t) => { let d; try { d = JSON.parse(t); } catch (e) { throw new Error("bank.json is not valid JSON"); } guardedReady(d); })
     .catch((e) => fail(e && e.name === "TimeoutError" ? "bank.json did not load within 15 seconds" : e && e.message ? e.message : "bank.json is missing"));
 })();

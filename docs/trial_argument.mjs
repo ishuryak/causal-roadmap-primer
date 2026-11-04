@@ -76,7 +76,15 @@ export function trialArgument(a) {
   }
   const supports = [], cannot = [], open = [];
   const ni = a.aim === "noninferiority";
-  const pop = a.support === "restricted" ? "the supported (overlap) population" : "the target population";
+  // One population label, used in every sentence of the output (review U08).
+  const pop = a.prior === "excludes"
+    ? (a.support === "restricted" ? "the supported subset of patients excluded from that earlier trial" : "the patients excluded from that earlier trial")
+    : (a.support === "restricted" ? "the supported (overlap) population" : "the target population");
+  // "crosses" records that the bias range changes the reading at some threshold,
+  // not which one, so the output never infers a direction from it (review U02).
+  const which = ni
+    ? "Check which threshold the bias range reaches by comparing it with the prespecified noninferiority margin: only a range that reaches the margin leaves a meaningful loss of efficacy possible."
+    : "Check which threshold the bias range reaches. If it reaches only the meaningful-benefit threshold, the benefit may be too small to matter. If it reaches no effect or the harm threshold, the effect itself is in doubt.";
   const harmSide = a.ci === "clear_harm" || a.ci === "harm_or_none";
   let key;
 
@@ -101,10 +109,10 @@ export function trialArgument(a) {
     if (a.ci === "both" || a.ci === "benefit_or_none") {
       key = "consider";
       supports.push(`For ${pop}, ${CI_TEXT[a.ci]}. Clinicians have good reason to be uncertain, which is the situation randomization exists to resolve.`);
-      if (a.bias === "crosses") supports.push("Plausible hidden confounding could also move the estimate across a threshold, which adds to the case.");
+      if (a.bias === "crosses") supports.push(`Plausible hidden confounding could also move the estimate across a threshold, which adds to the case. ${which}`);
     } else if (a.ci === "clear_benefit" && a.bias === "crosses") {
       key = "consider";
-      supports.push("The effect looks clear, but plausible unmeasured confounding could explain it away. No further analysis of the same data can settle that. Randomization can.");
+      supports.push(`The effect looks clear, but plausible unmeasured confounding could move the estimate across a threshold. ${which} No further analysis of the same data can settle that, and a well-designed randomized trial is the recommended way to confirm it.`);
     } else if (a.ci === "clear_benefit") {
       key = "hypothesis";
       supports.push("The effect is clear and stays beyond no effect across the plausible bias range. Encouraging nonrandomized evidence is still a reason to test, not a substitute for testing, as RTOG 0617 showed for dose escalation.");
@@ -119,7 +127,7 @@ export function trialArgument(a) {
         supports.push("The new schedule looks harmful, and the harm survives the plausible bias range. Randomizing patients to it may no longer be acceptable. Report the finding and examine it for errors in design or data before anyone proposes a trial.");
       } else {
         supports.push(`${cap(CI_TEXT[a.ci])}. A superiority trial is hard to justify on these data. If the new schedule has other advantages, ask instead whether a noninferiority question fits.`);
-        if (a.bias === "crosses") cannot.push("Plausible hidden confounding could move the estimate across a threshold in either direction.");
+        if (a.bias === "crosses") cannot.push(`Plausible hidden confounding could move the estimate across a threshold in either direction. ${which}`);
       }
     } else if (a.ci === "negligible" && a.bias === "within") {
       key = "lowpriority";
@@ -127,18 +135,21 @@ export function trialArgument(a) {
       open.push("This does not show the schedules are equivalent for other outcomes. If the shorter schedule reduces burden, toxicity, cost or travel, a noninferiority question on the right endpoint may still be worth asking.");
     } else {
       key = "inconclusive";
-      cannot.push("The estimate looks negligible, but plausible confounding could be hiding a meaningful benefit or harm. If frailer patients were steered toward the schedule that helps, a real benefit can look like no effect.");
+      cannot.push(`The estimate looks negligible, but plausible confounding could be hiding a meaningful benefit or harm. If frailer patients were steered toward the schedule that helps, a real benefit can look like no effect. ${which}`);
       open.push("A trial is worth considering only if a meaningful effect remains clinically plausible and the stakes are high.");
     }
   } else {
     // Noninferiority: preserving efficacy while gaining other advantages.
-    cannot.push("Similar observational survival does not establish noninferiority. That needs a randomized trial with a prespecified endpoint and a justified margin.");
+    cannot.push("Similar observational survival alone does not establish noninferiority. A well-designed randomized trial with a prespecified endpoint and a justified margin is the recommended way to confirm it.");
     if (a.ci === "clear_harm" && a.bias === "within") {
       key = "ni_doubt";
       supports.push("The shorter schedule looks worse, beyond the plausible bias range. A noninferiority trial would be testing a schedule the data already count against. Examine the finding first.");
-    } else if (harmSide || a.ci === "both" || a.bias === "crosses") {
+    } else if (harmSide || a.ci === "both") {
       key = "ni_consider";
-      supports.push(`For ${pop}, ${CI_TEXT[a.ci]}${a.bias === "crosses" ? ", and plausible confounding could move the estimate across a threshold" : ""}. A loss of efficacy cannot be ruled out from these data. A noninferiority trial is the way to settle it, provided clinicians are uncertain and the other advantages are real.`);
+      supports.push(`For ${pop}, ${CI_TEXT[a.ci]}. The interval itself reaches the margin, so a meaningful loss of efficacy is possible. A noninferiority trial is the way to settle it, provided clinicians are uncertain and the other advantages are real.${a.bias === "crosses" ? ` Plausible confounding could also move the estimate across a threshold. ${which}` : ""}`);
+    } else if (a.bias === "crosses") {
+      key = "ni_consider";
+      supports.push(`For ${pop}, ${CI_TEXT[a.ci]}, but plausible confounding could move the estimate across a threshold. ${which} A noninferiority trial can settle the question, provided clinicians are uncertain and the other advantages are real.`);
     } else {
       key = "ni_consider";
       supports.push(`For ${pop}, ${CI_TEXT[a.ci]}, across the plausible bias range. That is compatible with noninferiority and makes a noninferiority trial a reasonable proposal, with the margin set before seeing its data.`);
@@ -150,8 +161,8 @@ export function trialArgument(a) {
   const against = ["duplicate", "lowpriority", "nobenefit", "harm", "ni_doubt"].includes(key);
   if (a.prior === "excludes") {
     extras.push(against
-      ? `The earlier trial excluded patients like these, and your analysis is about them. ${key === "harm" || key === "ni_doubt" ? "It flags a possible harm in them" : "It argues against a new trial of this comparison in them"}, so report it as evidence for that group rather than as a case for a trial.`
-      : "The earlier trial excluded patients like these, and your analysis speaks to exactly those patients. That can support a trial in them. Patients the trial excluded outright had no chance of enrolling, so extending its result to them is an extrapolation that rests on modeling assumptions, not a transport of the trial's evidence (section 9).");
+      ? `The earlier trial excluded patients like these, and your analysis is about ${pop}. ${key === "harm" || key === "ni_doubt" ? "It flags a possible harm in that group" : "It argues against a new trial of this comparison in that group"}, so report it as evidence for that group rather than as a case for a trial.`
+      : `The earlier trial excluded patients like these, and your analysis speaks to ${pop}. That can support a trial in that group. Patients the trial excluded outright had no chance of enrolling, so extending its result to them is an extrapolation that rests on modeling assumptions, not a transport of the trial's evidence (section 9).`);
   }
   if (a.bench === "na" && a.prior !== "none") extras.push("You have not yet checked your emulation against the existing trial. Running the same pipeline in the patients that trial would have enrolled, and comparing, is the most persuasive check available.");
   if (a.support === "restricted") extras.push("Your estimate applies only to the patients with overlap. It says nothing about patients who almost always received one schedule (positivity, section 5). A trial in them is a separate question with its own justification, not a conclusion of this analysis.");

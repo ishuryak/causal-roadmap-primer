@@ -334,7 +334,8 @@ loadSim3().then((d) => {
 // (for reading straight through, or printing).
 $("#expand-all").addEventListener("click", (e) => {
   const open = e.currentTarget.getAttribute("aria-pressed") !== "true";
-  document.querySelectorAll("details.more").forEach((d) => (d.open = open));
+  // Every disclosure, nested ones included (the path checker is a details.inner).
+  document.querySelectorAll("details").forEach((d) => (d.open = open));
   e.currentTarget.setAttribute("aria-pressed", String(open));
   e.currentTarget.textContent = open ? "Collapse all details" : "Expand all details";
   rerenders.forEach((f) => f());

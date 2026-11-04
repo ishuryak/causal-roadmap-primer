@@ -51,3 +51,9 @@ jobs:
           cp docs/dag-quiz/bank.json /tmp/dag-bank.saved.json
           node docs/quiz/build_bank.mjs docs/dag-quiz/questions_source.json docs/dag-quiz
           diff -q /tmp/dag-bank.saved.json docs/dag-quiz/bank.json
+
+      - name: Regressions from the 2026-11-03 external review (U01-U11, H01-H04)
+        run: node tests/test_review_2026_11_03.mjs
+
+      - name: References are in first-citation order (renumbering tool, read-only)
+        run: python3 tools/renumber_refs.py --check

@@ -49,7 +49,7 @@ check("additions: Pearl's ladder is in section 0", html.indexOf('id="ladder"') >
 check("additions: cross-fitting and honesty are in section 7", html.indexOf('id="crossfit"') > at("estimators") && html.indexOf('id="crossfit"') < at("checks"));
 check("additions: missing data and simulation limits are in section 8", ["missing", "sim-limits"].every((id) => html.indexOf(`id="${id}"`) > at("checks") && html.indexOf(`id="${id}"`) < at("compare")));
 check("additions: a closed glossary sits before the references", at("glossary") < at("references") && /<section class="part" id="glossary">[\s\S]*?<details class="more">/.test(html));
-check("additions: the imputation advice keeps the outcome in and splits first", /including the treatment and the outcome/.test(html) && /fit the imputation model on the training patients only/.test(html));
+check("additions: the imputation advice keeps the outcome in and splits first", /including the treatment and the outcome/.test(html) && /fit any imputation on the training patients only/.test(html) && /without using the held-out outcomes/.test(html));
 
 // ---------- The self-test bank ----------
 const { errors, stats } = validateBank(bank, refs, sections);

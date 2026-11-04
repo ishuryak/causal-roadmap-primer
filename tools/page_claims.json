@@ -1,0 +1,2081 @@
+{
+ "about": "Claims behind the primer's page text, each with verbatim evidence from its full-text source (kept outside this repository). Checked by tools/check_evidence.py. Element-level mapping was retired on 2026-11-03 together with the one-shot page generator: when a passage changes, add or update its claim here and re-run the checker.",
+ "claims": [
+  {
+   "id": "g1",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "For example, a prior hospitalization may be identified as a useful predictor of future heart failure, but nobody would suggest we stop admitting people to the hospital in order to prevent heart failures."
+    }
+   ]
+  },
+  {
+   "id": "g10",
+   "refs": [
+    16
+   ],
+   "evidence": [
+    {
+     "ref": 16,
+     "file": "dag_Shrier_2008_reducing_bias.norm.txt",
+     "quote": "all causal inferences based on statistical models are implicitly based on a causal structure – the DAG approach simply makes the assumptions explicit."
+    }
+   ]
+  },
+  {
+   "id": "g100",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "so that she accounts in the analysis not only for herself, but also for those like her, i.e., with the same values of L and A, who were not selected"
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The IP weight W C is the inverse of the probability of her selection Pr [ C = 0|L, A]."
+    }
+   ]
+  },
+  {
+   "id": "g101",
+   "refs": [
+    26
+   ],
+   "evidence": [
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "A nested sample refers to the situation when key variables are only measured within a subset of an otherwise representative"
+    },
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "Inverse probability weighting is a powerful and flexible approach to adjust for collider bias in nested samples"
+    },
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "the optimal way to mitigate the problem is to use appropriate sampling strategies at the study design stage."
+    }
+   ]
+  },
+  {
+   "id": "g102",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "That is, the confounder affects the treatment and the treatment affects the confounder. There is treatment-confounder feedback"
+    }
+   ]
+  },
+  {
+   "id": "g104",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "when there are time-varying confounders and treatment-confounder feedback, traditional methods cannot be used to correctly adjust for those confounders."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "In contrast, g-methods appropriately adjust for the time-varying confounders even in the presence of treatment-confounder feedback."
+    }
+   ]
+  },
+  {
+   "id": "g107",
+   "refs": [
+    30
+   ],
+   "evidence": [
+    {
+     "ref": 30,
+     "file": "dag_Yates_2025_immortal_time.norm.txt",
+     "quote": "It occurs when people receive the intervention because they survive, rather than survive because they received the intervention."
+    }
+   ]
+  },
+  {
+   "id": "g109",
+   "refs": [
+    30
+   ],
+   "evidence": [
+    {
+     "ref": 30,
+     "file": "dag_Yates_2025_immortal_time.norm.txt",
+     "quote": "The 2 best approaches to avoiding misassignment of person-time are analyzing the intervention as a time-varying exposure and designing the study so that follow-up time in treated and untreated individuals is aligned."
+    }
+   ]
+  },
+  {
+   "id": "g11",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The presence of an arrow pointing from a particular variable V to another variable W indicates that we know there is a direct causal effect (i.e., an effect not mediated through any other variables on the graph) for at least one individual."
+    }
+   ]
+  },
+  {
+   "id": "g110",
+   "refs": [
+    31
+   ],
+   "evidence": [
+    {
+     "ref": 31,
+     "file": "dag_Tsuruda_2025_immortal_lung.norm.txt",
+     "quote": "Because patients were selected for this cohort study based on having survived long enough to receive their first systemic treatment"
+    },
+    {
+     "ref": 31,
+     "file": "dag_Tsuruda_2025_immortal_lung.norm.txt",
+     "quote": "the difference in median survival between the treatment groups is 5.6 months"
+    },
+    {
+     "ref": 31,
+     "file": "dag_Tsuruda_2025_immortal_lung.norm.txt",
+     "quote": "is reduced by 40%, to 3.4 months"
+    }
+   ]
+  },
+  {
+   "id": "g113",
+   "refs": [
+    5
+   ],
+   "evidence": [
+    {
+     "ref": 5,
+     "file": "Hernan_2016a.norm.txt",
+     "quote": "Eligibility criteria need to be met at that point but not later; study outcomes begin to be counted after that point but not earlier."
+    },
+    {
+     "ref": 5,
+     "file": "Hernan_2016a.norm.txt",
+     "quote": "time zero to be the time when an eligible individual initiates a treatment strategy"
+    }
+   ]
+  },
+  {
+   "id": "g114",
+   "refs": [
+    5
+   ],
+   "evidence": [
+    {
+     "ref": 5,
+     "file": "Hernan_2016a.norm.txt",
+     "quote": "Starting after randomization could result in selection bias because all outcome cases between"
+    }
+   ]
+  },
+  {
+   "id": "g115",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "We say that there is measurement bias when the association between treatment and outcome is weakened or strengthened as a result of the process by which the study data are measured."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The true treatment A affects both the outcome Y and the measured treatment A∗. The causal diagram also includes the node UA to represent all factors other than A that determine the value of A∗."
+    }
+   ]
+  },
+  {
+   "id": "g119",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Mismeasurement of confounders may result in bias even if both treatment and outcome are perfectly measured."
+    }
+   ]
+  },
+  {
+   "id": "g12",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "because there are no cycles: a variable cannot cause itself, either directly or through another variable."
+    }
+   ]
+  },
+  {
+   "id": "g120",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Doctors and patients, however, do not make their treatment decisions based on the true blood pressure L but based on the blood pressure measurement L∗ that was recorded in the doctor’s office."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Either variable is sufficient to adjust for confounding."
+    }
+   ]
+  },
+  {
+   "id": "g122",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Causal diagrams do not encode quantitative information, and therefore they cannot be used to describe the magnitude of the bias."
+    }
+   ]
+  },
+  {
+   "id": "g123",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "the diagram does not encode how the two causes interact."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "valid causal graphs such as Figure 6.12 fail to distinguish between the above three different qualitative types of effect modification by V ."
+    }
+   ]
+  },
+  {
+   "id": "g125",
+   "refs": [
+    18
+   ],
+   "evidence": [
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "A further limitation is the inability of DAGs to depict random, as opposed to systematic, error."
+    }
+   ]
+  },
+  {
+   "id": "g126",
+   "refs": [
+    18
+   ],
+   "evidence": [
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "a DAG can only be as good as the background information used to create it"
+    }
+   ]
+  },
+  {
+   "id": "g127",
+   "refs": [
+    20
+   ],
+   "evidence": [
+    {
+     "ref": 20,
+     "file": "dag_Digitale_2022_tutorial.norm.txt",
+     "quote": "Finally, DAGs are not an analysis approach and do not replace the need for numerous statistical modeling decisions"
+    }
+   ]
+  },
+  {
+   "id": "g128",
+   "refs": [
+    20
+   ],
+   "evidence": [
+    {
+     "ref": 20,
+     "file": "dag_Digitale_2022_tutorial.norm.txt",
+     "quote": "it is useful to assess whether results differ meaningfully across analyses guided by different DAGs and be honest about our uncertainty."
+    }
+   ]
+  },
+  {
+   "id": "g129",
+   "refs": [
+    16
+   ],
+   "evidence": [
+    {
+     "ref": 16,
+     "file": "dag_Shrier_2008_reducing_bias.norm.txt",
+     "quote": "Under these conditions, it is necessary to draw each of the possible DAGs and determine if the same choice of covariates yields an unbiased estimate for each."
+    }
+   ]
+  },
+  {
+   "id": "g13",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "A path is a collection of one or more arcs that connects two nodes. Paths may be either open or closed; open paths transmit statistical associations, closed paths do not."
+    }
+   ]
+  },
+  {
+   "id": "g130",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "In causal diagrams, nodes for treatment variables need to correspond to sufficiently well-defined interventions."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "It may be okay to draw a causal diagram that includes a node for “obesity” as the outcome Y or even as a covariate L"
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "it is generally not okay to draw a causal dia- gram that includes a node for"
+    }
+   ]
+  },
+  {
+   "id": "g131",
+   "refs": [
+    20
+   ],
+   "evidence": [
+    {
+     "ref": 20,
+     "file": "dag_Digitale_2022_tutorial.norm.txt",
+     "quote": "We consider drawing DAGs the first step when conceiving research questions and believe a DAG is often the appropriate Figure 1 in research proposals and papers."
+    }
+   ]
+  },
+  {
+   "id": "g132",
+   "refs": [
+    16
+   ],
+   "evidence": [
+    {
+     "ref": 16,
+     "file": "dag_Shrier_2008_reducing_bias.norm.txt",
+     "quote": "generating a causal DAG necessarily requires the collaboration of methodological experts, clinicians, physiologists, and others"
+    }
+   ]
+  },
+  {
+   "id": "g133",
+   "refs": [
+    32
+   ],
+   "evidence": [
+    {
+     "ref": 32,
+     "file": "dag_Textor_2016_dagitty.norm.txt",
+     "quote": "tools for drawing DAGs and automated algorithms capable of rapidly specifying all minimal sufficient adjustment sets."
+    },
+    {
+     "ref": 32,
+     "file": "dag_Textor_2016_dagitty.norm.txt",
+     "quote": "evaluate whether a DAG is consistent with the dataset it is intended to represent"
+    }
+   ]
+  },
+  {
+   "id": "g134",
+   "refs": [
+    32
+   ],
+   "evidence": [
+    {
+     "ref": 32,
+     "file": "dag_Textor_2016_dagitty.norm.txt",
+     "quote": "formal statistical evaluation of DAG-dataset consistency is a potentially powerful tool for identifying many of the errors in the way a DAG has been specified"
+    }
+   ]
+  },
+  {
+   "id": "g135",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "all estimands of interest should be clearly stated in the study aims or at the beginning of the article’s methods section"
+    }
+   ]
+  },
+  {
+   "id": "g136",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "The DAG used to inform the model for estimating every causal effect estimate should therefore be available to all potential readers."
+    }
+   ]
+  },
+  {
+   "id": "g137",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "The DAG for a specific focal relationship should include all plausible confounding variables (i.e. that may plausibly cause both the exposure and the outcome), regardless of whether direct measurements are available or possible."
+    }
+   ]
+  },
+  {
+   "id": "g138",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "easier to interpret when the constituent variables are arranged spatially in a way that clearly reflects the passage of time"
+    }
+   ]
+  },
+  {
+   "id": "g139",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "Omitted arcs should therefore be carefully considered and ideally justified with theory and/or evidence."
+    }
+   ]
+  },
+  {
+   "id": "g14",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "A causal path is one where all constituent arcs flow in the same direction from one node to another."
+    }
+   ]
+  },
+  {
+   "id": "g140",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "The DAG-implied adjustment set(s) for every estimand of interest should be stated explicitly, including variables for which measurements are not available for conditioning."
+    }
+   ]
+  },
+  {
+   "id": "g141",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "The estimate(s) obtained from using the unmodified DAG-implied adjustment set(s) should be reported, even if not considered or interpreted as central to the study findings."
+    }
+   ]
+  },
+  {
+   "id": "g142",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "If alternative adjustment set(s) are used, they should be clearly described and justified, and the ensuing estimates should be reported separately to those reported using the DAG-implied adjustment set."
+    }
+   ]
+  },
+  {
+   "id": "g143",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "Where possible, bias analyses should be performed to quantify the impact of unobserved confounders and obtain more accurate causal effect estimates."
+    }
+   ]
+  },
+  {
+   "id": "g144",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "A total of 234 articles were identified that reported using DAGs. A fifth ( n  = 48, 21%) reported their target estimand(s) and half ( n  = 115, 48%) reported the adjustment set(s) implied by their DAG(s)."
+    },
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "62%) made at least one DAG available."
+    }
+   ]
+  },
+  {
+   "id": "g145",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "No articles reported attempting to evaluate the compatibility of their DAG(s) with their data."
+    }
+   ]
+  },
+  {
+   "id": "g147",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "Prediction models are fundamentally different than those used for causal inference"
+    }
+   ]
+  },
+  {
+   "id": "g148",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "The DAG-implied adjustment set(s) for every estimand of interest should be stated explicitly"
+    }
+   ]
+  },
+  {
+   "id": "g149",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "will be confounded if the drug is more likely to be prescribed to individuals with certain condition L (say, heart disease) that is both an indication for treatment and a risk factor for the disease."
+    }
+   ]
+  },
+  {
+   "id": "g15",
+   "refs": [
+    1,
+    18
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "That is, the path has an arrow pointing into treatment."
+    },
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "including an arrow entering rather than emanating from the exposure"
+    }
+   ]
+  },
+  {
+   "id": "g150",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "P-value-based and model-based variable selection methods (including forward, backward, and stepwise selection) should not be used for causal inference."
+    }
+   ]
+  },
+  {
+   "id": "g151",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The A-Y association adjusted for the mediator L, or its descendants, will differ from the effect of treatment A on the outcome Y because the adjustment blocks the component of the effect that goes through L."
+    }
+   ]
+  },
+  {
+   "id": "g152",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "We will use the term selection bias to refer to all biases that arise from conditioning on a common effect of two variables, one of which is either the treatment or a cause of treatment, and the other is either the outcome or a cause of the outcome."
+    }
+   ]
+  },
+  {
+   "id": "g153",
+   "refs": [
+    5,
+    30
+   ],
+   "evidence": [
+    {
+     "ref": 30,
+     "file": "dag_Yates_2025_immortal_time.norm.txt",
+     "quote": "It occurs when people receive the intervention because they survive, rather than survive because they received the intervention."
+    },
+    {
+     "ref": 5,
+     "file": "Hernan_2016a.norm.txt",
+     "quote": "Eligibility criteria need to be met at that point but not later; study outcomes begin to be counted after that point but not earlier."
+    }
+   ]
+  },
+  {
+   "id": "g154",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "The observed associations between these covariates and the outcome have not been subject to the same approach to control of confounding as the exposure."
+    }
+   ]
+  },
+  {
+   "id": "g155",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "Where possible, bias analyses should be performed to quantify the impact of unobserved confounders"
+    }
+   ]
+  },
+  {
+   "id": "g157",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "A set of covariates L satisfies the backdoor criterion if all backdoor paths between A and Y are blocked by conditioning on L and L contains no variables that are descendants of"
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The A-Y association adjusted for the mediator L, or its descendants, will differ from the effect of treatment A on the outcome Y"
+    }
+   ]
+  },
+  {
+   "id": "g16",
+   "refs": [
+    16
+   ],
+   "evidence": [
+    {
+     "ref": 16,
+     "file": "dag_Shrier_2008_reducing_bias.norm.txt",
+     "quote": "Ancestor : An ancestor is a direct cause (i.e. parent) or indirect cause (e.g. grandparent) of a particular variable."
+    },
+    {
+     "ref": 16,
+     "file": "dag_Shrier_2008_reducing_bias.norm.txt",
+     "quote": "Descendant : A descendant is a direct effect (i.e. child) or indirect effect (e.g. grandchild) of a particular variable."
+    }
+   ]
+  },
+  {
+   "id": "g17",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "a confounder is a common cause of both the exposure and the outcome, a mediator is caused by the exposure and in turn causes the outcome (i.e. falls on a causal path between the exposure and outcome), and a competing exposure is a cause of the outcome that is neither caused by nor causes the exposure."
+    }
+   ]
+  },
+  {
+   "id": "g179",
+   "refs": [
+    26
+   ],
+   "evidence": [
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "Figure 2c illustrates how this so-called"
+    },
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "index event bias” is a special case of collider bias"
+    },
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "However, once we condition on being infected, all factors for infection become correlated with each other."
+    },
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "ACE-i/ARB use may be protective against severe symptoms, conditional on already being infected"
+    },
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "which is consistent with index event bias"
+    }
+   ]
+  },
+  {
+   "id": "g18",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The common effect L is referred to as a collider on the path A → L ← Y because two arrowheads collide on this node."
+    }
+   ]
+  },
+  {
+   "id": "g181",
+   "refs": [
+    30
+   ],
+   "evidence": [
+    {
+     "ref": 30,
+     "file": "dag_Yates_2025_immortal_time.norm.txt",
+     "quote": "While excluding early deaths in the untreated might be expected to attenuate ITB, it comes at the cost of creating groups that are not directly comparable"
+    }
+   ]
+  },
+  {
+   "id": "g19",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "A sufficient adjustment set for a particular estimand is any set of variables that, if fully conditioned on, will provide an unbiased estimate for that estimand by closing all paths that are not causal and leaving all causal paths open."
+    }
+   ]
+  },
+  {
+   "id": "g20",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "Omitting an arc between two variables implies that there is precisely no causal effect of one on the other. This is a much stronger statistical assumption than is implied when an arc is included, which allows a causal effect of any sign, magnitude or parametric form (including a very small effect)."
+    }
+   ]
+  },
+  {
+   "id": "g22",
+   "refs": [
+    1,
+    19
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "implies that in a causal DAG the common causes of any pair of variables in the graph must be also in the graph."
+    },
+    {
+     "ref": 19,
+     "file": "dag_Cole_2010_collider.norm.txt",
+     "quote": "For a diagram to represent a causal system, all common causes of any pair of variables included on the diagram must also be included on the diagram."
+    }
+   ]
+  },
+  {
+   "id": "g23",
+   "refs": [
+    20
+   ],
+   "evidence": [
+    {
+     "ref": 20,
+     "file": "dag_Digitale_2022_tutorial.norm.txt",
+     "quote": "Even if a variable was not measured in the available data (or cannot be measured in most practical settings), it should nonetheless be represented in the DAG."
+    }
+   ]
+  },
+  {
+   "id": "g24",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "An arc between two nodes denotes the assumed existence and direction of a causal relationship, but it does not specify the sign (i.e. positive or negative), magnitude (i.e. large or small), shape (e.g. linear or non-linear) or form of that relationship"
+    }
+   ]
+  },
+  {
+   "id": "g25",
+   "refs": [
+    16
+   ],
+   "evidence": [
+    {
+     "ref": 16,
+     "file": "dag_Shrier_2008_reducing_bias.norm.txt",
+     "quote": "the same construct measured at different times represents distinct variables and must be treated as such."
+    }
+   ]
+  },
+  {
+   "id": "g26",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "aspirin A affects the risk of heart disease Y because it reduces platelet aggregation B."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "we say that a box placed around variable B blocks the flow of association through the path A → B → Y ."
+    }
+   ]
+  },
+  {
+   "id": "g27",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "having information about the treatment A improves our ability to predict the outcome Y , even though A does not have a causal effect"
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "the path A ← L → Y is blocked by the box around L."
+    }
+   ]
+  },
+  {
+   "id": "g28",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "colliders, unlike other variables, block the flow of association along the path on which they lie."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "conditioning on a collider like L opens the path A → L ← Y , which was blocked when the collider was not conditioned on."
+    }
+   ]
+  },
+  {
+   "id": "g29",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "A collider that has a descendant that has been conditioned on does not block a path."
+    }
+   ]
+  },
+  {
+   "id": "g32",
+   "refs": [
+    16
+   ],
+   "evidence": [
+    {
+     "ref": 16,
+     "file": "dag_Shrier_2008_reducing_bias.norm.txt",
+     "quote": "both a thrombus and a haemorrhage can cause a stroke. If we condition on the patient having symptoms of a stroke and learn that there was no haemorrhage, the probability that a thrombotic event occurred is increased."
+    }
+   ]
+  },
+  {
+   "id": "g33",
+   "refs": [
+    19
+   ],
+   "evidence": [
+    {
+     "ref": 19,
+     "file": "dag_Cole_2010_collider.norm.txt",
+     "quote": "yielding a risk difference of 0.9."
+    },
+    {
+     "ref": 19,
+     "file": "dag_Cole_2010_collider.norm.txt",
+     "quote": "Recall that sandwich type was randomly assigned. This association was not present before we knew about (and conditioned on) your fever status."
+    }
+   ]
+  },
+  {
+   "id": "g34",
+   "refs": [
+    19
+   ],
+   "evidence": [
+    {
+     "ref": 19,
+     "file": "dag_Cole_2010_collider.norm.txt",
+     "quote": "is called a ‘collider’ on the ‘path’ I–F–S; but may not be a collider on other paths (if they existed)."
+    }
+   ]
+  },
+  {
+   "id": "g35",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "A path is blocked if and only if it contains a non-collider that has been conditioned on, or it contains a collider that has not been conditioned on and has no descendants that have been conditioned on."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Two variables are d-separated if all paths between them are blocked (otherwise they are d-connected)."
+    }
+   ]
+  },
+  {
+   "id": "g36",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "one causes the other, they share common causes, or they share a common effect and the analysis is restricted to certain level of that common effect (or of its descendants)."
+    }
+   ]
+  },
+  {
+   "id": "g37",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "results in chance associations that become smaller when the size of the study population increases."
+    }
+   ]
+  },
+  {
+   "id": "g38",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The structure of confounding, the bias due to common causes of treatment and outcome, can be represented by using causal diagrams."
+    }
+   ]
+  },
+  {
+   "id": "g39",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "A set of covariates L satisfies the backdoor criterion if all backdoor paths between A and Y are blocked by conditioning on L and L contains no variables that are descendants of"
+    }
+   ]
+  },
+  {
+   "id": "g41",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "When more than one variable lies along a back-door path, control of a single confounder on the path is sufficient to close the back-door path."
+    },
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "In a fully developed DAG with many paths, control of a small number of variables"
+    },
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "will often close all back-door paths."
+    },
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "DAGitty.net offers authors a simple interface with which to construct DAGs and identify back-door paths"
+    }
+   ]
+  },
+  {
+   "id": "g42",
+   "refs": [
+    20
+   ],
+   "evidence": [
+    {
+     "ref": 20,
+     "file": "dag_Digitale_2022_tutorial.norm.txt",
+     "quote": "use of DAGs can help investigators recognize multiple alternative variable sets that would be sufficient to estimate the causal effect of interest; some sets of variables may be preferable for reasons such as ease or quality of measurement."
+    }
+   ]
+  },
+  {
+   "id": "g43",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "In Figures 7.2 and 7.3, L is not a common cause of A and Y , yet we still say that L is a confounder because it is needed to block the open backdoor path attributable to the unmeasured common cause U of A and Y ."
+    }
+   ]
+  },
+  {
+   "id": "g44",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "will be confounded if the drug is more likely to be prescribed to individuals with certain condition L (say, heart disease) that is both an indication for treatment and a risk factor for the disease."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "This bias is known as confounding by indication or channeling"
+    }
+   ]
+  },
+  {
+   "id": "g46",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The backdoor criterion does not answer questions regarding the magnitude or direction of confounding."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Educated guesses can be organized by conducting sensitivity analyses (i.e., repeating the analyses under several assumptions regarding the magnitude of the bias)"
+    }
+   ]
+  },
+  {
+   "id": "g48",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "A large confounding bias requires a strong confounder-treatment association and a strong confounder-outcome association (conditional on the treatment)."
+    }
+   ]
+  },
+  {
+   "id": "g49",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Income L is a surrogate for the often ill-defined variable socioeconomic status."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Therefore we will typically prefer to adjust, rather than not to adjust, for L."
+    }
+   ]
+  },
+  {
+   "id": "g52",
+   "refs": [
+    22
+   ],
+   "evidence": [
+    {
+     "ref": 22,
+     "file": "dag_Sakurai_2019_ems_indication.norm.txt",
+     "quote": "In Japanese prehospital protocol patients with confirmed cardiac output on arrival to EMS are often treated with BVM ventilation."
+    },
+    {
+     "ref": 22,
+     "file": "dag_Sakurai_2019_ems_indication.norm.txt",
+     "quote": "The OR for a good neurological outcome with BVM decreased from 3.24 (2.49 to 4.20) to 2.60 (1.97 to 3.44)"
+    }
+   ]
+  },
+  {
+   "id": "g54",
+   "refs": [
+    23
+   ],
+   "evidence": [
+    {
+     "ref": 23,
+     "file": "dag_Tanaka_2024_causal_oncology.norm.txt",
+     "quote": "adjusting for the prognostic factors can block the backdoor path Treatment←Measured prognostic factors→OS"
+    }
+   ]
+  },
+  {
+   "id": "g55",
+   "refs": [
+    23
+   ],
+   "evidence": [
+    {
+     "ref": 23,
+     "file": "dag_Tanaka_2024_causal_oncology.norm.txt",
+     "quote": "This diagram implies that the five most important factors identified by the expert panel are assumed to be the only prognostic factors for OS."
+    }
+   ]
+  },
+  {
+   "id": "g56",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The A-Y association adjusted for the mediator L, or its descendants, will differ from the effect of treatment A on the outcome Y because the adjustment blocks the component of the effect that goes through L."
+    }
+   ]
+  },
+  {
+   "id": "g59",
+   "refs": [
+    23
+   ],
+   "evidence": [
+    {
+     "ref": 23,
+     "file": "dag_Tanaka_2024_causal_oncology.norm.txt",
+     "quote": "the primary focus should be on the total effect on OS, rather than on a path-specific effect, and any adjustment for PFS is not necessary for this estimand"
+    }
+   ]
+  },
+  {
+   "id": "g6",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Causal inference generally requires expert knowledge and untestable assumptions about the causal network linking treatment, outcome, and other variables."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "draw your assumptions before your conclusions."
+    }
+   ]
+  },
+  {
+   "id": "g60",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "We might be tempted to control for sleepiness, since both shift work and obstructive sleep apnea cause sleepiness."
+    },
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "Controlling for sleepiness would open this back-door path, introducing confounding."
+    },
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "and thus report an inverse association. This confounded association results from conditioning on a collider"
+    }
+   ]
+  },
+  {
+   "id": "g62",
+   "refs": [
+    20
+   ],
+   "evidence": [
+    {
+     "ref": 20,
+     "file": "dag_Digitale_2022_tutorial.norm.txt",
+     "quote": "Analyses should not adjust for, stratify on, or in any way condition on descendants of D (e.g., Z)."
+    }
+   ]
+  },
+  {
+   "id": "g63",
+   "refs": [
+    1,
+    23
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "adjustment for the instrument Z can amplify the confounding bias due to U."
+    },
+    {
+     "ref": 23,
+     "file": "dag_Tanaka_2024_causal_oncology.norm.txt",
+     "quote": "additional adjusting for an instrumental variable might paradoxically amplify the degree of bias"
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "does not eliminate confounding because Z is not on"
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "any backdoor path from the treatment A to the outcome Y"
+    }
+   ]
+  },
+  {
+   "id": "g64",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "conditioning on a mediator that is also caused by one or more common causes of the outcome (known as mediator-outcome confounders) is likely to introduce collider bias, since the mediator in this situation is also a collider on the path between the exposure and the outcome."
+    }
+   ]
+  },
+  {
+   "id": "g65",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "suppose A represents physical activity, Y cervical cancer, U1 a pre-cancer lesion, L a diagnostic test (Pap smear) for pre-cancer, and U2 a health-conscious personality"
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "adjustment for L would induce bias because conditioning on the collider L opens the backdoor path between A and Y"
+    }
+   ]
+  },
+  {
+   "id": "g66",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "it is commonly believed that an estimator that adjusts for all available pre-treatment covariates will minimize the bias. However, this belief is wrong for two separate reasons."
+    }
+   ]
+  },
+  {
+   "id": "g67",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The variable L is a post-treatment variable, but it can be used to block the backdoor path between treatment A and outcome Y ."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The take home message is that causal graphs do not care about temporal order."
+    }
+   ]
+  },
+  {
+   "id": "g68",
+   "refs": [
+    1,
+    18
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "whether to adjust for L cannot be determined via any automated procedures that rely exclusively on statistical associations."
+    },
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "Statistical tests reveal only the strength of an association between two variables, not the causal relationship between them"
+    }
+   ]
+  },
+  {
+   "id": "g69",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Under the traditional approach, a confounder was defined as a variable that meets the following three conditions: (1) it is associated with the treatment,"
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "These examples show that associational or statistical criteria are insufficient to characterize confounding."
+    }
+   ]
+  },
+  {
+   "id": "g7",
+   "refs": [
+    15
+   ],
+   "evidence": [
+    {
+     "ref": 15,
+     "file": "dag_Smit_2023_icu_causal.norm.txt",
+     "quote": "Causal inference is not possible based on data only, and incorporation of expert knowledge is key to think about the causal structure between the treatment and outcome of interest."
+    }
+   ]
+  },
+  {
+   "id": "g71",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "P-value-based and model-based variable selection methods (including forward, backward, and stepwise selection) should not be used for causal inference."
+    },
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "Confounders and colliders are treated similarly."
+    }
+   ]
+  },
+  {
+   "id": "g73",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "A total of 42 (18%) studies applied additional statistical criteria or algorithms for covariate selection, including 28 (12%) that used change-in-estimate criteria and 14 (6%) that used P -value criteria."
+    }
+   ]
+  },
+  {
+   "id": "g75",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "This is exemplified by the ‘Table 2 fallacy’, which occurs when the coefficients for two or more ‘risk factors’ in a multivariable regression model are (mistakenly) interpreted as estimates for meaningful causal effects."
+    }
+   ]
+  },
+  {
+   "id": "g77",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "the association between each confounder and the outcome cannot be causally interpreted"
+    }
+   ]
+  },
+  {
+   "id": "g78",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "If the authors have hypotheses about each variable, then a separate model for each variable should be generated using one of the above preferred approaches."
+    }
+   ]
+  },
+  {
+   "id": "g79",
+   "refs": [
+    18
+   ],
+   "evidence": [
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "A variable may be simultaneously a mediator, a collider, or a confounder, can be interpreted differently in separate research questions using the same data, and these will dictate different analytical strategies."
+    },
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "Here the need for mechanical ventilation is a mediator and should not be conditioned on."
+    },
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "antenatal steroids are a confounder in the backdoor path between mechanical ventilation and the outcome, and should be conditioned on."
+    }
+   ]
+  },
+  {
+   "id": "g80",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "We will use the term selection bias to refer to all biases that arise from conditioning on a common effect of two variables, one of which is either the treatment or a cause of treatment, and the other is either the outcome or a cause of the outcome."
+    }
+   ]
+  },
+  {
+   "id": "g81",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Unlike confounding, this type of bias is not due to the presence of common causes of treatment and outcome, and can arise in both randomized experiments and observational studies."
+    }
+   ]
+  },
+  {
+   "id": "g82",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "protects against confounding, but not against selection bias when the selection occurs after the randomization."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "no bias arises in randomized experiments from selection into the study before treatment is assigned."
+    }
+   ]
+  },
+  {
+   "id": "g83",
+   "refs": [
+    16
+   ],
+   "evidence": [
+    {
+     "ref": 16,
+     "file": "dag_Shrier_2008_reducing_bias.norm.txt",
+     "quote": "Berkson's bias (conditioning on admission to hospital), loss to follow-up or missing data (conditioning on presence of data; occurs in both observational or randomized trials)"
+    }
+   ]
+  },
+  {
+   "id": "g84",
+   "refs": [
+    26
+   ],
+   "evidence": [
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "By analysing only hospitalised samples, anything that influences hospitalisation will become negatively associated with COVID-19 infection (in the marginal case of no interactions)."
+    }
+   ]
+  },
+  {
+   "id": "g86",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "The risk ratio of 0 .89 in the uncensored differs from the causal risk ratio of 1 in the entire population: There is selection bias due to conditioning on the common effect C."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "It is also referred to as bias due to informative censoring"
+    }
+   ]
+  },
+  {
+   "id": "g87",
+   "refs": [
+    23
+   ],
+   "evidence": [
+    {
+     "ref": 23,
+     "file": "dag_Tanaka_2024_causal_oncology.norm.txt",
+     "quote": "Unfortunately, censoring is not at random in practice, 14 and it is reasonable to add arrows from some prognostic factors to Censoring in the DAG, anticipating causes of censoring."
+    }
+   ]
+  },
+  {
+   "id": "g89",
+   "refs": [
+    18
+   ],
+   "evidence": [
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "HLA-A2 was not associated with an increased risk of developing ALL, but rather with an increased chance of survival."
+    }
+   ]
+  },
+  {
+   "id": "g90",
+   "refs": [
+    27
+   ],
+   "evidence": [
+    {
+     "ref": 27,
+     "file": "dag_Yasuda_2025_alcohol_collider.norm.txt",
+     "quote": "By making hospitalization with TBI ( W ) a necessary condition for inclusion in the study, W acts as a collider and can inadvertently open non-causal paths between X and Y ."
+    },
+    {
+     "ref": 27,
+     "file": "dag_Yasuda_2025_alcohol_collider.norm.txt",
+     "quote": "alcohol use may appear spuriously associated with improved in-hospital survival, even if no true protective effect or causal relationship exists."
+    }
+   ]
+  },
+  {
+   "id": "g93",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "Treated survivors of time 1 are less likely than untreated survivors of time 1 to have the protective haplotype U (because treatment can explain their survival)"
+    }
+   ]
+  },
+  {
+   "id": "g94",
+   "refs": [
+    29
+   ],
+   "evidence": [
+    {
+     "ref": 29,
+     "file": "dag_Robinson_2014_obesity_paradox.norm.txt",
+     "quote": "Selection bias could occur if heavier, sicker patients die faster, before they can be included in studies."
+    },
+    {
+     "ref": 29,
+     "file": "dag_Robinson_2014_obesity_paradox.norm.txt",
+     "quote": "then obesity will appear inversely associated with mortality among patients"
+    }
+   ]
+  },
+  {
+   "id": "g96",
+   "refs": [
+    28
+   ],
+   "evidence": [
+    {
+     "ref": 28,
+     "file": "dag_Hernan_2023_selection_collider.norm.txt",
+     "quote": "This form of selection bias largely explains, for example, the association reported between postmenopausal hormone treatment and coronary heart disease, 8 the birth weight paradox, 9 and the obesity paradox."
+    }
+   ]
+  },
+  {
+   "id": "g97",
+   "refs": [
+    25
+   ],
+   "evidence": [
+    {
+     "ref": 25,
+     "file": "dag_Stocks_2025_prostate_obesity.norm.txt",
+     "quote": "the restriction to cases only (i.e., collider stratification) creates a spurious association between E and U"
+    }
+   ]
+  },
+  {
+   "id": "g98",
+   "refs": [
+    25
+   ],
+   "evidence": [
+    {
+     "ref": 25,
+     "file": "dag_Stocks_2025_prostate_obesity.norm.txt",
+     "quote": "For localized PCa, men with obesity have a decreased risk of diagnosis, but worse survival, which can be seen as an"
+    },
+    {
+     "ref": 25,
+     "file": "dag_Stocks_2025_prostate_obesity.norm.txt",
+     "quote": "Across a broad range of plausible parameter values for the PCa context, collider bias did not distort the OR of BMI on PCa death by more than 4%"
+    },
+    {
+     "ref": 25,
+     "file": "dag_Stocks_2025_prostate_obesity.norm.txt",
+     "quote": "Collider bias alone is unlikely to explain the inverse obesity paradox in (localized) PCa"
+    }
+   ]
+  },
+  {
+   "id": "g99",
+   "refs": [
+    26
+   ],
+   "evidence": [
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "The magnitude of this distortion can be large, inducing associations that do not exist in the general population or attenuating, inflating or reversing the sign of existing associations"
+    }
+   ]
+  },
+  {
+   "id": "p-dml",
+   "refs": [
+    6
+   ],
+   "evidence": [
+    {
+     "ref": 6,
+     "file": "Chernozhukov_2018.norm.txt",
+     "quote": "(1) using Neyman-orthogonal moments/scores that have reduced sensitivity with respect to nuisance parameters to estimate θ0, and (2) making use of cross-fitting which provides an efficient form of data-splitting."
+    },
+    {
+     "ref": 6,
+     "file": "Chernozhukov_2018.norm.txt",
+     "quote": "We call this sample splitting procedure where we swap the roles of main and auxiliary samples to obtain multiple estimates and then average the results cross-fitting."
+    },
+    {
+     "ref": 6,
+     "file": "Chernozhukov_2018.norm.txt",
+     "quote": "Without sample splitting, terms such as (1.6) may not vanish and can lead to poor performance of estimators of θ0."
+    }
+   ]
+  },
+  {
+   "id": "p-honest",
+   "refs": [
+    7
+   ],
+   "evidence": [
+    {
+     "ref": 7,
+     "file": "Wager_2018.norm.txt",
+     "quote": "An example of an honest tree is one where the tree is grown using one subsample, while the predictions at the leaves of the tree are estimated using a different"
+    }
+   ]
+  },
+  {
+   "id": "p-kapoor",
+   "refs": [
+    41
+   ],
+   "evidence": [
+    {
+     "ref": 41,
+     "file": "Kapoor_2023.norm.txt",
+     "quote": "Using the entire dataset for any pre-processing steps, such as imputation or over/under sampling, results in leakage."
+    },
+    {
+     "ref": 41,
+     "file": "Kapoor_2023.norm.txt",
+     "quote": "leakage usually leads to inflated estimates of model performance."
+    }
+   ]
+  },
+  {
+   "id": "p-morris",
+   "refs": [
+    43
+   ],
+   "evidence": [
+    {
+     "ref": 43,
+     "file": "Morris_2019.norm.txt",
+     "quote": "A key strength of simulation studies is the ability to understand the behavior of statistical methods because some “truth” (usually some parameter/s of interest) is known from the process of generating the data."
+    },
+    {
+     "ref": 43,
+     "file": "Morris_2019.norm.txt",
+     "quote": "Bias is frequently of central interest, and quantifies whether a method targets θ on average."
+    },
+    {
+     "ref": 43,
+     "file": "Morris_2019.norm.txt",
+     "quote": "to have chosen a data‐generating mechanism that happened to exhibit this property when performance would have been poor for other choices of data‐generating mechanism."
+    },
+    {
+     "ref": 43,
+     "file": "Morris_2019.norm.txt",
+     "quote": "it may be useful to have unrealistically extreme data‐generating mechanisms to understand when and how each method fails."
+    }
+   ]
+  },
+  {
+   "id": "p-pacific",
+   "refs": [
+    24
+   ],
+   "evidence": [
+    {
+     "ref": 24,
+     "file": "Spigel_2022.norm.txt",
+     "quote": "The phase III PACIFIC trial compared durvalumab with placebo in patients with unresectable, stage III non–small-cell lung cancer and no disease progression after concurrent chemoradiotherapy."
+    },
+    {
+     "ref": 24,
+     "file": "Spigel_2022.norm.txt",
+     "quote": "without disease progression were randomly assigned 1-42 days after CRT. Patients with unresolved grade > 2 toxicities"
+    },
+    {
+     "ref": 24,
+     "file": "Spigel_2022.norm.txt",
+     "quote": "or grade ≥ 2 pneumonitis and/or radiation pneumonitis from prior CRT were excluded"
+    }
+   ]
+  },
+  {
+   "id": "p-pearl1",
+   "refs": [
+    9
+   ],
+   "evidence": [
+    {
+     "ref": 9,
+     "file": "Pearl_2019_r481.norm.txt",
+     "quote": "The classification forms a 3-level hierarchy in the sense that questions at level i (i = 1, 2, 3) can only be answered if"
+    },
+    {
+     "ref": 9,
+     "file": "Pearl_2019_r481.norm.txt",
+     "quote": "Questions at level i can only be answered if information from level i or higher is available."
+    }
+   ]
+  },
+  {
+   "id": "p-pearl2",
+   "refs": [
+    9
+   ],
+   "evidence": [
+    {
+     "ref": 9,
+     "file": "Pearl_2019_r481.norm.txt",
+     "quote": "The second level, Intervention, ranks higher than Association because it involves not just seeing what is, but changing what we see."
+    },
+    {
+     "ref": 9,
+     "file": "Pearl_2019_r481.norm.txt",
+     "quote": "A typical question in the counterfactual category is “What if I had acted differently, ” thus necessitating retrospective reasoning."
+    }
+   ]
+  },
+  {
+   "id": "p-pearl3",
+   "refs": [
+    9
+   ],
+   "evidence": [
+    {
+     "ref": 9,
+     "file": "Pearl_2019_r481.norm.txt",
+     "quote": "Interventional questions cannot be answered from purely observational information (i.e., from statistical data alone)."
+    },
+    {
+     "ref": 9,
+     "file": "Pearl_2019_r481.norm.txt",
+     "quote": "Such expressions can be estimated experimentally from ran- domized trials or analytically using Causal Bayesian Networks"
+    }
+   ]
+  },
+  {
+   "id": "p-pearl4",
+   "refs": [
+    9
+   ],
+   "evidence": [
+    {
+     "ref": 9,
+     "file": "Pearl_2019_r481.norm.txt",
+     "quote": "we cannot re-run an experiment on subjects who were treated with a drug and see how they behave had they not been given the drug."
+    },
+    {
+     "ref": 9,
+     "file": "Pearl_2019_r481.norm.txt",
+     "quote": "Answering these questions is the hallmark of current machine learning methods."
+    }
+   ]
+  },
+  {
+   "id": "p-sterne",
+   "refs": [
+    40
+   ],
+   "evidence": [
+    {
+     "ref": 40,
+     "file": "Sterne_2009.norm.txt",
+     "quote": "In this case, the outcome carries information about the missing values of the predictors and this information must be used."
+    },
+    {
+     "ref": 40,
+     "file": "Sterne_2009.norm.txt",
+     "quote": "Failure to include the coronary heart disease outcome and time to this outcome when imputing the missing systolic blood pressure values would falsely weaken the association between systolic blood pressure and coronary heart disease."
+    },
+    {
+     "ref": 40,
+     "file": "Sterne_2009.norm.txt",
+     "quote": "It is sensible to include a wide range of variables in imputation models, including all variables in the substantive analysis"
+    }
+   ]
+  },
+  {
+   "id": "p-sterne2",
+   "refs": [
+    40
+   ],
+   "evidence": [
+    {
+     "ref": 40,
+     "file": "Sterne_2009.norm.txt",
+     "quote": "Standard errors are calculated using Rubin’s rules, 16 which take account of the variability in results between the imputed datasets, reflecting the uncertainty associated with the missing values."
+    },
+    {
+     "ref": 40,
+     "file": "Sterne_2009.norm.txt",
+     "quote": "Unfortunately, it is not possible to distinguish between missing at random and missing not at random using observed data. Therefore, biases caused by data that are missing not at random can be addressed only by sensitivity analyses examining the effect of different assumptions about the missing data mechanism."
+    }
+   ]
+  },
+  {
+   "id": "p-wood",
+   "refs": [
+    42
+   ],
+   "evidence": [
+    {
+     "ref": 42,
+     "file": "Wood_2015.norm.txt",
+     "quote": "We distinguish between ideal model performance and pragmatic model performance , where the former refers to the model's performance in an ideal clinical setting where all individuals have fully observed predictors"
+    },
+    {
+     "ref": 42,
+     "file": "Wood_2015.norm.txt",
+     "quote": "we propose constructing predictions either from a second set of covariate imputations which make no use of observed outcomes"
+    },
+    {
+     "ref": 42,
+     "file": "Wood_2015.norm.txt",
+     "quote": "especially since it requires knowledge about the outcome (which of course is not yet available)"
+    }
+   ]
+  },
+  {
+   "id": "p-grace",
+   "refs": [
+    5
+   ],
+   "evidence": [
+    {
+     "ref": 5,
+     "file": "Hernan_2016a.norm.txt",
+     "quote": "In emulating a target trial that includes grace periods using observational data, we must allow for an analogous grace period measured from time zero."
+    }
+   ]
+  }
+ ]
+}

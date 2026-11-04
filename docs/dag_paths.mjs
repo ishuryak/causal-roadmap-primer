@@ -78,9 +78,14 @@ export function isOpen(dag, path, adjusted) {
   return true;
 }
 
-// Rejects inputs the rules do not cover: a cycle, treatment equal to outcome,
-// or the treatment or outcome in the adjustment set.
+// Rejects inputs the rules do not cover: a malformed edge, an unknown node, a
+// cycle, treatment equal to outcome, or the treatment or outcome in the
+// adjustment set. Nodes are the edge endpoints plus any keys of dag.nodes.
 function validate(dag, adjusted, A, Y) {
+  if (!Array.isArray(dag.edges) || !dag.edges.every((e) => Array.isArray(e) && e.length === 2 && e.every((v) => typeof v === "string" && v)))
+    throw new Error("every edge must be a pair of node names");
+  const known = new Set([...dag.edges.flat(), ...Object.keys(dag.nodes || {})]);
+  for (const v of [A, Y, ...adjusted]) if (!known.has(v)) throw new Error(`unknown node: ${v}`);
   if (A === Y) throw new Error("treatment and outcome must differ");
   if (adjusted.includes(A) || adjusted.includes(Y)) throw new Error("the treatment and outcome cannot be adjusted for");
   for (const v of new Set(dag.edges.flat())) if (descendants(dag, v).has(v)) throw new Error(`the graph has a cycle through ${v}`);
@@ -106,7 +111,12 @@ export function assess(dag, adjusted, A = "A", Y = "Y") {
 
 // Minimal adjustment sets drawn from `candidates` that satisfy the backdoor
 // criterion: no proper subset also satisfies it. Minimal sets can differ in size.
+// The search tries every subset, so it is limited to MAX_CANDIDATES variables;
+// duplicate candidates are dropped first.
+export const MAX_CANDIDATES = 16;
 export function minimalSufficientSets(dag, candidates, A = "A", Y = "Y") {
+  candidates = [...new Set(candidates)];
+  if (candidates.length > MAX_CANDIDATES) throw new Error(`at most ${MAX_CANDIDATES} candidate variables are supported, got ${candidates.length}`);
   const sets = [];
   for (let mask = 0; mask < 1 << candidates.length; mask++) {
     const s = candidates.filter((_, i) => mask & (1 << i));
@@ -144,7 +154,10 @@ const escHtml = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<":
 const listing = (xs) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 const KIND = { causal: "causal path", backdoor: "backdoor path", other: "non-causal path through a collider" };
 
+// The verdict text names the teaching diagram's own variables (toxicity, U,
+// performance status), so this renderer accepts only that diagram.
 export function explanationHtml(dag, adjusted, names = dag.nodes) {
+  if (dag !== TEACHING_DAG) throw new Error("explanationHtml describes the teaching diagram only");
   const e = explain(dag, adjusted, names);
   const out = [];
   if (e.ok) {

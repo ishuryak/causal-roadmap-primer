@@ -489,7 +489,7 @@
    "id": "cr-17",
    "topic": "Modified treatment policy",
    "section": "policies",
-   "stem": "A team asks: \"What if each patient's prescribed total dose were delivered in five fewer fractions, with fraction size raised to match?\" They will check that such shifted courses occur for similar patients. Which framework defines this effect directly?",
+   "stem": "A team asks a hypothetical question: \"What if each patient's prescribed total dose were delivered in five fewer, larger fractions, but only when the shorter course stays within a prespecified allowed range of fraction number and dose per fraction? Otherwise the course stays as prescribed.\" They will check that such shifted courses occur for similar patients. Which framework defines this effect directly?",
    "choices": [
     "A static comparison of everyone receiving the shortest schedule in the data",
     "A Cox model with number of fractions entered as a continuous covariate",
@@ -498,7 +498,7 @@
     "An as-treated analysis comparing short courses with long courses"
    ],
    "answer": 2,
-   "explanation": "A modified treatment policy defines the intervention as a fully specified change to the treatment each patient would otherwise have received, here the same total dose in five fewer, larger fractions, which matches a realistic shift in practice. Checking that such shifted courses occur for similar patients addresses positivity. Because this policy acts once, at the start of treatment, it is a single time point policy, and the longitudinal modified treatment policy (LMTP) framework extends the same idea to decisions made during treatment. Setting everyone to the shortest schedule is tempting, but it is a different and less realistic question, and for many patients that schedule may never occur in the data.",
+   "explanation": "A modified treatment policy defines the intervention as a fully specified change to the treatment each patient would otherwise have received. Here that is five fewer, larger fractions where the shortened course is allowed, and the original course otherwise. The rule and the comparator are set before the analysis. Checking that such shifted courses occur for similar patients addresses positivity. Defining the policy is not the same as identifying its effect, which needs the assumptions of section 5, or as showing that the shorter course is clinically safe. Because this policy acts once, at the start of treatment, it is a single time point policy, and the longitudinal modified treatment policy (LMTP) framework extends the same idea to decisions made during treatment. Setting everyone to the shortest schedule is tempting, but it is a different question, and for many patients that schedule may never occur in the data.",
    "refs": [
     36
    ],
@@ -754,7 +754,7 @@
    "answer": 1,
    "explanation": "Randomization makes the arms exchangeable, so adjustment is not needed to remove confounding, but adjusting for prognostic baseline covariates can improve precision, with minimal impact on bias or type I error, under an analysis suited to the estimand. That is an expected gain, not a promise that every realized interval narrows, and with nonlinear models adjustment can change the effect being estimated. The procedure must be specified before unblinding, and covariates measured after randomization must be avoided because the treatment may affect them. Acute toxicity during treatment is tempting because it predicts survival, but it is a consequence of the assigned schedule. Randomization also does not fix informative loss to follow-up, which needs its own handling.",
    "refs": [
-    43,
+    44,
     2,
     10
    ],
@@ -765,22 +765,22 @@
      "quote": "In randomized experiments the true propensity score is known and is defined by the study design."
     },
     {
-     "ref": 43,
+     "ref": 44,
      "file": "FDA_2023_covariate_adjustment.norm.txt",
      "quote": "this can be done with minimal impact on bias or the Type I error rate. ... The ICH E9 guidance also cautions against adjusting for \"covariates measured after randomization because they could be affected by the treatments.\""
     },
     {
-     "ref": 43,
+     "ref": 44,
      "file": "FDA_2023_covariate_adjustment.norm.txt",
      "quote": "Sponsors should prospectively specify the detailed procedures for executing covariateadjusted analysis before any unblinding of comparative data."
     },
     {
-     "ref": 43,
+     "ref": 44,
      "file": "FDA_2023_covariate_adjustment.norm.txt",
      "quote": "In linear models, adjustment for prognostic baseline covariates often leads to improved precision by reducing residual variance."
     },
     {
-     "ref": 43,
+     "ref": 44,
      "file": "FDA_2023_covariate_adjustment.norm.txt",
      "quote": "inclusion of baseline covariates in a regression model can change the treatment effect that is being estimated"
     },
@@ -806,26 +806,26 @@
    "answer": 3,
    "explanation": "Trials are powered for the average effect, and data-driven effect modeling is vulnerable to overfitting and false discovery of subgroup effects, so these signals generate hypotheses rather than settle them. Overfitting can produce apparent benefit and harm even for an intervention that has no effect at all, so the signals need confirmation in independent data. Randomization protects the comparison between arms, not the search across many subgroups. Heterogeneity can exist under a null average, so the signals are not impossible, only unconfirmed, and the clinically relevant scale for them is the absolute risk difference.",
    "refs": [
-    44
+    45
    ],
    "evidence": [
     {
-     "ref": 44,
+     "ref": 45,
      "file": "Kent_2020.norm.txt",
      "quote": "data-driven effect models are prone to bias due to false or exaggerated interaction effects"
     },
     {
-     "ref": 44,
+     "ref": 45,
      "file": "Kent_2020.norm.txt",
      "quote": "these more flexible approaches are vulnerable to overfitting and to false discovery of promising subgroup effects (or require very large databases well powered for the detection of interaction effects)"
     },
     {
-     "ref": 44,
+     "ref": 45,
      "file": "Kent_2020.norm.txt",
      "quote": "Both approaches can be used to predict differential absolute treatment effects, the most relevant scale for clinical decision-making."
     },
     {
-     "ref": 44,
+     "ref": 45,
      "file": "Kent_2020.norm.txt",
      "quote": "overfitting that can lead to signals of treatment benefit and harm even for interventions that are completely ineffective and innocuous"
     }
@@ -878,7 +878,7 @@
    "explanation": "Existing randomized evidence comes first: the question is whether it generalizes or transports to the target population, which depends on whether the populations differ in factors that modify the effect. The answer is endpoint-specific. CHHiP showed noninferiority for biochemical or clinical failure, not for overall survival, so a question about survival or toxicity in older patients is a related but different question. Methods for generalizability and transportability make those assumptions explicit and can combine trial and observational data. Applying the trial estimate unchanged is tempting, but trial samples are often not representative of the target population.",
    "refs": [
     11,
-    45
+    46
    ],
    "evidence": [
     {
@@ -887,7 +887,7 @@
      "quote": "Hypofractionated radiotherapy using 60 Gy in 20 fractions is non-inferior to conventional fractionation using 74 Gy in 37 fractions"
     },
     {
-     "ref": 45,
+     "ref": 46,
      "file": "Degtiar_2023_arXiv.norm.txt",
      "quote": "Estimates from randomized data may have internal validity but are often not representative of the target population. Observational data may better reflect the target population, and hence be more likely to have external validity"
     },
@@ -913,11 +913,11 @@
    "answer": 1,
    "explanation": "Emulating the trial's eligibility, start of follow-up and intention-to-treat comparison brought the observational estimates close to the trial's, and the remaining discrepancy could be largely explained by different distributions of time since menopause and length of follow-up. Reproducing an existing trial is therefore a strong check on an emulation before it is used where no trial exists. Unmeasured confounding is the tempting answer, but the design changes, not a new confounder, closed most of the gap.",
    "refs": [
-    46
+    47
    ],
    "evidence": [
     {
-     "ref": 46,
+     "ref": 47,
      "file": "Hernan_2008.norm.txt",
      "quote": "Our findings suggest that the discrepancies between the Women's Health Initiative and Nurses' Health Study ITT estimates could be largely explained by differences in the distribution of time since menopause and length of follow-up."
     }
@@ -938,17 +938,17 @@
    "answer": 2,
    "explanation": "In RTOG 0617, median overall survival was 28.7 months with 60 Gy and 20.3 months with 74 Gy, so the higher dose was not better and might be harmful. The earlier comparison set phase 1 and 2 results against a different, earlier trial (RTOG 9410), so patient selection and era could not be separated from the dose. When a randomized trial is feasible, randomization generally gives more certainty that an estimate has a causal interpretation.",
    "refs": [
-    47,
+    48,
     10
    ],
    "evidence": [
     {
-     "ref": 47,
+     "ref": 48,
      "file": "Bradley_2015.norm.txt",
      "quote": "Median overall survival was 28.7 months (95% CI 24.1–36.9) for patients who received standard-dose radiotherapy and 20.3 months (17.7–25.0) for those who received high-dose radiotherapy"
     },
     {
-     "ref": 47,
+     "ref": 48,
      "file": "Bradley_2015.norm.txt",
      "quote": "74 Gy radiation given in 2 Gy fractions with concurrent chemotherapy was not better than 60 Gy plus concurrent chemotherapy for patients with stage III non-small-cell lung cancer, and might be potentially harmful."
     },
@@ -1089,27 +1089,27 @@
    "url": "https://doi.org/10.7326/M16-2607"
   },
   {
-   "n": 43,
+   "n": 44,
    "citation": "US Food and Drug Administration. Adjusting for Covariates in Randomized Clinical Trials for Drugs and Biological Products: Guidance for Industry. Silver Spring, MD: FDA; May 2023.",
    "url": "https://www.fda.gov/media/148910/download"
   },
   {
-   "n": 44,
+   "n": 45,
    "citation": "Kent DM, Paulus JK, van Klaveren D, et al. The Predictive Approaches to Treatment effect Heterogeneity (PATH) Statement. Ann Intern Med. 2020;172(1):35-45.",
    "url": "https://doi.org/10.7326/M18-3667"
   },
   {
-   "n": 45,
+   "n": 46,
    "citation": "Degtiar I, Rose S. A review of generalizability and transportability. Annu Rev Stat Appl. 2023;10:501-524.",
    "url": "https://doi.org/10.1146/annurev-statistics-042522-103837"
   },
   {
-   "n": 46,
+   "n": 47,
    "citation": "Hernán MA, Alonso A, Logan R, et al. Observational studies analyzed like randomized experiments: an application to postmenopausal hormone therapy and coronary heart disease. Epidemiology. 2008;19(6):766-779.",
    "url": "https://doi.org/10.1097/EDE.0b013e3181875e61"
   },
   {
-   "n": 47,
+   "n": 48,
    "citation": "Bradley JD, Paulus R, Komaki R, et al. Standard-dose versus high-dose conformal radiotherapy with concurrent and consolidation carboplatin plus paclitaxel with or without cetuximab for patients with stage IIIA or IIIB non-small-cell lung cancer (RTOG 0617): a randomised, two-by-two factorial phase 3 study. Lancet Oncol. 2015;16(2):187-199.",
    "url": "https://doi.org/10.1016/S1470-2045(14)71207-0"
   }

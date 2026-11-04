@@ -46,6 +46,17 @@ This page is a companion to the [Causal Analysis for Survival Trajectories (CAST
 - `quiz/`: the roadmap self-test and the quiz engine. Edit `quiz/questions_source.json`, then run `node docs/quiz/build_bank.mjs docs/quiz/questions_source.json`.
 - `dag-quiz/`: the causal-diagram self-test, run by the same engine. Edit `dag-quiz/questions_source.json`, then run `node docs/quiz/build_bank.mjs docs/dag-quiz/questions_source.json docs/dag-quiz`.
 
+## Maintaining the page
+
+- **Edit these files directly. They are the source:** `docs/index.html`, `docs/quiz/questions_source.json`, `docs/dag-quiz/questions_source.json`, and the scripts in `docs/`.
+- **Derived files.** Never edit these by hand. Rebuild them:
+  - `docs/quiz/bank.json`: `node docs/quiz/build_bank.mjs docs/quiz/questions_source.json`
+  - `docs/dag-quiz/bank.json`: `node docs/quiz/build_bank.mjs docs/dag-quiz/questions_source.json docs/dag-quiz`
+  - `docs/sim3.json`: `node docs/build_sim3.mjs`, only after editing the simulation code.
+- **Adding a reference.** Give its `<li>` and its citation links any unused number, add the full-text file name to `tools/reference_manifest.json`, then run `python3 tools/renumber_refs.py` and rebuild both banks. The script puts references in first-citation order. In the same pass it updates both question sources, the manifest and `tools/page_claims.json`. `python3 tools/renumber_refs.py --check` only reports.
+- **Checking quotes.** Run `python3 tools/check_evidence.py FILE --sources DIR`. FILE is a question source or `tools/page_claims.json`, and DIR is the private folder of full texts. The full texts are not in this repository because several are under copyright. A quote match shows the quoted words are in the source. It does not show that the sentence around them follows from them, so read every changed passage against the full text.
+- **Retired.** The one-time page generator and DAG-bank converter that built the 2026-11-03 version from templates are retired and refuse to run, because they would overwrite later edits.
+
 Run the tests with Node 20 or later:
 
 ```
@@ -54,6 +65,8 @@ node tests/test_causal_roadmap_numerics.mjs
 node tests/test_causal_roadmap_quiz.mjs
 node tests/test_dag_paths.mjs
 node tests/test_dag_quiz.mjs
+node tests/test_review_2026_11_03.mjs
+python3 tools/renumber_refs.py --check
 ```
 
 The same commands run in GitHub Actions on every push.

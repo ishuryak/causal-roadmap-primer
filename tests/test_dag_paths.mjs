@@ -100,8 +100,10 @@ check("text: a missing confounder gets the confounding verdict naming its path",
 check("text: three open paths are listed as A, B and C", /Age → Survival, Fractionation schedule ← Stage → Survival and Fractionation/.test(html([]).verdict));
 check("text: adjusting for toxicity names the collider path it opens", /opens Fractionation schedule → Acute toxicity ← Unrecorded factor U → Survival, because toxicity is a collider/.test(html(["age", "stage", "ps", "tox"]).verdict));
 check("text: the list is outside the verdict, so the live region stays short", !/<li>/.test(html([]).verdict) && rows([]).length === 6);
-const evil = { nodes: { A: "<b>x</b>", Y: "Y" }, edges: [["A", "Y"]], adjustable: [] };
-check("text: labels are escaped", /&lt;b&gt;x&lt;\/b&gt;/.test(explanationHtml(evil, []).list) && !/<b>/.test(explanationHtml(evil, []).list));
+// The renderer is for the teaching diagram only (review H02), so escaping is
+// tested with hostile display names on that diagram.
+const evilNames = { ...D.nodes, A: "<b>x</b>" };
+check("text: labels are escaped", /&lt;b&gt;x&lt;\/b&gt;/.test(explanationHtml(D, [], evilNames).list) && !/<b>/.test(explanationHtml(D, [], evilNames).list + explanationHtml(D, ["age"], evilNames).verdict));
 
 console.log(`\n${passes} passed, ${fails} failed`);
 process.exit(fails ? 1 : 0);
