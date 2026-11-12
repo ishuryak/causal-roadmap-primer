@@ -1,0 +1,7 @@
+Hand-drawn causal roadmap
+Source: The Tao of RWD, Causal Navigator
+https://navigator.tao-rwd.com/
+Local source: tao-of-rwd/roadmap, public/navigator-map.png
+Copied without alteration at Andy Wilson's explicit request, November 12, 2026.
+This image is separate from the CAST illustrations covered by LICENSE.
+No new license or transfer of ownership is asserted by this copy.

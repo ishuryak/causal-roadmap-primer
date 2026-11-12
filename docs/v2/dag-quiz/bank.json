@@ -1,0 +1,975 @@
+{
+ "title": "Causal Diagram Self-Test",
+ "sections": [
+  [
+   "dag-read",
+   "3a · Reading a causal diagram"
+  ],
+  [
+   "dag-blocks",
+   "3b · Chains, forks and colliders"
+  ],
+  [
+   "dag-confounding",
+   "3c · Confounding and the backdoor criterion"
+  ],
+  [
+   "dag-adjust",
+   "3d · What not to adjust for"
+  ],
+  [
+   "dag-selection",
+   "3e · Selection bias"
+  ],
+  [
+   "dag-time",
+   "3f · Time, treatment and time zero"
+  ],
+  [
+   "dag-limits",
+   "3g · What a diagram cannot do"
+  ],
+  [
+   "dag-report",
+   "3h · Drawing and reporting a diagram"
+  ]
+ ],
+ "questions": [
+  {
+   "id": "dags-01",
+   "topic": "DAG vocabulary",
+   "section": "dag-read",
+   "stem": "A fellow drafting a DAG (directed acyclic graph) for a study of statins and postoperative delirium leaves out an arrow from frailty to delirium because the evidence is weak. What does omitting that arrow assert?",
+   "choices": [
+    "Frailty has a small effect that can safely be ignored",
+    "Frailty and delirium share no common causes at all",
+    "Frailty has no direct effect on delirium in anyone",
+    "The frailty effect is uncertain and still untested",
+    "Frailty modifies the statin effect but causes nothing"
+   ],
+   "answer": 2,
+   "explanation": "Leaving out the arrow from frailty to delirium is the stronger assumption. It says frailty has precisely no direct effect on delirium, given the variables in the diagram. An arrow allows an effect of any sign or size, including a tiny one (Tennant et al.). Frailty could still affect delirium indirectly, through other variables in the diagram. Leaving out the arrow is not a way of saying an effect is small or unproven.",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "Omitting an arc between two variables implies that there is precisely no causal effect of one on the other. This is a much stronger statistical assumption than is implied when an arc is included"
+    }
+   ]
+  },
+  {
+   "id": "dags-02",
+   "topic": "causal vs predictive",
+   "section": "dag-read",
+   "stem": "A team builds a model to flag emergency department patients at high 30-day readmission risk. A prior admission is the strongest predictor. Which statement is correct?",
+   "choices": [
+    "Confounding does not apply, and the predictor need not be causal",
+    "Prior admission must be adjusted for confounders before use",
+    "The model is invalid unless a DAG justifies every predictor",
+    "Cutting admissions would lower readmission, given the weight",
+    "Prior admission is a collider and must be removed from the model"
+   ],
+   "answer": 0,
+   "explanation": "For pure prediction there is no treatment whose effect can be confounded, so confounder selection is not the question (Hernán and Robins, Chapter 18). Their example: prior hospitalization predicts heart failure, but nobody would stop admitting people to prevent it, so the coefficient is not a causal lever.",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "We do not ask the question of whether those covariates are confounders because there is no treatment variable whose effect can be confounded."
+    },
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "a prior hospitalization may be identified as a useful predictor of future heart failure, but nobody would suggest we stop admitting people to the hospital"
+    }
+   ]
+  },
+  {
+   "id": "dags-03",
+   "topic": "DAG vocabulary",
+   "section": "dag-read",
+   "stem": "A resident drafting a DAG for a study of early antibiotics and sepsis mortality includes only variables recorded in the electronic health record. Which requirement for a causal DAG does this risk violating?",
+   "choices": [
+    "Every pair of nodes must be joined by an arrow",
+    "Each arrow must match a significant association",
+    "Only pre-treatment variables may appear on it",
+    "Arrows may be drawn only for large effects",
+    "Every common cause of any two nodes is drawn"
+   ],
+   "answer": 4,
+   "explanation": "For a diagram to represent a causal system, every common cause of any pair of variables on it must also be on it, whether or not it was measured (Hernán and Robins, Section 6.1, and Cole et al.). Restricting the graph to recorded variables can silently drop an unmeasured common cause. Arrows encode assumed causal effects of any size, not statistical significance.",
+   "refs": [
+    1,
+    19
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "implies that in a causal DAG the common causes of any pair of variables in the graph must be also in the graph."
+    },
+    {
+     "ref": 19,
+     "file": "dag_Cole_2010_collider.norm.txt",
+     "quote": "For a diagram to represent a causal system, all common causes of any pair of variables included on the diagram must also be included on the diagram."
+    }
+   ]
+  },
+  {
+   "id": "dags-04",
+   "topic": "three structures",
+   "section": "dag-blocks",
+   "stem": "DAG: Haplotype → Heart disease ← Smoking. Heart disease → Diuretic use. An analysis is restricted to diuretic users. What happens to the path between haplotype and smoking?",
+   "choices": [
+    "It stays blocked, because diuretic use is not itself a collider",
+    "It opens, because diuretic use is a descendant of the collider",
+    "It stays blocked, because restriction is not the same as adjustment",
+    "It opens only if haplotype directly causes smoking",
+    "It closes further, because conditioning removes association"
+   ],
+   "answer": 1,
+   "explanation": "A collider blocks a path unless it, or one of its descendants, is conditioned on (Hernán and Robins, Fine Point 6.1). Restricting to diuretic users conditions on a consequence of heart disease, so haplotype and smoking become associated even though neither causes the other.",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "A collider that has a descendant that has been conditioned on does not block a path."
+    }
+   ]
+  },
+  {
+   "id": "dags-05",
+   "topic": "confounder selection",
+   "section": "dag-adjust",
+   "stem": "An intensive care unit (ICU) study of early tracheostomy and 90-day mortality selects covariates by backward stepwise elimination at p < 0.10. According to the guidance from respiratory, sleep and critical care journal editors, what is the main problem?",
+   "choices": [
+    "The p threshold of 0.10 is too liberal, and 0.05 would make it valid",
+    "Backward elimination is acceptable only when forward selection agrees",
+    "Stepwise selection is valid whenever the final model fits the data well",
+    "It ignores causal structure and treats confounders and colliders alike",
+    "Stepwise methods fail only when there are fewer than 500 patients"
+   ],
+   "answer": 3,
+   "explanation": "The editors state that p-value and model-based selection (forward, backward, stepwise) should not be used for causal inference because it ignores the causal structure and treats confounders and colliders similarly (Lederer et al.). Changing the threshold or improving fit does not fix that.",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "P-value-based and model-based variable selection methods (including forward, backward, and stepwise selection) should not be used for causal inference."
+    },
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "Confounders and colliders are treated similarly."
+    }
+   ]
+  },
+  {
+   "id": "dags-06",
+   "topic": "Table 2 fallacy",
+   "section": "dag-report",
+   "stem": "A lung cancer survival paper fits one multivariable Cox model for radiotherapy dose and reports hazard ratios for dose, smoking, age and comorbidity side by side as independent effects. Why should the covariate hazard ratios not be read causally?",
+   "choices": [
+    "Cox models cannot estimate more than three covariate effects",
+    "All covariates are colliders, so their hazard ratios are reversed",
+    "Only age is biased, because age cannot be changed by intervention",
+    "They lacked the confounding control applied to the dose effect",
+    "They are causal once proportional hazards have been checked"
+   ],
+   "answer": 3,
+   "explanation": "This is the Table 2 fallacy: covariates are in the model to control confounding of the exposure, and their own associations with the outcome have not received the same confounding control (Lederer et al. and Tennant et al.). A separate DAG and model is needed for each exposure of interest.",
+   "refs": [
+    21,
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "The observed associations between these covariates and the outcome have not been subject to the same approach to control of confounding as the exposure."
+    }
+   ]
+  },
+  {
+   "id": "dags-07",
+   "topic": "limits of DAGs",
+   "section": "dag-limits",
+   "stem": "A DAG for a radiotherapy study contains Age → Toxicity and Dose → Toxicity. Which of the following can this standard DAG NOT tell you?",
+   "choices": [
+    "Whether age is a common cause of dose and toxicity",
+    "Whether dose and age interact, and on which scale",
+    "Whether conditioning on toxicity would open a path",
+    "Which variables lie on a backdoor path from dose",
+    "Whether a given variable is a descendant of dose"
+   ],
+   "answer": 1,
+   "explanation": "DAGs are nonparametric: they show which causal relations exist, not their magnitude or functional form, so they cannot show effect-measure modification or its scale (Digitale et al. and Hernán and Robins). Common causes, colliders, backdoor paths and descendants are exactly what a DAG does encode.",
+   "refs": [
+    20,
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 20,
+     "file": "dag_Digitale_2022_tutorial.norm.txt",
+     "quote": "DAGs do not convey information about magnitude or functional form of causal relationships and therefore are not ideal tools to definitively represent effect-measure modification or moderators."
+    }
+   ]
+  },
+  {
+   "id": "dags-08",
+   "topic": "selection bias",
+   "section": "dag-selection",
+   "stem": "In a randomized trial of an anticoagulant for cancer-associated thrombosis, dropout is higher in the active arm (bleeding) and among frailer patients. The analysis is restricted to completers. Which statement is correct?",
+   "choices": [
+    "Randomization does not protect against selection that occurs after it",
+    "Randomization keeps completers exchangeable between the two arms",
+    "Only confounding, never selection bias, can arise in a randomized trial",
+    "Restricting to completers is unbiased because both arms lose patients",
+    "This is volunteer bias, which randomization always prevents in trials"
+   ],
+   "answer": 0,
+   "explanation": "Dropout (censoring) is a common effect of treatment and of a cause of the outcome, so restricting to completers conditions on a collider. Randomization protects against confounding but not against selection that happens after randomization (Hernán and Robins, Chapter 8).",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "protects against confounding, but not against selection bias when the selection occurs after the randomization."
+    }
+   ]
+  },
+  {
+   "id": "dags-09",
+   "topic": "mediators (oncology)",
+   "section": "dag-adjust",
+   "stem": "A randomized trial of a new therapy in metastatic breast cancer targets the total effect on overall survival (OS). A statistician proposes adding each patient's progression status after randomization as a covariate in the OS model to improve precision. Why is this a problem?",
+   "choices": [
+    "Progression is a confounder of treatment and OS and must be adjusted for",
+    "Progression is an instrument, and adjusting for an instrument removes bias",
+    "Progression is fixed before randomization, so adjusting changes nothing",
+    "Progression is a collider between treatment and OS, but only in single-arm trials",
+    "Progression lies between treatment and death, so it blocks part of the effect"
+   ],
+   "answer": 4,
+   "explanation": "Treatment → progression status → death makes progression a mediator. For the total effect on OS, adjustment for progression is not needed and would block the part of the effect that works through delayed progression (Tanaka et al., Rules 1 and 2). Progression-free survival (PFS) is a different thing: a composite endpoint that counts progression or death, so it is not an intermediate covariate either.",
+   "refs": [
+    23
+   ],
+   "evidence": [
+    {
+     "ref": 23,
+     "file": "dag_Tanaka_2024_causal_oncology.norm.txt",
+     "quote": "the primary focus should be on the total effect on OS, rather than on a path-specific effect, and any adjustment for PFS is not necessary for this estimand"
+    }
+   ]
+  },
+  {
+   "id": "dags-10",
+   "topic": "immortal time (oncology)",
+   "section": "dag-time",
+   "stem": "A registry study of stage IV non-small cell lung cancer (NSCLC) measures survival from diagnosis and compares chemoimmunotherapy (which could start up to a year after diagnosis) with chemotherapy alone. What bias most threatens this comparison?",
+   "choices": [
+    "Confounding by indication, which a Cox model with stage removes entirely",
+    "Collider bias from conditioning on tumor histology at the diagnosis date",
+    "Immortal time bias, since patients had to survive long enough to be treated",
+    "Measurement bias from misclassifying the exact date of the diagnosis",
+    "Bias amplification from adjusting for an instrumental variable in the model"
+   ],
+   "answer": 2,
+   "explanation": "Follow-up began at diagnosis, but patients entered a treatment group only if they survived to receive it, so pretreatment time was guaranteed survival. Tsuruda et al. showed that a naive adjustment, subtracting an assumed immortal period, cut the median survival difference by 40% (5.6 to 3.4 months). That illustrates how large the bias can be. It is not a corrected estimate of the effect, which needs a time-varying analysis or a target trial emulation.",
+   "refs": [
+    31
+   ],
+   "evidence": [
+    {
+     "ref": 31,
+     "file": "dag_Tsuruda_2025_immortal_lung.norm.txt",
+     "quote": "Because patients were selected for this cohort study based on having survived long enough to receive their first systemic treatment, the observed risk of death between diagnosis and treatment initiation was 0% for all study subjects."
+    }
+   ]
+  },
+  {
+   "id": "dags-11",
+   "topic": "survivor bias (oncology)",
+   "section": "dag-selection",
+   "stem": "Early studies of HLA-A2 and acute lymphoblastic leukemia (ALL) used prevalent (already diagnosed) cases and found HLA-A2 more common in cases. A later study of newly diagnosed cases found the population frequency. Which explanation is best supported?",
+   "choices": [
+    "Survival was a collider: HLA-A2 was linked to survival, not to ALL risk",
+    "Incident cases were confounded by age, which the prevalent design avoided",
+    "HLA typing was more accurate in prevalent cases, removing misclassification",
+    "HLA-A2 was a mediator of ALL risk, so the incident study overadjusted for it",
+    "The prevalent design removed reverse causation that biased incident cases"
+   ],
+   "answer": 0,
+   "explanation": "Both HLA-A2 and ALL affect survival to the time of typing. Restricting to survivors (prevalent cases) conditions on that collider and enriches the sample for HLA-A2 (Williams et al.). This is incidence-prevalence (Neyman) bias.",
+   "refs": [
+    18
+   ],
+   "evidence": [
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "HLA-A2 was not associated with an increased risk of developing ALL, but rather with an increased chance of survival."
+    }
+   ]
+  },
+  {
+   "id": "dags-12",
+   "topic": "collider stratification (oncology)",
+   "section": "dag-selection",
+   "stem": "Among patients already diagnosed with colorectal cancer, obese patients have lower mortality. Assumed DAG: Obesity → Cancer, U → Cancer, U → Death, Obesity → Death, where U is an unmeasured cause of both cancer and death. What does restricting the analysis to diagnosed patients most likely do?",
+   "choices": [
+    "It removes confounding by U, because U is held constant among the cases",
+    "It has no effect, because obesity and U are independent in the population",
+    "It induces an obesity-U association among cases, biasing the estimate",
+    "It turns obesity into a mediator of the effect of U on death in cases",
+    "It creates measurement bias in obesity among patients who have cancer"
+   ],
+   "answer": 2,
+   "explanation": "Cancer is a common effect of obesity and U, so a case-only analysis conditions on a collider and creates a spurious obesity-U association, which then distorts the obesity-death estimate (Stocks et al. and Robinson et al.). Whether the bias is large is a separate, quantitative question.",
+   "refs": [
+    25,
+    29
+   ],
+   "evidence": [
+    {
+     "ref": 25,
+     "file": "dag_Stocks_2025_prostate_obesity.norm.txt",
+     "quote": "the restriction to cases only (i.e., collider stratification) creates a spurious association between E and U"
+    }
+   ]
+  },
+  {
+   "id": "dags-13",
+   "topic": "adjustment set (oncology)",
+   "section": "dag-confounding",
+   "stem": "An observational study asks whether concurrent chemotherapy (A) added to radiotherapy improves survival (Y) in older patients with head and neck cancer. Assumed DAG: Age → PS, PS → A, PS → Y, Age → Y, A → Neutropenia → Y, A → Y, where PS is Eastern Cooperative Oncology Group (ECOG) performance status and the team assumes that age affects the treatment decision only through PS. Which is the minimal sufficient adjustment set for the total effect of A on Y?",
+   "choices": [
+    "Adjust for PS alone",
+    "Adjust for PS and neutropenia",
+    "Adjust for age alone",
+    "Adjust for age and neutropenia",
+    "Adjust for nothing at all"
+   ],
+   "answer": 0,
+   "explanation": "The only backdoor paths are A ← PS → Y and A ← PS ← Age → Y, and both pass through PS, so PS alone blocks them (confounding by indication). Age is not needed once PS is adjusted, and neutropenia is a descendant of treatment (a mediator), so it must not be added. If age also drove the decision directly (an arrow Age → A), age would have to be added.",
+   "refs": [
+    1,
+    23
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "A set of covariates L satisfies the backdoor criterion if all backdoor paths between A and Y are blocked by conditioning on L and L contains no variables that are descendants of"
+    }
+   ]
+  },
+  {
+   "id": "dags-14",
+   "topic": "informative censoring (oncology)",
+   "section": "dag-selection",
+   "stem": "In a randomized trial of adjuvant therapy, patients with poor prognostic factors are more often lost to follow-up, yet the survival analysis assumes censoring is at random within each arm. What does drawing the DAG suggest?",
+   "choices": [
+    "Draw no arrows into censoring, since treatment itself was randomized",
+    "Add arrows from prognostic factors to censoring and plan for that bias",
+    "Treat censoring as a confounder of treatment and survival and stratify",
+    "Ignore it, as informative censoring cannot occur under intention to treat",
+    "Draw censoring as a mediator between treatment and overall survival"
+   ],
+   "answer": 1,
+   "explanation": "Tanaka et al. note that censoring is not at random in practice and recommend adding arrows from prognostic factors to censoring, which makes the potential selection bias visible and guides follow-up strategies. Randomization does not protect against selection that occurs after it.",
+   "refs": [
+    23
+   ],
+   "evidence": [
+    {
+     "ref": 23,
+     "file": "dag_Tanaka_2024_causal_oncology.norm.txt",
+     "quote": "Unfortunately, censoring is not at random in practice, 14 and it is reasonable to add arrows from some prognostic factors to Censoring in the DAG, anticipating causes of censoring."
+    }
+   ]
+  },
+  {
+   "id": "dags-15",
+   "topic": "selection bias",
+   "section": "dag-selection",
+   "stem": "A study of number of sexual partners and cervical cancer enrolls women attending a sexually transmitted infection (STI) clinic. More partners raise STI risk, and early cervical cancer symptoms can be mistaken for STI symptoms. What structure threatens validity?",
+   "choices": [
+    "Clinic attendance is a confounder that should be adjusted in the model",
+    "Clinic attendance is a mediator between partners and cervical cancer",
+    "STI status is an instrument that should be used for estimation",
+    "Clinic attendance is a collider caused by both exposure and outcome",
+    "Recall bias in the number of partners reported by the cases only"
+   ],
+   "answer": 3,
+   "explanation": "Both the exposure (partners) and the outcome (cancer symptoms) influence attendance at the STI clinic, so enrolling there conditions on a collider (Digitale et al.). In their example the bias would tend to attenuate any true effect.",
+   "refs": [
+    20
+   ],
+   "evidence": [
+    {
+     "ref": 20,
+     "file": "dag_Digitale_2022_tutorial.norm.txt",
+     "quote": "Because number of sexual partners influences risk of STIs, the exposure of interest in the study will affect the likelihood an individual is included in the study."
+    }
+   ]
+  },
+  {
+   "id": "dags-16",
+   "topic": "confounding by indication (EM)",
+   "section": "dag-confounding",
+   "stem": "Registry studies of out-of-hospital cardiac arrest (OHCA) associate bag-valve-mask (BVM) ventilation with better neurological outcome than advanced airway management (AAM). Under the Japanese protocol, patients with cardiac output on emergency medical services (EMS) arrival are often managed with BVM. Best interpretation?",
+   "choices": [
+    "Cardiac output on EMS arrival is a mediator that must not be adjusted",
+    "Cardiac output on EMS arrival is a collider created by survival only",
+    "BVM restores cardiac output, so the whole BVM benefit is causal",
+    "The association reflects recall bias in paramedic documentation",
+    "Cardiac output on EMS arrival confounds airway choice and outcome"
+   ],
+   "answer": 4,
+   "explanation": "Patients with cardiac output on arrival have a far better prognosis and are preferentially given BVM, which is confounding by indication. In Sakurai et al., adding it to the model reduced the BVM odds ratio from 3.24 to 2.60.",
+   "refs": [
+    22
+   ],
+   "evidence": [
+    {
+     "ref": 22,
+     "file": "dag_Sakurai_2019_ems_indication.norm.txt",
+     "quote": "In Japanese prehospital protocol patients with confirmed cardiac output on arrival to EMS are often treated with BVM ventilation."
+    }
+   ]
+  },
+  {
+   "id": "dags-17",
+   "topic": "collider bias (trauma)",
+   "section": "dag-selection",
+   "stem": "A nationwide study of hospitalized patients with traumatic brain injury (TBI) finds pre-injury alcohol use associated with better in-hospital survival. Demographics affect drinking and hospitalization, and injury severity affects hospitalization and survival. What is the main structural concern?",
+   "choices": [
+    "Hospitalization is a collider, and selecting on it opens a noncausal path",
+    "Injury severity is a mediator of alcohol, so adjustment created the result",
+    "Alcohol is an instrument for injury severity and amplifies confounding",
+    "Demographics are colliders and should be dropped from the model",
+    "The finding is robust because propensity scores remove collider bias"
+   ],
+   "answer": 0,
+   "explanation": "Hospitalization with TBI is a common effect of demographics (linked to alcohol) and injury severity (linked to survival). Requiring it for inclusion opens alcohol ← demographics → hospitalization ← severity → survival, so alcohol can look protective without any causal effect (Yasuda et al.). Adjusting within the selected sample does not remove selection bias automatically. In this simplified diagram, adjusting for measured demographics or severity would block the opened route, but unmeasured selection mechanisms, and inference to patients who were not hospitalized, need further assumptions.",
+   "refs": [
+    27
+   ],
+   "evidence": [
+    {
+     "ref": 27,
+     "file": "dag_Yasuda_2025_alcohol_collider.norm.txt",
+     "quote": "By making hospitalization with TBI ( W ) a necessary condition for inclusion in the study, W acts as a collider and can inadvertently open non-causal paths between X and Y ."
+    }
+   ]
+  },
+  {
+   "id": "dags-18",
+   "topic": "collider bias (COVID-19)",
+   "section": "dag-selection",
+   "stem": "Early in the COVID-19 pandemic, all frontline health workers were tested, but other people were tested only if ill enough to need hospital care. Among those tested, health workers had milder disease. What best explains this?",
+   "choices": [
+    "Health work protected against severe disease through access to care",
+    "Being tested was a collider influenced by occupation and by severity",
+    "Occupation confounded the association between testing and severity",
+    "Disease severity was misclassified more often in health workers",
+    "Health workers had lower viral loads, which mediated milder disease"
+   ],
+   "answer": 1,
+   "explanation": "Testing depended on both the exposure (health work) and the outcome (severe symptoms), so the tested sample is conditioned on a collider and health workers appear milder even if they are not (Griffith et al.).",
+   "refs": [
+    26
+   ],
+   "evidence": [
+    {
+     "ref": 26,
+     "file": "dag_Griffith_2020_covid_collider.norm.txt",
+     "quote": "health workers will therefore generally appear to have relatively low severity compared to others tested, inducing a negative association in our sample, which does not reflect the true relationship in the target population"
+    }
+   ]
+  },
+  {
+   "id": "dags-19",
+   "topic": "immortal time (critical care)",
+   "section": "dag-time",
+   "stem": "Observational studies of intravenous immunoglobulin (IVIG) in streptococcal toxic shock syndrome (STSS) compared deaths in patients who ever versus never received IVIG, counting from admission. Many deaths occur within hours. Which is the preferred fix for the main bias?",
+   "choices": [
+    "Adjust for IVIG dose to remove confounding by indication in the cohort",
+    "Exclude patients who died before IVIG could have been given at all",
+    "Adjust for organ failure measured after IVIG to control for severity",
+    "Analyze IVIG as time-varying or align follow-up start in both groups",
+    "Enlarge the sample, because immortal time bias shrinks as n increases"
+   ],
+   "answer": 3,
+   "explanation": "Patients must survive to receive IVIG, so naive ever-versus-never analyses misallocate person-time (immortal time bias). Yates et al. name the two best fixes: treat the intervention as a time-varying exposure, or design follow-up so it is aligned in treated and untreated patients. Excluding early deaths is listed among the problematic fixes, because some bias remains and the groups may no longer be comparable. A time-varying analysis fixes the person-time, but it does not by itself handle time-varying confounding, such as severity that changes over the first hours and steers the decision to give IVIG (see the g-methods question).",
+   "refs": [
+    30
+   ],
+   "evidence": [
+    {
+     "ref": 30,
+     "file": "dag_Yates_2025_immortal_time.norm.txt",
+     "quote": "The 2 best approaches to avoiding misassignment of person-time are analyzing the intervention as a time-varying exposure and designing the study so that follow-up time in treated and untreated individuals is aligned."
+    }
+   ]
+  },
+  {
+   "id": "dags-20",
+   "topic": "time-varying confounding (ICU)",
+   "section": "dag-time",
+   "stem": "In an intensive care unit (ICU) cohort, daily vasopressor dose depends on that day's blood pressure and lactate, and yesterday's dose changes today's blood pressure and lactate. Investigators want the effect of a sustained dosing strategy on 28-day mortality. Which approach is appropriate?",
+   "choices": [
+    "One Cox model adjusting for daily blood pressure and lactate as covariates",
+    "An unadjusted comparison, since adjusting for any later value is wrong",
+    "A g-method, such as inverse probability weighting of a structural model",
+    "Stepwise selection of the daily covariates that best predict mortality",
+    "Adjustment for baseline lactate only, ignoring all daily measurements"
+   ],
+   "answer": 2,
+   "explanation": "Blood pressure and lactate are time-varying confounders that are also affected by earlier treatment (treatment-confounder feedback). Traditional regression cannot adjust for them correctly, whereas g-methods can (Hernán and Robins, Chapter 20, and Smit et al.).",
+   "refs": [
+    1,
+    15
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "In contrast, g-methods appropriately adjust for the time-varying confounders even in the presence of treatment-confounder feedback."
+    }
+   ]
+  },
+  {
+   "id": "dags-21",
+   "topic": "M-bias (critical care)",
+   "section": "dag-adjust",
+   "stem": "A study of chronic beta-blocker use and acute respiratory distress syndrome (ARDS) considers adjusting for crackles on admission. Heart failure causes both beta-blocker use and crackles, and pneumonia causes both crackles and ARDS. What should be done with crackles?",
+   "choices": [
+    "Adjust for it, because it is associated with exposure and outcome",
+    "Leave it out, because adjusting for it opens a closed backdoor path",
+    "Adjust for it, because it was measured before the outcome occurred",
+    "Use it as an instrumental variable for chronic beta-blocker use",
+    "Stratify on it to test for effect modification of beta-blockers"
+   ],
+   "answer": 1,
+   "explanation": "Crackles is a collider on beta-blocker ← heart failure → crackles ← pneumonia → ARDS (M-bias). The path is closed unless crackles is adjusted for, so ignoring crackles is correct (Lederer et al.). Being associated with both exposure and outcome, or measured at baseline, does not make a variable a confounder.",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "Adjusting for the presence of crackles opens this back-door path, introducing confounding. Ignoring the presence of crackles would be the right thing to do."
+    }
+   ]
+  },
+  {
+   "id": "dags-22",
+   "topic": "mediator and collider (perinatal)",
+   "section": "dag-adjust",
+   "stem": "A perinatal study finds pre-eclampsia protective against cerebral palsy among very preterm infants but harmful at later gestations. Chorioamnionitis causes both preterm birth and cerebral palsy. Why can stratifying on gestational age mislead?",
+   "choices": [
+    "Gestational age is a confounder, so stratifying fully removes the bias",
+    "Pre-eclampsia is an instrument for gestational age in this population",
+    "Cerebral palsy is misclassified more often in very preterm infants",
+    "Stratification always reverses associations by chance in small strata",
+    "Gestational age is a mediator and also a collider with chorioamnionitis"
+   ],
+   "answer": 4,
+   "explanation": "Preterm birth lies on the path from pre-eclampsia to cerebral palsy (overadjustment) and is also a common effect of pre-eclampsia and chorioamnionitis, so stratifying opens a spurious path that can make pre-eclampsia look protective (Williams et al.).",
+   "refs": [
+    18
+   ],
+   "evidence": [
+    {
+     "ref": 18,
+     "file": "dag_Williams_2018_paediatrics.norm.txt",
+     "quote": "one can see that gestational age, as the shared effect of both pre-eclampsia and chorioamnionitis, also acts as a collider."
+    }
+   ]
+  },
+  {
+   "id": "dags-23",
+   "topic": "collider adjustment (sleep)",
+   "section": "dag-blocks",
+   "stem": "A study of shift work and obstructive sleep apnea (OSA) adjusts for daytime sleepiness because both shift work and OSA cause sleepiness. If shift work truly has no effect on OSA, what does this adjustment produce?",
+   "choices": [
+    "A spurious association, whose direction depends on the mechanisms",
+    "A correct null estimate, because sleepiness is a confounder",
+    "A spurious association that is always positive, from reverse causation",
+    "No change, because adjusting for a common effect is harmless",
+    "A null estimate with only wider confidence intervals"
+   ],
+   "answer": 0,
+   "explanation": "Sleepiness is a collider. Adjusting for it can create an association between shift work and OSA where none exists. Whether that association is inverse or positive depends on how the two causes combine to produce sleepiness, which the arrows alone do not specify. Lederer et al. give an example where it is inverse: among sleepy people, a shift worker's sleepiness is explained by shift work, so OSA appears less common among shift workers.",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "and thus report an inverse association. This confounded association results from conditioning on a collider"
+    }
+   ]
+  },
+  {
+   "id": "dags-24",
+   "topic": "target trial emulation",
+   "section": "dag-time",
+   "stem": "Investigators emulate a target trial of postmenopausal hormone therapy and breast cancer using claims data. When should follow-up (time zero) start?",
+   "choices": [
+    "At menopause for everyone, whenever hormone therapy later starts",
+    "Two years after initiation, to exclude early prevalent cancers",
+    "When eligibility is met and a strategy assigned, in both groups",
+    "At the first breast cancer screening after hormone therapy starts",
+    "At database entry, counting earlier therapy as exposed time"
+   ],
+   "answer": 2,
+   "explanation": "Time zero is the point where eligibility is met, a strategy is assigned and outcome follow-up starts, and outcomes count only after it (Hernán and Robins 2016). For a comparison of starting with not starting hormone therapy, eligible women who do not start need the same kind of starting point as those who do. Starting later excludes early outcomes (selection bias). Immortal time arises when women are classified at time zero by therapy they receive later, as when counting from menopause or from database entry.",
+   "refs": [
+    5
+   ],
+   "evidence": [
+    {
+     "ref": 5,
+     "file": "Hernan_2016a.norm.txt",
+     "quote": "Eligibility criteria need to be met at that point but not later; study outcomes begin to be counted after that point but not earlier."
+    }
+   ]
+  },
+  {
+   "id": "dags-25",
+   "topic": "read the DAG",
+   "section": "dag-blocks",
+   "stem": "DAG: A → Y, L → A, L → Y, A → M → Y, A → C ← Y. Which is the minimal sufficient adjustment set for the total effect of A on Y?",
+   "choices": [
+    "Adjust for L and M",
+    "Adjust for L and C",
+    "Adjust for M and C",
+    "Adjust for L alone",
+    "Adjust for nothing"
+   ],
+   "answer": 3,
+   "explanation": "The only backdoor path is A ← L → Y, closed by L. M is a mediator (adjusting blocks part of the effect) and C is a collider of A and Y (adjusting opens a biasing path). Both are descendants of A and fail the backdoor criterion.",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "A set of covariates L satisfies the backdoor criterion if all backdoor paths between A and Y are blocked by conditioning on L and L contains no variables that are descendants of"
+    }
+   ]
+  },
+  {
+   "id": "dags-26",
+   "topic": "read the DAG",
+   "section": "dag-adjust",
+   "stem": "DAG: A → Y, U1 → A, U1 → L, U2 → L, U2 → Y. U1 and U2 are unmeasured, and L is measured before A. Which statement is correct?",
+   "choices": [
+    "Leaving L out is valid, and adjusting for L opens a biasing path",
+    "Adjusting for L is required, because it is measured before A",
+    "No measured set can remove the confounding of A on Y here",
+    "L must be adjusted, because it is associated with A and Y",
+    "Adjusting for L is harmless here but simply unnecessary"
+   ],
+   "answer": 0,
+   "explanation": "L is a collider on A ← U1 → L ← U2 → Y (M-bias), so that path is closed without adjustment and opened by adjusting for L (Hernán and Robins, Figure 7.4). Being pre-treatment and associated with both A and Y does not make L a confounder.",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "adjustment for L would induce bias because conditioning on the collider L opens the backdoor path between A and Y"
+    }
+   ]
+  },
+  {
+   "id": "dags-27",
+   "topic": "read the DAG",
+   "section": "dag-confounding",
+   "stem": "DAG: A → Y, A → M → Y, U2 → A, U2 → L, U1 → L, L → A, U1 → L1 → Y. U1 and U2 are unmeasured, and L, L1 and M are measured. Which is the minimal sufficient adjustment set?",
+   "choices": [
+    "Adjust for L alone",
+    "Adjust for L1 and M",
+    "Adjust for nothing",
+    "Adjust for L1 alone",
+    "No measured set works"
+   ],
+   "answer": 3,
+   "explanation": "Adjusting for L blocks A ← L ← U1 → L1 → Y but opens A ← U2 → L ← U1 → L1 → Y, because L is also a collider. L1 sits on every backdoor path between U1 and Y, so L1 alone closes them all (Hernán and Robins, Figures 7.5 and 7.6). M is a mediator.",
+   "refs": [
+    1
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "L would block that backdoor path but would simultaneously open a backdoor path on which L is a collider"
+    }
+   ]
+  },
+  {
+   "id": "dags-28",
+   "topic": "read the DAG",
+   "section": "dag-adjust",
+   "stem": "DAG: Z → A, U → A, U → Y, L → A, L → Y, A → Y. U is unmeasured, and Z and L are measured. Which statement is correct?",
+   "choices": [
+    "Adjusting for L and Z removes all confounding of A on Y",
+    "No measured set suffices, and adding Z can even amplify the bias",
+    "Adjusting for L alone removes all confounding of A on Y",
+    "Z is a confounder, because it is associated with treatment A",
+    "Adjusting for Z alone suffices, because it predicts A so well"
+   ],
+   "answer": 1,
+   "explanation": "The path A ← U → Y can only be closed by U, which is unmeasured. Z is an instrument: it is not on any backdoor path, so adjusting for it cannot remove confounding and can amplify the bias from U (Hernán and Robins, Chapter 18, and Tanaka et al., Rule 5).",
+   "refs": [
+    1,
+    23
+   ],
+   "evidence": [
+    {
+     "ref": 1,
+     "file": "Hernan_2026_WhatIf.norm.txt",
+     "quote": "adjustment for the instrument Z can amplify the confounding bias due to U."
+    }
+   ]
+  },
+  {
+   "id": "dags-29",
+   "topic": "read the DAG",
+   "section": "dag-confounding",
+   "stem": "DAG: L1 → A, L1 → Y, L2 → A, L2 → L3 → Y, A → M → Y, A → Y. All variables are measured. Which is a minimal sufficient adjustment set?",
+   "choices": [
+    "Adjust for L1 alone",
+    "Adjust for L2 and L3",
+    "Adjust for L3 and M",
+    "Adjust for L1, L2, M",
+    "Adjust for L1 and L3"
+   ],
+   "answer": 4,
+   "explanation": "Two backdoor paths exist: A ← L1 → Y and A ← L2 → L3 → Y. L1 closes the first, and either L2 or L3 closes the second, so {L1, L3} (and also {L1, L2}) is minimal. One non-collider on a backdoor path is enough to close that path (Lederer et al.), but every other path must still be checked, and the set must not open a new one. M is a mediator.",
+   "refs": [
+    21
+   ],
+   "evidence": [
+    {
+     "ref": 21,
+     "file": "dag_Lederer_2019_confounding_guidance.norm.txt",
+     "quote": "When more than one variable lies along a back-door path, control of a single confounder on the path is sufficient to close the back-door path."
+    }
+   ]
+  },
+  {
+   "id": "dags-30",
+   "topic": "read the DAG",
+   "section": "dag-adjust",
+   "stem": "DAG: L → A, L → Y, A → Y, A → M → Y, W → M, W → Y. All variables are measured. Why does adjusting for {L, M} bias the total effect of A on Y?",
+   "choices": [
+    "It blocks only the confounding path through L",
+    "It leaves the backdoor path A ← W → Y open",
+    "It blocks A → M → Y and opens A → M ← W → Y",
+    "It opens A ← L → Y by conditioning on M",
+    "It is biased only if W also causes treatment A"
+   ],
+   "answer": 2,
+   "explanation": "M is a mediator that is also caused by W, a cause of Y (a mediator-outcome confounder). Conditioning on M blocks part of the effect and makes M a conditioned collider on A → M ← W → Y (Tennant et al.). There is no arrow W → A, so A ← W → Y is not a path at all, and {L} alone is sufficient.",
+   "refs": [
+    17
+   ],
+   "evidence": [
+    {
+     "ref": 17,
+     "file": "dag_Tennant_2021_dags_confounders.norm.txt",
+     "quote": "conditioning on a mediator that is also caused by one or more common causes of the outcome (known as mediator-outcome confounders) is likely to introduce collider bias"
+    }
+   ]
+  }
+ ],
+ "refs": [
+  {
+   "n": 1,
+   "citation": "Hernán MA, Robins JM. Causal Inference: What If. Boca Raton: Chapman & Hall/CRC; 2020. Free online and revised regularly (the August 2026 revision was used for the optional section on causal diagrams). The best single place to go deeper on every topic on this page.",
+   "url": "https://miguelhernan.org/whatifbook"
+  },
+  {
+   "n": 5,
+   "citation": "Hernán MA, Robins JM. Using big data to emulate a target trial when a randomized trial is not available. Am J Epidemiol. 2016;183(8):758-764.",
+   "url": "https://doi.org/10.1093/aje/kwv254"
+  },
+  {
+   "n": 15,
+   "citation": "Smit JM, Krijthe JH, Kant WMR, et al. Causal inference using observational intensive care unit data: a scoping review and recommendations for future practice. NPJ Digit Med. 2023;6(1):221.",
+   "url": "https://doi.org/10.1038/s41746-023-00961-1"
+  },
+  {
+   "n": 17,
+   "citation": "Tennant PWG, Murray EJ, Arnold KF, et al. Use of directed acyclic graphs (DAGs) to identify confounders in applied health research: review and recommendations. Int J Epidemiol. 2021;50(2):620-632.",
+   "url": "https://doi.org/10.1093/ije/dyaa213"
+  },
+  {
+   "n": 18,
+   "citation": "Williams TC, Bach CC, Matthiesen NB, Henriksen TB, Gagliardi L. Directed acyclic graphs: a tool for causal studies in paediatrics. Pediatr Res. 2018;84(4):487-493.",
+   "url": "https://doi.org/10.1038/s41390-018-0071-3"
+  },
+  {
+   "n": 19,
+   "citation": "Cole SR, Platt RW, Schisterman EF, et al. Illustrating bias due to conditioning on a collider. Int J Epidemiol. 2010;39(2):417-420.",
+   "url": "https://doi.org/10.1093/ije/dyp334"
+  },
+  {
+   "n": 20,
+   "citation": "Digitale JC, Martin JN, Glymour MM. Tutorial on directed acyclic graphs. J Clin Epidemiol. 2022;142:264-267.",
+   "url": "https://doi.org/10.1016/j.jclinepi.2021.08.001"
+  },
+  {
+   "n": 21,
+   "citation": "Lederer DJ, Bell SC, Branson RD, et al. Control of Confounding and Reporting of Results in Causal Inference Studies. Guidance for Authors from Editors of Respiratory, Sleep, and Critical Care Journals. Ann Am Thorac Soc. 2019;16(1):22-28.",
+   "url": "https://doi.org/10.1513/AnnalsATS.201808-564PS"
+  },
+  {
+   "n": 22,
+   "citation": "Sakurai A, Kinoshita K, Maeda Y, et al. Confirmed cardiac output on emergency medical services arrival as confounding by indication: an observational study of prehospital airway management in patients with out-of-hospital cardiac arrest. Emerg Med J. 2019;36(7):410-415.",
+   "url": "https://doi.org/10.1136/emermed-2018-208107"
+  },
+  {
+   "n": 23,
+   "citation": "Tanaka S, Muramatsu Y, Inoue K. Clarifying Causal Effects of Interest and Underlying Assumptions in Randomized and Nonrandomized Clinical Trials in Oncology Using Directed Acyclic Graphs and Single-World Intervention Graphs. JCO Clin Cancer Inform. 2024;8:e2300262.",
+   "url": "https://doi.org/10.1200/CCI.23.00262"
+  },
+  {
+   "n": 25,
+   "citation": "Stocks T, Häggström C, Fritz J. Collider Bias Is an Insufficient Explanation for the Inverse Obesity Paradox in Prostate Cancer. Cancer Med. 2025;14(8):e70871.",
+   "url": "https://doi.org/10.1002/cam4.70871"
+  },
+  {
+   "n": 26,
+   "citation": "Griffith GJ, Morris TT, Tudball MJ, et al. Collider bias undermines our understanding of COVID-19 disease risk and severity. Nat Commun. 2020;11(1):5749.",
+   "url": "https://doi.org/10.1038/s41467-020-19478-2"
+  },
+  {
+   "n": 27,
+   "citation": "Yasuda T, Shibata T, Shiraishi A. Re-evaluating the association between alcohol use and in-hospital survival: the role of collider bias. Crit Care. 2025;29(1):203.",
+   "url": "https://doi.org/10.1186/s13054-025-05442-3"
+  },
+  {
+   "n": 29,
+   "citation": "Robinson WR, Furberg H, Banack HR. Selection bias: a missing factor in the obesity paradox debate. Obesity (Silver Spring). 2014;22(3):625.",
+   "url": "https://doi.org/10.1002/oby.20666"
+  },
+  {
+   "n": 30,
+   "citation": "Yates TA, Parks T, Dodd PJ. Quantifying Potential Immortal Time Bias in Observational Studies in Acute Severe Infection. Open Forum Infect Dis. 2025;12(4):ofaf173.",
+   "url": "https://doi.org/10.1093/ofid/ofaf173"
+  },
+  {
+   "n": 31,
+   "citation": "Tsuruda KM, Hektoen HH, Reis Costa D, Andreassen BK. Immortal time bias in survival outcomes when comparing treatment with chemotherapy versus immunochemotherapy for non-small cell lung cancer. Transl Lung Cancer Res. 2025;14(1):300-302.",
+   "url": "https://doi.org/10.21037/tlcr-24-1002"
+  }
+ ],
+ "glossary": [
+  [
+   "AAM",
+   "Advanced airway management"
+  ],
+  [
+   "ALL",
+   "Acute lymphoblastic leukemia"
+  ],
+  [
+   "ARDS",
+   "Acute respiratory distress syndrome"
+  ],
+  [
+   "BVM",
+   "Bag-valve-mask ventilation"
+  ],
+  [
+   "COVID",
+   "Coronavirus disease (COVID-19)"
+  ],
+  [
+   "DAG",
+   "Directed acyclic graph"
+  ],
+  [
+   "ECOG",
+   "Eastern Cooperative Oncology Group"
+  ],
+  [
+   "EMS",
+   "Emergency medical services"
+  ],
+  [
+   "HLA",
+   "Human leukocyte antigen"
+  ],
+  [
+   "ICU",
+   "Intensive care unit"
+  ],
+  [
+   "IVIG",
+   "Intravenous immunoglobulin"
+  ],
+  [
+   "NSCLC",
+   "Non-small cell lung cancer"
+  ],
+  [
+   "OHCA",
+   "Out-of-hospital cardiac arrest"
+  ],
+  [
+   "OS",
+   "Overall survival"
+  ],
+  [
+   "OSA",
+   "Obstructive sleep apnea"
+  ],
+  [
+   "PFS",
+   "Progression-free survival"
+  ],
+  [
+   "PS",
+   "Performance status"
+  ],
+  [
+   "STI",
+   "Sexually transmitted infection"
+  ],
+  [
+   "STSS",
+   "Streptococcal toxic shock syndrome"
+  ],
+  [
+   "TBI",
+   "Traumatic brain injury"
+  ]
+ ]
+}

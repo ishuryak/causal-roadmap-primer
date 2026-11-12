@@ -1,0 +1,20 @@
+name: Bleile roadmap v2
+on:
+  push:
+    branches: [main]
+    paths: ["docs/v2/**", "tests/test_bleile_v2.mjs", ".github/workflows/bleile-v2.yml"]
+  pull_request:
+    paths: ["docs/v2/**", "tests/test_bleile_v2.mjs", ".github/workflows/bleile-v2.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scoring:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+      - run: node tests/test_bleile_v2.mjs
+      - run: node --check docs/v2/bleile.mjs

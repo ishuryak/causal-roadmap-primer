@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {COMPONENTS,PRESETS,assess} from '../docs/v2/bleile-model.mjs';
+let count=0;const test=(name,fn)=>{fn();count++;console.log('PASS '+name);};
+test('the worked revision is exactly 60 to 50',()=>{assert.equal(assess(PRESETS.start.scores).total,60);assert.equal(assess(PRESETS.recover.scores).total,50);});
+test('only the three stated components improve and positivity is unchanged',()=>{const changes=COMPONENTS.filter(c=>PRESETS.start.scores[c.id]!==PRESETS.recover.scores[c.id]).map(c=>[c.id,PRESETS.recover.scores[c.id]-PRESETS.start.scores[c.id]]);assert.deepEqual(changes,[['confounding',-6],['measurement',-2],['sensitivity',-2]]);assert.equal(PRESETS.recover.scores.positivity,8);});
+test('equal totals give different verdicts when the confounding and positivity profile changes',()=>{const a=assess(PRESETS.recover.scores),b=assess(PRESETS.alternate.scores);assert.equal(a.total,b.total);assert.notEqual(a.title,b.title);assert.match(a.verdict,/population-wide effect remains unsupported/);assert.match(b.verdict,/common causes/);});
+test('a low total cannot wash out a major confounding gap',()=>{const p={...PRESETS.ideal.scores,confounding:10};assert.equal(assess(p).total,10);assert.match(assess(p).verdict,/even where both treatments occur/);});
+test('a low total cannot wash out a positivity gap',()=>{const p={...PRESETS.ideal.scores,positivity:10};assert.equal(assess(p).total,10);assert.match(assess(p).verdict,/population-wide effect remains unsupported/);});
+test('other critical components remain visible even with a low sum',()=>{assert.match(assess({...PRESETS.ideal.scores,design:10}).verdict,/design/);});
+test('ideal and severe anchors remain explicitly scoped',()=>{assert.equal(assess(PRESETS.ideal.scores).total,0);assert.match(assess(PRESETS.ideal.scores).verdict,/not proof/);assert.equal(assess(PRESETS.severe.scores).total,80);assert.match(assess(PRESETS.severe.scores).verdict,/narrow the target/);});
+test('lowering by assumption does not become evidence',()=>{const r=assess(PRESETS.recover.scores,{...PRESETS.recover.basis,confounding:'assumption'});assert(r.assumptions.includes('Confounding'));assert.equal(r.total,50);});
+test('entering zeros with unsupported assumptions does not earn the ideal verdict',()=>{assert.match(assess(PRESETS.ideal.scores,{confounding:'assumption'}).title,/support still to show/);assert.match(assess(PRESETS.ideal.scores,{positivity:'unresolved'}).title,/support still to show/);});
+test('invalid, missing and non-integer values are rejected',()=>{for(const v of [-1,11,NaN,Infinity,1.5,'3',undefined])assert.throws(()=>assess({...PRESETS.start.scores,confounding:v}),RangeError);});
+test('every checkpoint belongs to an existing primer section',()=>{const html=readFileSync(new URL('../docs/v2/index.html',import.meta.url),'utf8');for(const c of COMPONENTS)assert(html.includes(`data-bleile-slot="${c.section}"`));assert(html.includes('id="roadmap"'));});
+console.log(`\n${count} passed, 0 failed`);

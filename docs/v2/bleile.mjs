@@ -1,0 +1,71 @@
+import {COMPONENTS,PRESETS,assess} from './bleile-model.mjs';
+
+let profile={...PRESETS.start.scores}, basis={...PRESETS.start.basis}, active='start';
+const panels=[];
+for(const c of COMPONENTS){
+  const host=document.querySelector(`[data-bleile-slot="${c.section}"]`);
+  if(!host)throw new Error(`Missing roadmap checkpoint ${c.section}`);
+  const panel=document.createElement('section');
+  panel.className='bleile-checkpoint'; panel.id=`bleile-${c.id}`;
+  panel.setAttribute('aria-labelledby',`bleile-title-${c.id}`);
+  panel.dataset.component=c.id;
+  panel.innerHTML=`<div class="bleile-check-head"><span class="bleile-check-mark" aria-hidden="true">◇</span><div><p class="eyebrow">Roadmap checkpoint</p><h3 id="bleile-title-${c.id}">${c.label}</h3></div><span class="bleile-dings"><output for="bleile-input-${c.id}" id="bleile-out-${c.id}"></output><small> / 10 dings</small></span></div>
+    <p>${c.prompt}</p><label class="bleile-range-label" for="bleile-input-${c.id}">How much of this gap remains?</label><input id="bleile-input-${c.id}" type="range" min="0" max="10" step="1" aria-describedby="bleile-scale-${c.id}">
+    <div class="bleile-scale" id="bleile-scale-${c.id}"><span><b>0</b> ${c.rubric[0]}</span><span><b>5</b> ${c.rubric[1]}</span><span><b>10</b> ${c.rubric[2]}</span></div>
+    <label class="bleile-basis">What supports your judgment?<select id="bleile-basis-${c.id}" aria-label="Basis for ${c.label}"><option value="evidence">Observed evidence or study design</option><option value="assumption">An assumption still to challenge</option><option value="unresolved">Unresolved or not yet checked</option></select></label>
+    <a class="bleile-return" href="#roadmap">See this in the full profile ↑</a>`;
+  host.append(panel);
+  const input=panel.querySelector('input'),select=panel.querySelector('select');
+  input.addEventListener('input',()=>{profile[c.id]=Number(input.value);active='custom';render(`${c.short}: ${profile[c.id]} dings. Moving a slider records a judgment. It does not add evidence.`);});
+  select.addEventListener('change',()=>{basis[c.id]=select.value;active='custom';render(`${c.short}: basis updated.`);});
+  panels.push({c,panel,input,select});
+}
+const profileList=document.querySelector('#bleile-profile');
+for(const c of COMPONENTS){
+  const link=document.createElement('a');link.href=`#bleile-${c.id}`;link.dataset.profile=c.id;
+  link.innerHTML=`<span>${c.short}</span><span class="bleile-mini-track"><i></i></span><b></b><span class="bleile-basis-dot" title=""></span>`;
+  profileList.append(link);
+}
+function render(change=''){
+  const result=assess(profile,basis);
+  for(const {c,panel,input,select} of panels){
+    input.value=profile[c.id];select.value=basis[c.id];
+    panel.querySelector('output').textContent=profile[c.id];
+    panel.dataset.concern=profile[c.id]>=8?'high':profile[c.id]>=4?'some':'low';
+    const item=profileList.querySelector(`[data-profile="${c.id}"]`);
+    item.querySelector('b').textContent=profile[c.id];
+    item.querySelector('i').style.width=`${profile[c.id]*10}%`;
+    const mark=item.querySelector('.bleile-basis-dot');
+    mark.textContent={evidence:'●',assumption:'◇',unresolved:'?'}[basis[c.id]];
+    mark.setAttribute('aria-label',{evidence:'Evidence or design',assumption:'Assumption to challenge',unresolved:'Unresolved'}[basis[c.id]]);
+    mark.title=mark.getAttribute('aria-label');
+  }
+  document.querySelectorAll('[data-bleile-total]').forEach(el=>el.textContent=result.total);
+  document.querySelectorAll('[data-bleile-confounding]').forEach(el=>el.textContent=profile.confounding);
+  document.querySelectorAll('[data-bleile-positivity]').forEach(el=>el.textContent=profile.positivity);
+  document.querySelectorAll('[data-bleile-title]').forEach(el=>el.textContent=result.title);
+  document.querySelectorAll('[data-bleile-verdict]').forEach(el=>el.textContent=result.verdict);
+  const reason=[result.assumptions.length?`Assumptions still to challenge: ${result.assumptions.join(', ')}.`:'',result.unresolved.length?`Unresolved or not yet checked: ${result.unresolved.join(', ')}.`:''].filter(Boolean).join(' ');
+  document.querySelectorAll('[data-bleile-basis-note]').forEach(el=>el.textContent=reason || 'Evidence/design is selected for every component. These are judgments in a fictional teaching example.');
+  document.querySelectorAll('[data-bleile-preset]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.bleilePreset===active)));
+  document.querySelector('#bleile-change').textContent=change;
+  document.querySelector('#bleile-case').textContent=active==='custom'?'Your edited profile':PRESETS[active].label;
+  if(active==='custom')document.querySelector('#bleile-story').textContent='You are editing the fictional study. Visit each checkpoint to set a judgment and say whether it rests on evidence, an assumption or an unresolved gap. Reducing a number alone does not recover information.';
+}
+function preset(key){
+  if(!PRESETS[key])return;
+  active=key;profile={...PRESETS[key].scores};basis={...PRESETS[key].basis};
+  document.querySelector('#bleile-story').textContent=PRESETS[key].story;
+  render(key==='recover'?'60 → 50: confounding −6, measurement −2, sensitivity −2. Positivity is unchanged.':`${PRESETS[key].label} loaded.`);
+}
+document.querySelectorAll('[data-bleile-preset]').forEach(b=>b.addEventListener('click',()=>preset(b.dataset.bleilePreset)));
+document.querySelectorAll('[data-bleile-recover]').forEach(b=>b.addEventListener('click',()=>{preset('recover');document.querySelector('#bleile-verdict').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});}));
+document.querySelector('#bleile-copy').addEventListener('click',async()=>{
+  const url=new URL(location.href);url.searchParams.set('bleile',COMPONENTS.map(c=>profile[c.id]).join(','));url.searchParams.set('basis',COMPONENTS.map(c=>({evidence:'e',assumption:'a',unresolved:'u'})[basis[c.id]]).join(''));url.hash='roadmap';
+  try{await navigator.clipboard.writeText(url.href);document.querySelector('#bleile-copy-result').textContent='Profile link copied.';}
+  catch{document.querySelector('#bleile-copy-result').textContent='Copy this link:';const field=document.querySelector('#bleile-share-url');field.hidden=false;field.value=url.href;field.focus();field.select();}
+});
+const query=new URLSearchParams(location.search), saved=query.get('bleile'), savedBasis=query.get('basis');
+if(saved && /^\d+(,\d+){9}$/.test(saved) && saved.split(',').every(n=>Number(n)<=10) && /^[eau]{10}$/.test(savedBasis||'')){
+  profile=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,Number(saved.split(',')[i])]));basis=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,({e:'evidence',a:'assumption',u:'unresolved'})[savedBasis[i]]]));active='custom';render('Shared profile loaded.');
+}else preset('start');
