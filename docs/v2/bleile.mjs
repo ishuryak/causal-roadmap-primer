@@ -8,11 +8,11 @@ const panels=[];
 for(const c of COMPONENTS){
   const host=document.querySelector(`[data-bleile-slot="${c.section}"]`);
   if(!host)throw new Error(`Missing roadmap checkpoint ${c.section}`);
-  const panel=document.createElement('section');
+  const panel=document.createElement('details');
   panel.className='bleile-checkpoint'; panel.id=`bleile-${c.id}`;
   panel.setAttribute('aria-labelledby',`bleile-title-${c.id}`);
   panel.dataset.component=c.id;
-  panel.innerHTML=`<div class="bleile-check-head"><span class="bleile-check-mark" aria-hidden="true">◇</span><div><p class="eyebrow">Roadmap checkpoint</p><h3 id="bleile-title-${c.id}">${c.label}</h3></div><span class="bleile-dings"><output for="bleile-input-${c.id}" id="bleile-out-${c.id}"></output><small> / 10 dings</small></span></div>
+  panel.innerHTML=`<summary class="bleile-check-head"><span id="bleile-title-${c.id}">Assess ${c.short.toLowerCase()}</span><span class="bleile-dings"><output for="bleile-input-${c.id}" id="bleile-out-${c.id}"></output><small> / 10 dings</small></span></summary>
     <p>${c.prompt}</p><label class="bleile-range-label" for="bleile-input-${c.id}">How much of this gap remains?</label><input id="bleile-input-${c.id}" type="range" min="0" max="10" step="1" aria-describedby="bleile-scale-${c.id}">
     <div class="bleile-scale" id="bleile-scale-${c.id}"><span><b>0</b> ${c.rubric[0]}</span><span><b>5</b> ${c.rubric[1]}</span><span><b>10</b> ${c.rubric[2]}</span></div>
     <label class="bleile-basis">What supports your judgment?<select id="bleile-basis-${c.id}" aria-label="Basis for ${c.label}"><option value="evidence">Observed evidence or study design</option><option value="assumption">An assumption still to challenge</option><option value="unresolved">Unresolved or not yet checked</option></select></label>

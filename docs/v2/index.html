@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="story.css">
 <link rel="stylesheet" href="bleile.css">
+<link rel="stylesheet" href="roadmap-flow.css">
 </head>
 <body>
 <a class="story-skip" href="#roadmap">Skip to the roadmap</a>
@@ -42,16 +43,17 @@
   <h2 id="researcher-title">The records show a difference.<br>Did the treatment make it?</h2>
   <p>Susan studies people starting radiotherapy. A shorter course means fewer visits, but would choosing it change survival? Her electronic health records show different outcomes under the two schedules. They also show that clinicians chose the schedules for different kinds of patients.</p>
   <p>Some of those differences are recorded, such as age and disease stage. Others, including how well a patient could manage daily activities before treatment, may be missing. Susan needs to understand what drove the choice before she can interpret the survival gap.</p>
-  <div class="story-note"><span aria-hidden="true">↳</span><p>She starts with an information gap and a decision that matters. Her task is to build a fair comparison, discover where its support runs out, and say what would help next.</p></div>
-  <ol class="story-reading-path" aria-label="Susan’s path through the primer"><li><a href="#roadmap">Map the argument</a><span>See the components.</span></li><li><a href="#questions">Understand the gap</a><span>Ask what the data can tell us.</span></li><li><a href="#rehearsal">Try the lab</a><span>Test ideas against a known truth.</span></li><li><a href="#causal-verdict">State a verdict</a><span>Keep its scope and conditions.</span></li></ol>
-  <p class="story-next"><a href="#roadmap">Follow Susan onto the roadmap ↓</a></p>
+
+
+
 </section>
 
 <section class="bleile-roadmap" id="roadmap" aria-labelledby="roadmap-title">
-  <div class="bleile-intro"><p class="eyebrow">The causal roadmap</p><h2 id="roadmap-title">Build the argument, one component at a time.</h2><p>A causal verdict is an ambitious destination. The roadmap shows what connects your question to an answer: the data you can observe, the assumptions you need, and the analysis that follows. Each component gives us something specific to examine and improve.</p></div>
-  <figure class="bleile-map"><img src="assets/story/tao-roadmap.png" width="1867" height="671" loading="lazy" alt="The Tao of RWD's hand-drawn roadmap: define the question, specify a causal model, consider data, assess identifiability, choose an estimand and estimator, estimate, examine sensitivity, and report results. The causal model connects to a diagram builder and estimation connects to an analytics module."><figcaption>The hand-drawn roadmap from <a href="https://navigator.tao-rwd.com/">The Tao of RWD’s Causal Navigator</a>. Follow the links below to explore the corresponding parts of this primer. On a small screen, slide the sketch sideways.</figcaption></figure>
-  <ol class="bleile-path" aria-label="Explore the illustrated roadmap"><li><a href="#question">Define the question</a></li><li><a href="#dag">Specify the causal model</a></li><li><a href="#question">Consider the data</a></li><li><a href="#identify">Assess identifiability</a></li><li><a href="#estimand">Define the estimand</a></li><li><a href="#estimators">Estimate the effect</a></li><li><a href="#checks">Challenge the interpretation</a></li><li><a href="#causal-verdict">Render a causal verdict</a></li></ol>
-  <div class="bleile-game-intro" id="bleile-game"><p class="eyebrow">An experiment in gamifying the roadmap</p><h3>Can we make the assumptions something to play with?</h3><p>Let's call the remaining gaps <strong>Bleile dings</strong>, following MaryLena Bleile’s suggestion to make the strength of the causal argument something we can discuss along a spectrum. Give each component 0–10 dings, then explore how recovering information, improving the design or making an assumption changes the argument.</p><p>The point is to see progress and its limits. Confounding and positivity remain distinct, even when we add the dings into a total. Try Susan’s fictional study below, then explore the checkpoints as we walk through the roadmap.</p></div>
+  <div class="bleile-intro"><p class="eyebrow">The causal roadmap</p><h2 id="roadmap-title">Build the argument, one component at a time.</h2><p>Start with the trial that would answer your question, then follow the causal roadmap from assumptions to interpretation. <a href="https://doi.org/10.1097/EDE.0000000000001636">Dang and Balzer (2023)</a> explain why a target-trial protocol is a starting point, and why identification needs its own argument.</p></div>
+  <figure class="independent-roadmap"><ol aria-label="A simplified causal roadmap" class="roadmap-flow"><li><a href="#question"><span aria-hidden="true" class="flow-number">01</span><strong>State the question</strong><small>Write the target-trial protocol.</small></a></li><li><a href="#dag"><span aria-hidden="true" class="flow-number">02</span><strong>Specify a causal model</strong><small>Name the causes and the causal effect.</small></a></li><li><a href="#question"><span aria-hidden="true" class="flow-number">03</span><strong>Examine the data</strong><small>What is observed, and what is missing?</small></a></li><li><a href="#identify"><span aria-hidden="true" class="flow-number">04</span><strong>Assess identification</strong><small>Can assumptions connect data to effect?</small></a></li><li><a href="#estimand"><span aria-hidden="true" class="flow-number">05</span><strong>Define the statistical target</strong><small>What quantity in the data will answer it?</small></a></li><li><a href="#estimators"><span aria-hidden="true" class="flow-number">06</span><strong>Estimate with uncertainty</strong><small>Choose methods for that target.</small></a></li><li><a href="#checks"><span aria-hidden="true" class="flow-number">07</span><strong>Challenge and interpret</strong><small>Test sensitivity; state scope and limits.</small></a></li></ol><figcaption>A simplified reading of <a href="https://doi.org/10.1097/EDE.0000000000001636">Dang and Balzer (2023), <em>Start with the Target Trial Protocol, Then Follow the Roadmap for Causal Inference</em></a>. If support is inadequate, revise the question, assumptions or data before proceeding.</figcaption></figure>
+
+
+  <div class="bleile-game-intro" id="bleile-game"><p class="eyebrow">An experiment in gamifying the roadmap</p><h3>Can we make the assumptions something to play with?</h3><p>Give each component 0–10 <strong>Bleile dings</strong> for the gaps that remain. Explore how recovering information, improving the design or making an assumption changes the argument.</p><p>Try Susan’s fictional study, then visit its checkpoints. The profile keeps confounding and positivity distinct even when their dings add to the same total.</p></div>
   <noscript><p class="bleile-nojs">Enable JavaScript to edit the checkpoints. In the worked example, recording baseline health reduces confounding from 10 to 4, validation reduces measurement dings from 6 to 4, and a relevant bias analysis reduces sensitivity dings from 7 to 5. The total falls from 60 to 50. Positivity stays at 8, so the full-population comparison still lacks support.</p></noscript>
   <div class="bleile-workbench">
     <div>
@@ -68,7 +70,7 @@
       <figure class="bleile-star-figure" aria-labelledby="bleile-star-heading">
         <p class="eyebrow" id="bleile-star-heading">Where the dings come from</p>
         <svg id="bleile-star" role="group" aria-labelledby="bleile-star-title" aria-describedby="bleile-star-description bleile-star-caption" viewBox="0 0 600 500"></svg>
-        <figcaption id="bleile-star-caption">The pale star outline represents 100 dings. Each point names a component, and its colored wedge contributes that component’s share of the shaded area. <strong>Equal totals give equal areas, even when the shapes differ.</strong> Select a point to edit its checkpoint.</figcaption>
+        <figcaption id="bleile-star-caption">The outline is 100 dings. Each wedge contributes its component’s share of the shaded area. Equal totals have equal areas; their shapes can differ. Select a point to edit it.</figcaption>
       </figure>
       <details class="more"><summary>How to read the area and scale</summary><div class="more-body"><p>The full star represents 100 dings. A total of 60 fills 60% of that area, and moving to 50 removes one-sixth of the shading. Each wedge is sized independently, so a component contributes the same area regardless of its neighbors.</p><p>The rings mark 2, 5 and 10 dings on each axis. Distances use a square-root scale so that <em>area</em> adds up to the total. Read the labels for the component values. An ordinary connected radar polygon would not have this property.</p></div></details>
       <details class="more bleile-profile-details"><summary>Inspect all ten component scores and their basis</summary><div class="more-body"><div class="bleile-profile" id="bleile-profile" aria-label="Dings by roadmap component"></div><p class="bleile-small">● Evidence or design &nbsp; ◇ Assumption to challenge &nbsp; ? Unresolved</p></div></details>
@@ -76,7 +78,7 @@
     </div>
   </div>
   <div class="bleile-explanation"><h3>What changes between 60 and 50?</h3><p>Recovering pretreatment performance status makes the confounding argument more credible. Validation improves the measurement argument. A bias analysis clarifies the remaining uncertainty. The ten removed dings are an illustrative judgment about these changes, not an effect calculated from a dataset.</p><p><strong>Positivity stays at 8.</strong> For some patients, only one treatment is observed. Measuring their health more accurately does not supply the missing comparison. A claim about patients with both options requires a newly stated target and a reassessment of its assumptions.</p>
-  <div class="bleile-comparison"><article><strong>50 with confounding 4, positivity 8</strong><p>The treatment-choice argument improves. The population-wide claim still lacks support where a treatment is absent.</p></article><article><strong>50 with confounding 8, positivity 4</strong><p>Both options are better represented. Unresolved common causes still undermine the treatment comparison.</p></article></div>
+
   <details class="more"><summary>Why the dings do not exchange one for one</summary><div class="more-body"><p>Five confounding dings cannot pay off five positivity dings. The total is many-to-one: different profiles can have the same sum. A single serious gap can limit the claim even when everything else scores well. The verdict therefore reads the components as well as the total.</p><p>The checklist includes identification assumptions and the design, measurement, analysis and applicability decisions around them. Identification is the umbrella question, so it gets no extra score on top of confounding, positivity and the other relevant assumptions. Better predictive fit cannot erase those gaps. Sensitivity points describe how well the argument has been challenged, not whether the underlying assumption has become true.</p><p>Within a fixed question and rubric, fewer dings usually signal a stronger argument. Changing the population, finding a previously hidden problem, or making an unsupported assumption can break that relationship. Scores are neither strictly monotonic nor transferable between studies. Moving a slider records a judgment: use the basis selector to distinguish evidence from an assumption still to challenge.</p></div></details></div>
   <details class="more bleile-review" id="bleile-review"><summary>Record the argument before analysis, then revisit it</summary><div class="more-body">
     <p>Before seeing the effect estimate, record the question, the component judgments and their basis. After analysis, revisit what the diagnostics and sensitivity checks revealed. A newly discovered problem can add dings. A favorable result alone cannot remove them.</p>
@@ -157,7 +159,7 @@
     <p class="eyebrow"><span class="stepnum">0</span> · Before anything else</p>
     <h2>Three questions that look alike</h2>
     <p class="lede">The same registry can answer three different kinds of question: <span class="kw">description</span>, <span class="kw">prediction</span>, and <span class="kw">cause and effect</span>. Each needs different tools.<a class="cite" href="#ref-8">8</a></p>
-<div class="story-note"><span aria-hidden="true">↳</span><p>Begin by naming what you want to learn. Describing what happened, predicting what comes next, and asking what a treatment would change lead to different analyses.</p></div>
+
     <div class="key"><strong>The core difference</strong><p>A causal effect compares two outcomes for the same patients: one under hypofractionation and one under conventional fractionation. Each patient shows us only one of them. No cohort size and no better learner can fill in the other, so ordinary prediction accuracy cannot confirm a causal effect. A causal analysis is built on a design and on stated assumptions, and then challenged from several directions.</p></div>
     <details class="more"><summary>The three kinds of question, side by side</summary><div class="more-body">
       <div class="table-scroll">
@@ -176,7 +178,7 @@
     </div></details>
     <details class="more" id="why-causal"><summary>If the assumptions are uncertain, why think causally at all?</summary><div class="more-body">
       <p><strong>Why not use a familiar prediction pipeline?</strong> Susan could predict survival well using the treatment patients received and information about their health. To ask what would happen if she changed their treatment, she also needs an argument about treatment choice. The roadmap exposes that argument and its weak points. Calling an estimator “causal” does not make its assumptions true.<a class="cite" href="#ref-8">8</a></p>
-      <p><strong>Could a large language model learn the answer from enough data?</strong> It might bring relevant scientific knowledge or experimental results into the discussion. But equally good fits to observational records can be compatible with different intervention effects. More of the same records cannot, by itself, choose between those explanations. Ask which design, evidence and assumptions support this answer. A DAG is one way to make them inspectable; it is not proof that they are correct.<a class="cite" href="#ref-9">9</a> Pearl and Bareinboim’s <a href="#engine-caption">inference engine</a> makes those inputs explicit.</p>
+      <p><strong>Could a large language model learn the answer from enough data?</strong> It might bring relevant scientific knowledge or experimental results into the discussion. But equally good fits to observational records can be compatible with different intervention effects. More of the same records cannot, by itself, choose between those explanations. Ask which design, evidence and assumptions support this answer. A DAG is one way to make them inspectable; it is not proof that they are correct.<a class="cite" href="#ref-9">9</a> Pearl and Bareinboim’s <a href="https://ftp.cs.ucla.edu/pub/stat_ser/r400.pdf">inference engine</a> makes those inputs explicit.</p>
       <p><strong>Would it be safer to report only an association?</strong> That is appropriate when description or prediction is the goal. If the reader will use the result to choose a treatment, the intervention question remains. Susan can state her causal target, explain what the evidence supports, and say where it falls short. An honest conclusion may be that this dataset cannot yet answer her question.</p>
       <p><strong>What about finding benefits hidden by an average near zero?</strong> Different subgroup effects are possible. Finding them reliably requires enough information and a plan for checking the discovery. <a href="#subgroup-evidence">See what a subgroup estimate does and does not establish.</a></p>
     </div></details>
@@ -208,11 +210,7 @@
     <h2>Start with the clinical question, then find data that can answer it</h2>
     <p class="lede">The causal roadmap is a sequence of steps from a scientific question to an estimate and its interpretation.<a class="cite" href="#ref-4">4</a><a class="cite" href="#ref-10">,10</a> The first step is to write the question so precisely that two people would compute the same number from it: the <span class="kw">population</span>, the <span class="kw">strategies</span> compared, the <span class="kw">outcome</span>, the <span class="kw">time horizon</span> and the <span class="kw">scale</span>.</p>
 <figure class="story-figure sketch"><img src="assets/story/cohort-fork.svg" loading="lazy" alt="A sketched cohort at a fork, with the same patients imagined under two alternative treatment strategies."><figcaption>We want to compare two possible treatment worlds for the same population. The data reveal only the world each patient actually experienced.</figcaption></figure>
-<figure class="story-engine" aria-labelledby="engine-caption">
-  <div class="story-engine-inputs"><div><span>What we want to know</span><strong>The causal question</strong></div><div><span>What we observe</span><strong>The available data</strong></div><div><span>What connects them</span><strong>Scientific knowledge and assumptions</strong></div></div>
-  <div class="story-engine-flow"><div><strong>The inference engine</strong><small>Identification, estimation and checks</small></div><span aria-hidden="true">→</span><div><strong>A causal verdict</strong><small>A conclusion with a scope and conditions</small></div></div>
-  <figcaption id="engine-caption">A simplified view of Pearl and Bareinboim’s <a href="https://ftp.cs.ucla.edu/pub/stat_ser/r400.pdf">inference engine</a>. The roadmap makes the parts of the argument explicit.</figcaption>
-</figure>
+
     <div data-bleile-slot="question"></div>
     <details class="more"><summary>The five elements, for the running example</summary><div class="more-body">
       <p>A vague version is “Is hypofractionation better?”. A precise version names five things:</p>
@@ -251,7 +249,7 @@
     <p class="eyebrow"><span class="stepnum">2</span> · The target trial</p>
     <h2>Write the trial you would run, then imitate it</h2>
     <p class="lede"><span class="kw">Target trial emulation</span> means writing the protocol of the randomized trial that would answer your question, and then making the observational analysis follow that protocol as closely as the data allow.<a class="cite" href="#ref-5">5</a> It removes several biases that no estimator can fix later, and the protocol becomes the draft of a real trial if one is needed (section 10).</p>
-<figure class="story-figure"><img src="assets/story/home-ground.jpg" loading="lazy" alt="A clinician and surveyor study the comparison at a table with patient figures and a balance."><figcaption>Write down the comparison you want before choosing how to obtain the evidence.</figcaption></figure>
+
 <div class="story-route">
   <p>Susan writes the trial protocol she would want: who enters, which schedules they could receive, when follow-up starts, and what outcome matters. Clinicians can discuss those choices before debating an algorithm. <strong>Target trial emulation fits inside the roadmap</strong>: it organizes the design, while the causal model and identification assumptions explain whether the available records can support the comparison.<a class="cite" href="#ref-5">5</a><a class="cite" href="#ref-10">,10</a></p>
   <p class="eyebrow">Two ambitious ways to investigate</p>
@@ -296,7 +294,7 @@
     <p class="eyebrow"><span class="stepnum">3</span> · The causal model</p>
     <h2>Draw what causes what before choosing what to adjust for</h2>
     <p class="lede">A <span class="kw">directed acyclic graph</span> (DAG) is a diagram where an arrow means “affects”. It decides which variables belong in the model, and that decision matters more than the choice between Cox, a random forest and a neural network.</p>
-<div class="story-prompt"><p>Susan asks why each patient received that schedule. Baseline health may affect both the choice and survival, even when it is absent from the records.</p><a href="#dag-more">Explore the causal diagram <span aria-hidden="true">↗</span></a></div>
+
     <div class="key"><strong>Three rules</strong><p><span class="good">Adjust for common causes measured before treatment.</span> <span class="bad">Do not adjust for anything the treatment itself affects</span> when estimating the total effect of the schedule chosen at the start. <span class="kw">Name what is missing.</span></p></div>
   </div>
   <div data-bleile-slot="dag"></div>
@@ -570,7 +568,7 @@
     <h2>Can these data answer the question at all?</h2>
     <p class="lede"><span class="kw">Identification</span> asks whether the estimand could be computed from the observed data if you had unlimited patients. For the treatment, it rests on three assumptions: <span class="kw">exchangeability</span>, <span class="kw">positivity</span> and <span class="kw">consistency</span>.<a class="cite" href="#ref-1">1</a> For a survival outcome, it also rests on assumptions about <span class="kw">censoring</span>.<a class="cite" href="#ref-35">35</a></p>
 <figure class="story-figure sketch"><img src="assets/story/hidden-thread.svg" loading="lazy" alt="A lamp illuminates several threads, while one thread runs beyond the light."><figcaption>Measured variables illuminate part of the comparison. An unobserved common cause can leave a path outside the light.</figcaption></figure>
-<div class="story-prompt"><p>Meet the ghost of unobserved confounding. Watch what changes when performance status is recorded, and when it is missing.</p><a href="#sim2">Try the hidden-factor example <span aria-hidden="true">↗</span></a></div>
+
     <div class="key"><strong>Two layers</strong><p>Identification decides whether the data can answer the question. Estimation (section 7) decides how well you compute the answer. Better models, including neural networks, help the second layer. They cannot fix a failure of the first.</p></div>
     <div data-bleile-slot="identify"></div>
     <details class="more"><summary>The three treatment assumptions, in plain clinical terms</summary><div class="more-body">
@@ -612,7 +610,7 @@
     <p class="eyebrow"><span class="stepnum">6</span> · Treatment policies</p>
     <h2>Compare the rules clinicians actually use</h2>
     <p class="lede">“Everyone gets hypofractionation” versus “everyone gets conventional fractionation” is a <span class="kw">static</span> comparison. Clinicians follow rules, and a causal analysis can compare rules directly: <span class="kw">dynamic</span> rules that depend on the patient, and <span class="kw">modified treatment policies</span> that shift practice a step.</p>
-<div class="story-note"><span aria-hidden="true">↳</span><p>A decision at baseline and a rule that changes with a patient’s health are different interventions. Keep the question and the analysis aligned.</p></div>
+
     <div data-bleile-slot="policies"></div>
     <details class="more"><summary>Four kinds of strategy, with examples</summary><div class="more-body">
       <div class="table-scroll">
@@ -640,8 +638,8 @@
     <p class="eyebrow"><span class="stepnum">7</span> · The estimator</p>
     <h2>Choose the estimator last, and put your machine learning inside it</h2>
     <p class="lede">Once the estimand is identified, several estimators can compute it. Most need two prediction tasks, called <span class="kw">nuisance models</span>: the outcome given baseline factors, and the probability of receiving each schedule given baseline factors (the <span class="kw">propensity score</span>).<a class="cite" href="#ref-2">2</a> This is where random forests, XGBoost and neural networks go. They stop being the analysis and become components of it.</p>
-<figure class="story-figure"><img src="assets/story/slices-to-curve.jpg" loading="lazy" alt="Brass calipers measure gaps between two colored paths on a board, with a curve-fitting instrument below."><figcaption>The tools measure the comparison you have defined. Their flexibility does not supply missing causal information.</figcaption></figure>
-<div class="story-prompt"><p>The model that predicts best need not answer the causal question best.</p><a href="#sim1">Compare prediction and causal estimation <span aria-hidden="true">↗</span></a></div>
+
+
     <div data-bleile-slot="estimators"></div>
     <details class="more"><summary>The estimator menu</summary><div class="more-body">
       <p>For example, targeted maximum likelihood estimation (TMLE) is often paired with super learning, which combines machine-learning algorithms so that the estimate depends less on any one modeling assumption being right.<a class="cite" href="#ref-10">10</a></p>
@@ -710,7 +708,7 @@
     <p class="eyebrow"><span class="stepnum">8</span> · Checks and sensitivity</p>
     <h2>Build confidence without an answer key</h2>
     <p class="lede">A prediction is validated on held-out outcomes. A causal estimate cannot be validated that way, so confidence comes from how much it withstands: <span class="kw">overlap</span>, <span class="kw">agreement across estimators</span>, <span class="kw">planted-effect and negative-control checks</span>, and a <span class="kw">bias analysis</span> for what was not measured.</p>
-<div class="story-note"><span aria-hidden="true">↳</span><p>Susan asks what could fool her analysis. A reassuring fit, good overlap and resistance to hidden confounding answer different questions.</p></div>
+
     <div class="story-lab" id="rehearsal">
       <p class="eyebrow">A rehearsal with an answer key</p><h3>Can the pipeline recover an effect we put there?</h3>
       <p>Before interpreting the real study, Susan can simulate cohorts with similar covariates, treatment selection and follow-up, while setting the treatment effect herself. She runs the planned analysis across many simulated studies, checking bias, interval coverage (how often the interval contains the truth), and false discoveries. A failure gives her something to repair before relying on the real-data result.<a class="cite" href="#ref-43">43</a></p>
@@ -746,7 +744,7 @@
     <h2>What each approach tells you about the same question</h2>
     <p class="lede">Compare the question each analysis is designed to answer. A coefficient from a fitted model describes an association unless a study design and causal argument support more. The roadmap connects those choices to what would happen under each strategy.</p>
     <p class="story-small">The table compares common uses of the tools. A Cox model or a prediction learner can also serve inside a causal analysis. The model’s name does not determine whether the resulting claim is causal.</p>
-<div class="story-prompt"><p>Return to the clinical question before comparing the tools.</p><a href="#question">Revisit the target <span aria-hidden="true">↗</span></a></div>
+
   </div>
   <details class="more wide"><summary>Side-by-side comparison</summary><div class="more-body">
     <div class="table-scroll">
@@ -785,7 +783,7 @@
     <p class="eyebrow"><span class="stepnum">9</span> · Beyond registries</p>
     <h2>Causal machine learning on randomized trial data</h2>
     <p class="lede">The same estimators apply to observational and randomized studies alike. What changes is which assumptions the design guarantees. <span class="good">Randomization makes the assigned groups comparable</span>, so the effect of being assigned to a schedule, the <span class="kw">intention-to-treat effect</span>, needs no adjustment for confounding.<a class="cite" href="#ref-1">1</a> The propensity score is known: it is the randomization probability. <span class="bad">Censoring and nonadherence are not settled by randomization.</span></p>
-<figure class="story-figure"><img src="assets/story/one-ratio-many-people.jpg" loading="lazy" alt="A surveyor examines a row of distinct clay patients, with treatment paths on a board behind them."><figcaption>The study answers a question about particular patients. Applying the result to other patients needs its own argument.</figcaption></figure>
+
     <details class="more" id="subgroup-evidence"><summary>An average near zero: no benefit, or benefits that cancel?</summary><div class="more-body">
       <p>Either is possible. A conditional average treatment effect (CATE) describes an average among patients with specified characteristics. A forest may suggest that effects differ across those characteristics, but an exploratory split is not yet a dependable treatment rule.</p>
       <p>Susan needs uncertainty intervals, adequate overlap and follow-up within the relevant groups, and a check of the discovery on data that did not select it. Prespecified, clinically motivated analyses and analyses by baseline risk are useful starting points. Searching many subgroups increases the opportunity for chance patterns; sample splitting and regularization help but cannot create information a small study lacks. Report inconclusive subgroup evidence as inconclusive.<a class="cite" href="#ref-7">7</a><a class="cite" href="#ref-45">,45</a></p>
@@ -929,7 +927,7 @@
     <p class="eyebrow"><span class="stepnum">11</span> · Your turn</p>
     <h2>Turn your question into a one-page plan</h2>
     <p class="lede">Fill in each section for your own question, then take the plan to your mentor or a statistician before writing any analysis code. The fields start with the running example, with [brackets] where a real protocol must fill in specifics.</p>
-<div class="story-note"><span aria-hidden="true">↳</span><p>Bring the roadmap back to your own information gap. The worksheet collects the decisions and assumptions that your study will need to defend.</p></div>
+
     <details class="more"><summary>Open the worksheet</summary><div class="more-body">
       <form class="sheet" id="sheet"></form>
       <div class="sheet-actions">
@@ -1029,6 +1027,7 @@
       <li id="ref-47">Hernán MA, Alonso A, Logan R, et al. Observational studies analyzed like randomized experiments: an application to postmenopausal hormone therapy and coronary heart disease. <em>Epidemiology</em>. 2008;19(6):766-779. <a href="https://doi.org/10.1097/EDE.0b013e3181875e61">doi:10.1097/EDE.0b013e3181875e61</a></li>
       <li id="ref-48">Bradley JD, Paulus R, Komaki R, et al. Standard-dose versus high-dose conformal radiotherapy with concurrent and consolidation carboplatin plus paclitaxel with or without cetuximab for patients with stage IIIA or IIIB non-small-cell lung cancer (RTOG 0617): a randomised, two-by-two factorial phase 3 study. <em>Lancet Oncol</em>. 2015;16(2):187-199. <a href="https://doi.org/10.1016/S1470-2045(14)71207-0">doi:10.1016/S1470-2045(14)71207-0</a></li>
       <li id="ref-49">Senn S. Statistical pitfalls of personalized medicine. <em>Nature</em>. 2018;563:619-621. <a href="https://doi.org/10.1038/d41586-018-07535-2">doi:10.1038/d41586-018-07535-2</a></li>
+          <li id="ref-50">Dang LE, Balzer LB. Start with the Target Trial Protocol, Then Follow the Roadmap for Causal Inference. <em>Epidemiology</em>. 2023;34(5):614–618. <a href="https://doi.org/10.1097/EDE.0000000000001636">doi:10.1097/EDE.0000000000001636</a>.</li>
     </ol>
   </div>
 </section>
@@ -1036,11 +1035,7 @@
 </main>
 
 <footer class="site">
-  <div class="wrap">
-    <p>Written by Igor Shuryak as a companion to the CAST demo site by Andy Wilson, Aimee Harrison and Igor Shuryak. Every number in the three simulations is computed from synthetic data. No patient data are used anywhere on this page. Parts of the text, code and checks were prepared with the help of an AI assistant (Anthropic Claude). The author is responsible for the scientific content.</p>
-    <p>Illustrated reading layout developed with Andy Wilson. CAST artwork is reused from the survival companion under its <a href="assets/story/LICENSE">MIT license</a>. The hand-drawn roadmap comes from The Tao of RWD’s Causal Navigator and is reused at Andy Wilson’s request (<a href="assets/story/TAO-ATTRIBUTION.txt">attribution</a>). The technical notes, examples and self-tests remain available throughout the roadmap.</p>
-    <p>The Bleile exercise develops MaryLena Bleile’s proposal, with discussion and refinements from Andy Wilson and Igor Shuryak. Susan’s narrative path adapts Alexander Steele’s approach for the CAST companion. This illustrated prototype and its interactive exercises were developed with OpenAI Codex.</p>
-  </div>
+  <div class="wrap"><p>Primer by Igor Shuryak. Illustrated edition developed with Andy Wilson. CAST artwork is reused under its <a href="assets/story/LICENSE">MIT license</a>. Synthetic data are used throughout. AI assistance: Anthropic Claude and OpenAI Codex; the authors are responsible for the scientific content.</p></div>
 </footer>
 
 <div class="tip" id="tip" hidden></div>

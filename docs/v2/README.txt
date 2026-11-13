@@ -32,10 +32,13 @@ of an ordinary connected radar polygon. Axis labels and a component list keep
 the numerical values and evidence basis available.
 
 Artwork: CAST illustrations retain their MIT notice in assets/story/LICENSE.
-The Tao Navigator map has separate attribution in assets/story/TAO-ATTRIBUTION.txt.
+The current product-independent roadmap cites Dang and Balzer (2023),
+doi:10.1097/EDE.0000000000001636. roadmap-flow.css draws its responsive steps.
+The former Navigator image is retained as a historical asset, not shown.
 
-Susan's opening and the conceptual-to-lab reading path adapt Alexander
-Steele's CAST outline. The primer also includes Igor's discussion prompts,
-simulation rehearsal guidance, subgroup cautions and a toy transport example.
+The primer includes a researcher narrative, simulation rehearsal guidance,
+subgroup cautions and a toy transport example. Repeated prompts, large
+decorative illustrations and duplicated navigation have been removed.
+Scoring controls open on demand, including when selected from the star.
 The transport slider reweights stipulated subgroup effects; it is not a
 fitted transport model. The CAST companion itself is maintained separately.
