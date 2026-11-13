@@ -13,7 +13,7 @@ for(const c of COMPONENTS){
     <p>${c.prompt}</p><label class="bleile-range-label" for="bleile-input-${c.id}">How much of this gap remains?</label><input id="bleile-input-${c.id}" type="range" min="0" max="10" step="1" aria-describedby="bleile-scale-${c.id}">
     <div class="bleile-scale" id="bleile-scale-${c.id}"><span><b>0</b> ${c.rubric[0]}</span><span><b>5</b> ${c.rubric[1]}</span><span><b>10</b> ${c.rubric[2]}</span></div>
     <label class="bleile-basis">What supports your judgment?<select id="bleile-basis-${c.id}" aria-label="Basis for ${c.label}"><option value="evidence">Observed evidence or study design</option><option value="assumption">An assumption still to challenge</option><option value="unresolved">Unresolved or not yet checked</option></select></label>
-    <a class="bleile-return" href="#roadmap">See this in the full profile ↑</a>`;
+    <a class="bleile-return" href="#bleile-game">Return to the roadmap exercise ↑</a>`;
   host.append(panel);
   const input=panel.querySelector('input'),select=panel.querySelector('select');
   input.addEventListener('input',()=>{profile[c.id]=Number(input.value);active='custom';render(`${c.short}: ${profile[c.id]} dings. Moving a slider records a judgment. It does not add evidence.`);});
@@ -59,9 +59,8 @@ function preset(key){
   render(key==='recover'?'60 → 50: confounding −6, measurement −2, sensitivity −2. Positivity is unchanged.':`${PRESETS[key].label} loaded.`);
 }
 document.querySelectorAll('[data-bleile-preset]').forEach(b=>b.addEventListener('click',()=>preset(b.dataset.bleilePreset)));
-document.querySelectorAll('[data-bleile-recover]').forEach(b=>b.addEventListener('click',()=>{preset('recover');document.querySelector('#bleile-verdict').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});}));
 document.querySelector('#bleile-copy').addEventListener('click',async()=>{
-  const url=new URL(location.href);url.searchParams.set('bleile',COMPONENTS.map(c=>profile[c.id]).join(','));url.searchParams.set('basis',COMPONENTS.map(c=>({evidence:'e',assumption:'a',unresolved:'u'})[basis[c.id]]).join(''));url.hash='roadmap';
+  const url=new URL(location.href);url.searchParams.set('bleile',COMPONENTS.map(c=>profile[c.id]).join(','));url.searchParams.set('basis',COMPONENTS.map(c=>({evidence:'e',assumption:'a',unresolved:'u'})[basis[c.id]]).join(''));url.hash='bleile-game';
   try{await navigator.clipboard.writeText(url.href);document.querySelector('#bleile-copy-result').textContent='Profile link copied.';}
   catch{document.querySelector('#bleile-copy-result').textContent='Copy this link:';const field=document.querySelector('#bleile-share-url');field.hidden=false;field.value=url.href;field.focus();field.select();}
 });

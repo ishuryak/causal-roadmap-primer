@@ -16,6 +16,9 @@ The fictional 60-to-50 example preserves positivity at 8 while improving
 confounding, measurement and sensitivity. Equal totals can yield different
 verdicts. Dings are a teaching rubric, not an empirical probability or ranking.
 Profile links contain the ten scores and evidence-basis flags only.
+Introduce the roadmap first, then gamification, then the score. The total and
+worked verdict appear only in that roadmap exercise. There is no floating
+score or repeated score panel in the final interpretation section.
 
 Artwork: CAST illustrations retain their MIT notice in assets/story/LICENSE.
 The Tao Navigator map has separate attribution in assets/story/TAO-ATTRIBUTION.txt.
