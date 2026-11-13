@@ -1,4 +1,5 @@
 import {COMPONENTS,PRESETS,assess} from './bleile-model.mjs';
+import {renderStar} from './bleile-star.mjs';
 
 let profile={...PRESETS.start.scores}, basis={...PRESETS.start.basis}, active='start';
 const panels=[];
@@ -28,6 +29,7 @@ for(const c of COMPONENTS){
 }
 function render(change=''){
   const result=assess(profile,basis);
+  renderStar(document.querySelector('#bleile-star'),profile);
   for(const {c,panel,input,select} of panels){
     input.value=profile[c.id];select.value=basis[c.id];
     panel.querySelector('output').textContent=profile[c.id];
@@ -68,3 +70,5 @@ const query=new URLSearchParams(location.search), saved=query.get('bleile'), sav
 if(saved && /^\d+(,\d+){9}$/.test(saved) && saved.split(',').every(n=>Number(n)<=10) && /^[eau]{10}$/.test(savedBasis||'')){
   profile=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,Number(saved.split(',')[i])]));basis=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,({e:'evidence',a:'assumption',u:'unresolved'})[savedBasis[i]]]));active='custom';render('Shared profile loaded.');
 }else preset('start');
+let starResizePending=false;
+window.addEventListener('resize',()=>{if(!starResizePending){starResizePending=true;requestAnimationFrame(()=>{starResizePending=false;renderStar(document.querySelector('#bleile-star'),profile);});}});

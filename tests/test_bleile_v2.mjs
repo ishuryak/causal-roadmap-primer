@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {COMPONENTS,PRESETS,assess} from '../docs/v2/bleile-model.mjs';
+import {starGeometry} from '../docs/v2/bleile-star.mjs';
 let count=0;const test=(name,fn)=>{fn();count++;console.log('PASS '+name);};
 test('the worked revision is exactly 60 to 50',()=>{assert.equal(assess(PRESETS.start.scores).total,60);assert.equal(assess(PRESETS.recover.scores).total,50);});
 test('only the three stated components improve and positivity is unchanged',()=>{const changes=COMPONENTS.filter(c=>PRESETS.start.scores[c.id]!==PRESETS.recover.scores[c.id]).map(c=>[c.id,PRESETS.recover.scores[c.id]-PRESETS.start.scores[c.id]]);assert.deepEqual(changes,[['confounding',-6],['measurement',-2],['sensitivity',-2]]);assert.equal(PRESETS.recover.scores.positivity,8);});
@@ -13,4 +14,11 @@ test('lowering by assumption does not become evidence',()=>{const r=assess(PRESE
 test('entering zeros with unsupported assumptions does not earn the ideal verdict',()=>{assert.match(assess(PRESETS.ideal.scores,{confounding:'assumption'}).title,/support still to show/);assert.match(assess(PRESETS.ideal.scores,{positivity:'unresolved'}).title,/support still to show/);});
 test('invalid, missing and non-integer values are rejected',()=>{for(const v of [-1,11,NaN,Infinity,1.5,'3',undefined])assert.throws(()=>assess({...PRESETS.start.scores,confounding:v}),RangeError);});
 test('every checkpoint belongs to an existing primer section',()=>{const html=readFileSync(new URL('../docs/v2/index.html',import.meta.url),'utf8');for(const c of COMPONENTS)assert(html.includes(`data-bleile-slot="${c.section}"`));assert(html.includes('id="roadmap"'));});
+const polygonArea=points=>Math.abs(points.reduce((sum,[x,y],i)=>{const [nx,ny]=points[(i+1)%points.length];return sum+x*ny-nx*y;},0))/2;
+const measuredArea=profile=>starGeometry(profile).wedges.reduce((sum,w)=>sum+polygonArea(w.points),0);
+test('the rendered wedge areas add to the score across diverse profiles',()=>{for(let seed=0;seed<33;seed++){const p=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,(seed*7+i*i*3)%11]));const g=starGeometry(p);assert(Math.abs(measuredArea(p)/g.fullArea-assess(p).total/100)<1e-12);}});
+test('60 to 50 removes exactly one sixth of the plot area',()=>{assert(Math.abs(measuredArea(PRESETS.recover.scores)/measuredArea(PRESETS.start.scores)-5/6)<1e-12);});
+test('the two 50-point profiles have equal areas but different point shapes',()=>{assert(Math.abs(measuredArea(PRESETS.recover.scores)-measuredArea(PRESETS.alternate.scores))<1e-9);assert.notDeepEqual(starGeometry(PRESETS.recover.scores).wedges.map(w=>w.radius),starGeometry(PRESETS.alternate.scores).wedges.map(w=>w.radius));});
+test('a single component contributes area without needing nonzero neighbors',()=>{for(const c of COMPONENTS){const p={...PRESETS.ideal.scores,[c.id]:10},g=starGeometry(p);assert(Math.abs(measuredArea(p)/g.fullArea-0.1)<1e-12);assert.equal(g.wedges.find(w=>w.id===c.id).value,10);}});
+test('zero has zero area and the maximum profile fills the full star',()=>{assert.equal(measuredArea(PRESETS.ideal.scores),0);const full=Object.fromEntries(COMPONENTS.map(c=>[c.id,10]));assert(Math.abs(measuredArea(full)/starGeometry(full).fullArea-1)<1e-12);});
 console.log(`\n${count} passed, 0 failed`);

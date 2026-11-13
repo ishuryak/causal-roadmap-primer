@@ -54,9 +54,13 @@
       <div class="bleile-share"><button type="button" class="bleile-action" id="bleile-copy">Copy this profile link</button><span class="bleile-small" id="bleile-copy-result" role="status"></span><input id="bleile-share-url" hidden readonly aria-label="Shareable profile link"></div>
     </div>
     <div>
-      <p class="eyebrow">Ten distinct components · select one to edit</p>
-      <div class="bleile-profile" id="bleile-profile" aria-label="Dings by roadmap component"></div>
-      <p class="bleile-small">● Evidence or design &nbsp; ◇ Assumption to challenge &nbsp; ? Unresolved</p>
+      <figure class="bleile-star-figure" aria-labelledby="bleile-star-heading">
+        <p class="eyebrow" id="bleile-star-heading">Where the dings come from</p>
+        <svg id="bleile-star" role="group" aria-labelledby="bleile-star-title" aria-describedby="bleile-star-description bleile-star-caption" viewBox="0 0 600 500"></svg>
+        <figcaption id="bleile-star-caption">The pale star outline represents 100 dings. Each point names a component, and its colored wedge contributes that component’s share of the shaded area. <strong>Equal totals give equal areas, even when the shapes differ.</strong> Select a point to edit its checkpoint.</figcaption>
+      </figure>
+      <details class="more"><summary>How to read the area and scale</summary><div class="more-body"><p>The full star represents 100 dings. A total of 60 fills 60% of that area, and moving to 50 removes one-sixth of the shading. Each wedge is sized independently, so a component contributes the same area regardless of its neighbors.</p><p>The rings mark 2, 5 and 10 dings on each axis. Distances use a square-root scale so that <em>area</em> adds up to the total. Read the labels for the component values. An ordinary connected radar polygon would not have this property.</p></div></details>
+      <details class="more bleile-profile-details"><summary>Inspect all ten component scores and their basis</summary><div class="more-body"><div class="bleile-profile" id="bleile-profile" aria-label="Dings by roadmap component"></div><p class="bleile-small">● Evidence or design &nbsp; ◇ Assumption to challenge &nbsp; ? Unresolved</p></div></details>
       <div class="bleile-verdict" id="bleile-verdict"><p class="eyebrow">The current causal verdict</p><h3 data-bleile-title>Treatment choice is still entangled with health</h3><p data-bleile-verdict></p><div class="bleile-tokens"><span class="bleile-token conf">Confounding <b data-bleile-confounding>10</b> / 10</span><span class="bleile-token pos">Positivity <b data-bleile-positivity>8</b> / 10</span></div><p class="bleile-small" data-bleile-basis-note></p><a class="bleile-return" href="#causal-verdict">Carry this into the final interpretation ↓</a></div>
     </div>
   </div>

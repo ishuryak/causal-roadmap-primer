@@ -20,5 +20,12 @@ Introduce the roadmap first, then gamification, then the score. The total and
 worked verdict appear only in that roadmap exercise. There is no floating
 score or repeated score panel in the final interpretation section.
 
+bleile-star.mjs draws the component star beside the score. Equal-angle kite
+wedges use radius proportional to the square root of the component's dings.
+Their geometric areas add to a fixed multiple of the total, independently of
+neighboring scores. The full star is 100 dings. This avoids the area distortion
+of an ordinary connected radar polygon. Axis labels and a component list keep
+the numerical values and evidence basis available.
+
 Artwork: CAST illustrations retain their MIT notice in assets/story/LICENSE.
 The Tao Navigator map has separate attribution in assets/story/TAO-ATTRIBUTION.txt.
