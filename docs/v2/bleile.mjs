@@ -1,7 +1,9 @@
-import {COMPONENTS,PRESETS,assess} from './bleile-model.mjs';
+import {COMPONENTS,PRESETS,assess,snapshot,compareAssessment} from './bleile-model.mjs';
 import {renderStar} from './bleile-star.mjs';
 
 let profile={...PRESETS.start.scores}, basis={...PRESETS.start.basis}, active='start';
+let baseline=null;
+const basisName={evidence:'Evidence / design',assumption:'Assumption',unresolved:'Unresolved'};
 const panels=[];
 for(const c of COMPONENTS){
   const host=document.querySelector(`[data-bleile-slot="${c.section}"]`);
@@ -14,7 +16,7 @@ for(const c of COMPONENTS){
     <p>${c.prompt}</p><label class="bleile-range-label" for="bleile-input-${c.id}">How much of this gap remains?</label><input id="bleile-input-${c.id}" type="range" min="0" max="10" step="1" aria-describedby="bleile-scale-${c.id}">
     <div class="bleile-scale" id="bleile-scale-${c.id}"><span><b>0</b> ${c.rubric[0]}</span><span><b>5</b> ${c.rubric[1]}</span><span><b>10</b> ${c.rubric[2]}</span></div>
     <label class="bleile-basis">What supports your judgment?<select id="bleile-basis-${c.id}" aria-label="Basis for ${c.label}"><option value="evidence">Observed evidence or study design</option><option value="assumption">An assumption still to challenge</option><option value="unresolved">Unresolved or not yet checked</option></select></label>
-    <a class="bleile-return" href="#bleile-game">Return to the roadmap exercise ↑</a>`;
+    <p class="bleile-concern"></p><a class="bleile-return" href="#bleile-game">Return to the roadmap exercise ↑</a>`;
   host.append(panel);
   const input=panel.querySelector('input'),select=panel.querySelector('select');
   input.addEventListener('input',()=>{profile[c.id]=Number(input.value);active='custom';render(`${c.short}: ${profile[c.id]} dings. Moving a slider records a judgment. It does not add evidence.`);});
@@ -34,6 +36,7 @@ function render(change=''){
     input.value=profile[c.id];select.value=basis[c.id];
     panel.querySelector('output').textContent=profile[c.id];
     panel.dataset.concern=profile[c.id]>=8?'high':profile[c.id]>=4?'some':'low';
+    panel.querySelector('.bleile-concern').textContent={high:'High concern · 8–10 dings',some:'Some concern · 4–7 dings',low:'Fewer dings · 0–3'}[panel.dataset.concern];
     const item=profileList.querySelector(`[data-profile="${c.id}"]`);
     item.querySelector('b').textContent=profile[c.id];
     item.querySelector('i').style.width=`${profile[c.id]*10}%`;
@@ -53,7 +56,41 @@ function render(change=''){
   document.querySelector('#bleile-change').textContent=change;
   document.querySelector('#bleile-case').textContent=active==='custom'?'Your edited profile':PRESETS[active].label;
   if(active==='custom')document.querySelector('#bleile-story').textContent='You are editing the fictional study. Visit each checkpoint to set a judgment and say whether it rests on evidence, an assumption or an unresolved gap. Reducing a number alone does not recover information.';
+  renderRevision();
 }
+
+function renderRevision(){
+  const host=document.querySelector('#bleile-revision');
+  host.hidden=!baseline;
+  if(!baseline)return;
+  const comparison=compareAssessment(baseline,profile,basis);
+  const delta=comparison.delta;
+  document.querySelector('#bleile-revision-summary').textContent=`Recorded before analysis: ${comparison.beforeTotal}. Current: ${comparison.currentTotal}. ${delta===0?'The total is unchanged; inspect the components.':Math.abs(delta)+' '+(delta<0?'fewer':'more')+' dings; inspect what changed.'}`;
+  const body=document.querySelector('#bleile-revision-rows');body.replaceChildren();
+  for(const c of comparison.components){
+    const row=document.createElement('tr');row.dataset.component=c.id;
+    const label=document.createElement('th');label.scope='row';label.textContent=c.label;row.append(label);
+    for(const value of [c.before,c.after,c.delta>0?'+'+c.delta:c.delta,basisName[c.beforeBasis]+' → '+basisName[c.afterBasis]]){
+      const cell=document.createElement('td');cell.textContent=value;row.append(cell);
+    }
+    body.append(row);
+  }
+}
+document.querySelector('#bleile-record').addEventListener('click',()=>{
+  baseline=snapshot(profile,basis);
+  document.querySelector('#bleile-revision-note').value='';
+  document.querySelector('#bleile-record').textContent='Replace the recorded baseline';
+  document.querySelector('#bleile-record-status').textContent='Pre-analysis profile recorded for this visit. Now try Recover information, or edit a checkpoint.';
+  renderRevision();
+});
+document.querySelector('#bleile-download').addEventListener('click',()=>{
+  if(!baseline)return;
+  const report={rubric:'Bleile teaching prototype, not a validated index',before:baseline,current:snapshot(profile,basis),
+    comparison:compareAssessment(baseline,profile,basis),reason:document.querySelector('#bleile-revision-note').value,
+    verdict:assess(profile,basis).verdict};
+  const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));
+  const a=document.createElement('a');a.href=url;a.download='bleile-assessment.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
 function preset(key){
   if(!PRESETS[key])return;
   active=key;profile={...PRESETS[key].scores};basis={...PRESETS[key].basis};

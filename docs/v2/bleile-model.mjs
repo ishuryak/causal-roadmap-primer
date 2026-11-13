@@ -16,7 +16,7 @@ const base = scores([4,5,10,8,5,6,5,5,7,5]);
 const recovered = {...base,confounding:4,measurement:4,sensitivity:5};
 const baseBasis = Object.fromEntries(COMPONENTS.map(c=>[c.id, ['confounding','positivity','sensitivity'].includes(c.id)?'unresolved':'assumption']));
 export const PRESETS = {
-  start:{label:'Starting study',scores:base,basis:baseBasis,story:'We want the effect of a shorter radiotherapy course on five-year survival. Baseline performance status is absent, treatment timing needs work, and some frail patients only receive the shorter course. These are illustrative judgments about a fictional study.'},
+  start:{label:'Susan’s starting study',scores:base,basis:baseBasis,story:'Susan wants the effect of a shorter radiotherapy course on five-year survival. Baseline performance status is absent, treatment timing needs work, and some frail patients only receive the shorter course. These are illustrative judgments about a fictional study.'},
   recover:{label:'Recover information',scores:recovered,basis:{...baseBasis,confounding:'evidence',measurement:'evidence',sensitivity:'evidence'},story:'Recover pretreatment performance status from charts (confounding 10 → 4), validate its timing and coding (measurement 6 → 4), and challenge the result with a relevant bias analysis (sensitivity 7 → 5). These ten dings come off different parts of the argument. Positivity stays at 8.'},
   alternate:{label:'Same 50, different weakness',scores:{...recovered,confounding:8,positivity:4},basis:{...baseBasis,confounding:'unresolved',positivity:'evidence',measurement:'evidence',sensitivity:'evidence'},story:'Imagine that a broader data source gives better treatment overlap, but key baseline health differences remain poorly captured. The total is still 50. The confounding problem now limits the comparison, even among patients with both treatment options.'},
   ideal:{label:'The divine RCT',scores:scores(Array(10).fill(0)),basis:Object.fromEntries(COMPONENTS.map(c=>[c.id,'evidence'])),story:'The deliberately divine randomized trial: perfect design, measurement, follow-up, analysis and applicability are stipulated. Randomization alone would only address part of this profile.'},
@@ -39,4 +39,16 @@ export function assess(profile, basis = {}) {
   else {title='A stronger argument, with conditions to name';verdict='The profile has fewer unresolved dings within this teaching rubric. Interpret the stated contrast in its supported population, report uncertainty, and explain the remaining assumptions. A low total does not itself identify an effect.';}
   if(total<80 && profile.confounding>=8 && profile.positivity>=8)verdict+=' Separately, the positivity gap leaves part of the target without a treatment comparison.';
   return {total,title,verdict,critical,assumptions,unresolved};
+}
+
+// Keep the earlier judgment independent of later slider and preset changes.
+export function snapshot(profile, basis) {
+  assess(profile, basis);
+  return {scores:{...profile}, basis:{...basis}};
+}
+export function compareAssessment(before, profile, basis) {
+  const earlier=assess(before.scores,before.basis), current=assess(profile,basis);
+  return {beforeTotal:earlier.total, currentTotal:current.total, delta:current.total-earlier.total,
+    components:COMPONENTS.map(c=>({id:c.id,label:c.short,before:before.scores[c.id],after:profile[c.id],
+      delta:profile[c.id]-before.scores[c.id],beforeBasis:before.basis[c.id],afterBasis:basis[c.id]}))};
 }

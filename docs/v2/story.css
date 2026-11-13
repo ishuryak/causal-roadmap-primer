@@ -32,6 +32,18 @@ h3 { font-family:var(--body); font-size:1.16rem; font-weight:600; }
 .story-purpose .goal>strong:first-child { color:var(--ink); font-family:var(--display); font-size:1.65rem; text-transform:none; letter-spacing:0; font-weight:400; }
 .story-purpose .byline { font-size:.76rem; }
 .story-purpose .companion { background:none; border:0; padding:0; font-size:.85rem; color:var(--muted); }
+.story-audience{font-size:.9rem;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.story-opening{max-width:var(--col);margin:55px auto 45px;scroll-margin-top:100px}
+.story-opening h2{margin:12px 0 26px}.story-opening>p{font-size:1rem}
+.story-reading-path{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px;margin:30px 0}
+.story-reading-path li{border-top:1px solid var(--line);padding-top:14px}.story-reading-path a{font-size:.9rem}.story-reading-path span{display:block;font-size:.8rem;color:var(--muted)}
+.story-lab,.story-transport{padding:28px 0;margin:28px 0;border-block:1px solid var(--line);scroll-margin-top:100px}
+.story-lab>p,.story-transport>p{font-size:.95rem}.story-lab .eyebrow,.story-transport .eyebrow{font-size:.68rem}
+.story-lab-links{padding-left:1.2em}.story-lab-links li{padding:10px 0;font-size:.9rem}.story-lab-links span{display:block;font-size:.82rem;color:var(--muted)}
+.story-transport label{display:block;font-size:.85rem}.story-transport input[type='range']{width:100%;height:36px;accent-color:var(--teal)}
+.story-transport .story-transport-result{padding:20px;background:var(--teal-wash);font-size:.85rem}.story-transport-result strong{display:block;font-family:var(--display);font-size:2rem;font-weight:400;color:var(--teal)}
+.story-transport .story-small{font-size:.78rem;line-height:1.7}
+@media(max-width:480px){.story-reading-path{gap:16px}.story-opening{margin-top:35px}.story-transport-result strong{font-size:1.65rem}}
 .chapter-track { position:sticky; top:0; z-index:8; margin:0 auto; max-width:var(--wide); display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); background:var(--paper); border-block:1px solid var(--line); }
 .chapter-track a { display:block; padding:16px 8px; text-decoration:none; color:var(--muted); font-size:.78rem; text-align:center; }
 .chapter-track a[aria-current='location'] { color:var(--teal); box-shadow:inset 0 -2px var(--teal); }

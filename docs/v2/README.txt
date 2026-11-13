@@ -16,6 +16,10 @@ The fictional 60-to-50 example preserves positivity at 8 while improving
 confounding, measurement and sensitivity. Equal totals can yield different
 verdicts. Dings are a teaching rubric, not an empirical probability or ranking.
 Profile links contain the ten scores and evidence-basis flags only.
+The optional pre-analysis record retains a separate copy of the current
+profile for the browser visit. Presets and slider changes do not overwrite it.
+Download the JSON assessment record to retain both profiles and a revision
+explanation. No notes or earlier assessments are included in share links.
 Introduce the roadmap first, then gamification, then the score. The total and
 worked verdict appear only in that roadmap exercise. There is no floating
 score or repeated score panel in the final interpretation section.
@@ -29,3 +33,9 @@ the numerical values and evidence basis available.
 
 Artwork: CAST illustrations retain their MIT notice in assets/story/LICENSE.
 The Tao Navigator map has separate attribution in assets/story/TAO-ATTRIBUTION.txt.
+
+Susan's opening and the conceptual-to-lab reading path adapt Alexander
+Steele's CAST outline. The primer also includes Igor's discussion prompts,
+simulation rehearsal guidance, subgroup cautions and a toy transport example.
+The transport slider reweights stipulated subgroup effects; it is not a
+fitted transport model. The CAST companion itself is maintained separately.

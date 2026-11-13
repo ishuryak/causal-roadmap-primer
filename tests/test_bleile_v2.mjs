@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {COMPONENTS,PRESETS,assess} from '../docs/v2/bleile-model.mjs';
+import {COMPONENTS,PRESETS,assess,snapshot,compareAssessment} from '../docs/v2/bleile-model.mjs';
 import {starGeometry} from '../docs/v2/bleile-star.mjs';
 let count=0;const test=(name,fn)=>{fn();count++;console.log('PASS '+name);};
 test('the worked revision is exactly 60 to 50',()=>{assert.equal(assess(PRESETS.start.scores).total,60);assert.equal(assess(PRESETS.recover.scores).total,50);});
@@ -21,4 +21,7 @@ test('60 to 50 removes exactly one sixth of the plot area',()=>{assert(Math.abs(
 test('the two 50-point profiles have equal areas but different point shapes',()=>{assert(Math.abs(measuredArea(PRESETS.recover.scores)-measuredArea(PRESETS.alternate.scores))<1e-9);assert.notDeepEqual(starGeometry(PRESETS.recover.scores).wedges.map(w=>w.radius),starGeometry(PRESETS.alternate.scores).wedges.map(w=>w.radius));});
 test('a single component contributes area without needing nonzero neighbors',()=>{for(const c of COMPONENTS){const p={...PRESETS.ideal.scores,[c.id]:10},g=starGeometry(p);assert(Math.abs(measuredArea(p)/g.fullArea-0.1)<1e-12);assert.equal(g.wedges.find(w=>w.id===c.id).value,10);}});
 test('zero has zero area and the maximum profile fills the full star',()=>{assert.equal(measuredArea(PRESETS.ideal.scores),0);const full=Object.fromEntries(COMPONENTS.map(c=>[c.id,10]));assert(Math.abs(measuredArea(full)/starGeometry(full).fullArea-1)<1e-12);});
+test('a recorded baseline survives later score and basis edits',()=>{const p={...PRESETS.start.scores},b={...PRESETS.start.basis},s=snapshot(p,b);p.confounding=4;b.confounding='evidence';assert.equal(s.scores.confounding,10);assert.equal(s.basis.confounding,'unresolved');});
+test('before/after comparisons retain distinct component and basis changes',()=>{const s=snapshot(PRESETS.start.scores,PRESETS.start.basis),r=compareAssessment(s,PRESETS.recover.scores,PRESETS.recover.basis);assert.equal(r.delta,-10);assert.equal(r.components.find(c=>c.id==='confounding').delta,-6);assert.equal(r.components.find(c=>c.id==='positivity').delta,0);assert.equal(r.components.find(c=>c.id==='confounding').beforeBasis,'unresolved');assert.equal(r.components.find(c=>c.id==='confounding').afterBasis,'evidence');});
+test('a newly discovered problem can increase dings; changing basis alone keeps the total',()=>{const s=snapshot(PRESETS.recover.scores,PRESETS.recover.basis);assert.equal(compareAssessment(s,{...s.scores,measurement:9},s.basis).delta,5);const r=compareAssessment(s,s.scores,{...s.basis,confounding:'assumption'});assert.equal(r.delta,0);assert.equal(r.components.find(c=>c.id==='confounding').afterBasis,'assumption');});
 console.log(`\n${count} passed, 0 failed`);
