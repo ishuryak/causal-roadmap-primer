@@ -34,9 +34,10 @@ function revealAnchor(hash, scroll = false) {
 }
 document.addEventListener('click', e => {
   const link=e.target.closest('a[href^="#"]');
-  if(link) revealAnchor(link.hash);
+  if(link) revealAnchor(link.getAttribute('href'));
 });
 window.addEventListener('hashchange',()=>revealAnchor(location.hash));
+document.addEventListener('bleile-ready',()=>revealAnchor(location.hash,true));
 revealAnchor(location.hash);
 document.querySelector('#expand-all')?.addEventListener('click',()=>{
   const history=document.querySelector('.history-fold');

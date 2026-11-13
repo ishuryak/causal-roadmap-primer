@@ -107,5 +107,6 @@ const query=new URLSearchParams(location.search), saved=query.get('bleile'), sav
 if(saved && /^\d+(,\d+){9}$/.test(saved) && saved.split(',').every(n=>Number(n)<=10) && /^[eau]{10}$/.test(savedBasis||'')){
   profile=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,Number(saved.split(',')[i])]));basis=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,({e:'evidence',a:'assumption',u:'unresolved'})[savedBasis[i]]]));active='custom';render('Shared profile loaded.');
 }else preset('start');
+document.dispatchEvent(new Event('bleile-ready'));
 let starResizePending=false;
 window.addEventListener('resize',()=>{if(!starResizePending){starResizePending=true;requestAnimationFrame(()=>{starResizePending=false;renderStar(document.querySelector('#bleile-star'),profile);});}});
