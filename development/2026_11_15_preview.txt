@@ -1,0 +1,43 @@
+SEPARATE TEST EDITION FOR ALEX'S REVIEW
+
+Scope: publish docs/preview/ beside the current root and v2 pages. No existing
+page, numerical model, rubric, synthetic dataset, or artwork is modified.
+The preview has a comparison link and noindex metadata. It is still a public
+GitHub Pages URL; noindex is not access control.
+
+The eight-step teaching sequence separates question/model/data/identification/
+statistical target/estimation/sensitivity/interpretation. It is an adapted
+route aligned with Navigator, not a claim about canonical step numbering.
+Target-trial planning and the causal estimand stay within the first step.
+All original section IDs survive, including optional sections. Old numbered
+cross-references are replaced with descriptive references. The game keeps the
+unchanged v2 model and moves editing into one local workbench.
+
+Scientific wording: the short statistical-target introduction explains the
+causal-to-statistical distinction already used in the roadmap. Source:
+Dang et al., J Clin Transl Sci 2023;7:e212, section "Step 4: Define the
+Statistical Estimand", doi:10.1017/cts.2023.635 (existing reference 10).
+Source text links a statistical estimand to the causal effect under the
+identification assumptions, and separates this from estimator selection.
+Definitions of treatment assumptions, RMST and target-trial planning are
+drawn from the existing lesson and its references. Igor should review the
+adapted teaching sequence before considering replacement of v2.
+
+Validation on 2026-11-15:
+- New structural check: consistent eight-step navigation, all section anchors,
+  local assets, correct placement of causal/statistical targets and optional
+  game, retained v2 comparison link, corrected DOI, isolated worksheet key.
+- Existing primer, quiz, DAG, review-regression and Bleile suites passed.
+- Existing numerical suite: 21 numerical checks passed; its exact-text
+  snapshot comparison failed locally because checkout JSON has Windows CRLF.
+  A fresh serialized simulation matches the saved file exactly after line-
+  ending normalization. No numerical data were regenerated or changed.
+- Browser at desktop and 390px width: game component selection and keyboard
+  slider changes update results; selecting a chart label opens the local
+  editor; recorded baseline survives edits and presets; query-string profiles
+  reload; nested optional deep links open; no page horizontal overflow on the
+  narrow view; no console errors during these checks.
+- Production deployment and CI status are recorded on the pull request.
+
+This is a candidate for review, not Alex's or Igor's endorsement. No review
+email was sent. Transcripts and private correspondence are not published.
