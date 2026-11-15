@@ -1,0 +1,24 @@
+name: Roadmap test edition
+on:
+  push:
+    branches: [main]
+    paths: ["docs/preview/**", "docs/v2/**", "tests/test_preview.mjs", ".github/workflows/preview.yml"]
+  pull_request:
+    paths: ["docs/preview/**", "docs/v2/**", "tests/test_preview.mjs", ".github/workflows/preview.yml"]
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+      - run: node tests/test_preview.mjs
+      - run: node tests/test_bleile_v2.mjs
+      - run: |
+          node --check docs/preview/app.mjs
+          node --check docs/preview/bleile.mjs
+          node --check docs/preview/story.mjs
+          node --check docs/preview/practice-ui.mjs

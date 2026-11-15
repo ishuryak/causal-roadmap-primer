@@ -1,0 +1,83 @@
+/* Test edition only. The existing illustrated edition remains unchanged. */
+html { scroll-behavior:auto; }
+[hidden] { display:none !important; }
+.preview-banner { display:flex; flex-wrap:wrap; gap:8px 24px; align-items:center; padding:12px max(24px,calc((100vw - 1152px)/2)); background:var(--teal-wash); font-size:.78rem; line-height:1.6; }
+.preview-banner strong { color:var(--teal); }
+.preview-banner a { margin-left:auto; }
+.masthead { padding-bottom:12px; }
+.story-top { padding:20px 0; }
+.story-audience { max-width:48rem; padding:0; border:0; margin-top:32px; font-size:.85rem; }
+.story-hero { padding:20px 0 35px; gap:40px; }
+.story-hero h1 { font-size:clamp(2.6rem,5vw,4.4rem); }
+.story-hero .dek { font-size:1.07rem; }
+.story-opening { padding-inline:0; margin:30px auto; }
+.lesson-bridge { border-left:3px solid var(--teal); padding-left:20px; }
+.chapter-track { grid-template-columns:repeat(8,minmax(0,1fr)); }
+.chapter-track a { font-size:.68rem; line-height:1.45; padding:13px 7px; }
+.chapter-track a span { display:block; font-size:.65rem; margin-bottom:4px; }
+.roadmap-flow { grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px 30px; }
+.roadmap-flow li::after { display:none; }
+.roadmap-flow strong { font-size:16px; }
+.roadmap-flow small,.independent-roadmap figcaption { font-size:14px; }
+#roadmap { padding:25px 0; }
+.learning-objective { font-size:.97rem; color:var(--muted); margin-top:-8px; }
+.learning-takeaway { border-left:3px solid var(--teal); background:var(--wash); padding:18px 22px; font-size:.92rem; }
+.core-assumptions { font-size:.95rem; }
+section.part.preview-substep { padding-top:25px; }
+.preview-substep>.wrap { padding:0; width:100%; }
+.preview-substep h3 { font-size:1.5rem; }
+.preview-substep .story-target { margin:15px 0; padding:10px 0; }
+.preview-substep .story-route-options button strong { font-size:1.35rem; }
+.optional-extension>section.part { padding:20px 0; }
+.optional-extension .wrap { padding:0; width:100%; }
+.optional-extension section h2 { font-size:1.8rem; }
+.preview-practice { margin-top:55px; }
+.bleile-workbench { grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; overflow-anchor:none; }
+.bleile-workbench>div:first-child { grid-column:1/-1; }
+.bleile-scoreline>strong { font-size:3.5rem; }
+.bleile-story,.bleile-score-caption { max-width:50rem; }
+.bleile-change { min-height:1.5em; }
+.practice-editor { position:sticky; top:110px; padding:24px; background:var(--wash); border:1px solid var(--line); border-radius:4px; }
+.practice-editor>label { display:block; font-size:.85rem; font-weight:600; margin-bottom:8px; }
+.practice-editor>select { width:100%; font:inherit; font-size:1rem; padding:10px; color:var(--ink); background:var(--paper); border:1px solid var(--line); }
+.practice-editor .bleile-checkpoint { padding:10px 0; border:0; background:none; margin:10px 0; }
+.practice-editor .bleile-checkpoint>p { font-size:.85rem; }
+.practice-editor .bleile-check-head { font-size:.9rem; }
+.practice-editor .bleile-return { display:none; }
+.practice-editor input[type=range] { width:100%; min-height:36px; }
+.practice-editor .bleile-basis { display:block; }
+.practice-editor .bleile-basis select { display:block; width:100%; max-width:100%; margin-top:8px; }
+.practice-lesson-link { font-size:.8rem; }
+.practice-live-result { padding-top:15px; border-top:1px solid var(--line); font-size:.85rem; }
+.practice-live-result>p { margin:8px 0; line-height:1.55; }
+.practice-live-result .bleile-small { font-size:.78rem; }
+.story-purpose { margin-top:24px; }
+.story-purpose .byline,.story-purpose .companion { font-size:.8rem; }
+#review-notes { border-top:1px solid var(--line); }
+@media(max-width:1000px) {
+  .chapter-track { display:flex; overflow:auto; scrollbar-width:thin; }
+  .chapter-track a { flex:0 0 125px; }
+  .story-opening,.bleile-roadmap { width:calc(100% - 40px); }
+  .story-opening { max-width:48rem; }
+}
+@media(max-width:760px) {
+  .preview-banner { padding:10px 20px; }
+  .preview-banner span { display:none; }
+  .preview-banner a { margin:0; }
+  .story-top-links { gap:16px; }
+  .story-hero { grid-template-columns:1fr; gap:20px; padding-top:12px; }
+  .story-hero h1 { font-size:3rem; }
+  .story-audience { margin-top:22px; }
+  .roadmap-flow { grid-template-columns:1fr 1fr; gap:18px; }
+  .roadmap-flow li { border:0; border-top:2px solid var(--line); padding:0 !important; margin:0; }
+  .roadmap-flow .flow-number { position:static; width:auto; text-align:left; margin:0 0 8px; padding:0; }
+  .bleile-workbench { grid-template-columns:1fr; gap:24px; }
+  .bleile-workbench>div:first-child { grid-column:auto; }
+  .practice-editor { position:static; padding:18px; }
+  .bleile-workbench>div:nth-child(2) { order:3; }
+  .bleile-workbench>.practice-editor { order:2; }
+  section.part { padding-top:45px; }
+  .optional-extension .story-figure { width:100%; margin-left:0; transform:none; }
+}
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media print { .preview-banner,.chapter-track,.story-top-links { display:none; } .practice-editor { position:static; } .bleile-checkpoint[hidden] { display:block !important; } }
