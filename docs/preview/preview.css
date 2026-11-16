@@ -171,3 +171,11 @@ section.part.preview-substep { padding-top:25px; }
 
 [data-learning-step]>.wrap>.step-question { font-family:var(--display); font-size:1.25rem; line-height:1.4; margin:12px 0 16px; }
 [data-learning-step]>.wrap>h2.eyebrow { font-size:1.5rem; }
+
+/* Four separate sketches follow the argument, one at a time. */
+.roadmap-sketch { width:100%; max-width:42rem; margin:30px auto; }
+.roadmap-sketch img { display:block; width:100%; height:auto; }
+.roadmap-sketch figcaption { margin-top:12px; font-size:.85rem; line-height:1.6; color:var(--muted); }
+.roadmap-sketch .sketch-fullsize { display:block; width:fit-content; margin-top:8px; }
+.illustration-bridge { width:calc(100% - 40px); margin:36px auto 0; }
+.intro-depth .story-hero-art { margin:20px 0; }
