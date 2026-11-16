@@ -1,5 +1,5 @@
 // Ensure checkpoint panels exist before binding their UI, independent of fetch timing.
-import './bleile.mjs?v=20261115-simpler';
+import './bleile.mjs?v=20261116-spotlight';
 // Select an editor locally; lesson links and copied deep links still work.
 const selector=document.querySelector('#practice-component');
 const editor=document.querySelector('#practice-editor');

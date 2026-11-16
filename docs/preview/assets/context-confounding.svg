@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-labelledby="title desc">
+<title id="title">Context in a causal diagram</title>
+<desc id="desc">Pretreatment health H has arrows to treatment A and survival Y. A separate arrow goes from A to Y. The diagram is a proposed causal account, not an estimated effect.</desc>
+<rect width="720" height="360" fill="#fffdf8" rx="10"/>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M251 52 Q357 35 471 52 Q482 93 468 116 Q361 127 250 114 Q242 80 251 52Z" stroke="#665d52" stroke-width="2.2"/>
+<path d="M253 55 Q366 39 468 54 M251 112 Q365 123 468 112" stroke="#665d52" opacity=".3" stroke-width="1.5"/>
+<path d="M288 127 Q249 173 197 222 M432 127 Q469 172 526 222" stroke="#aa6a3f" stroke-width="3.2"/>
+<path d="M286 126 Q247 175 195 220 M434 127 Q472 172 528 222" stroke="#aa6a3f" opacity=".3" stroke-width="2"/>
+<path d="M198 205 L194 225 L214 219 M510 219 L530 226 L524 205" stroke="#aa6a3f" stroke-width="3"/>
+<path d="M73 241 Q162 229 253 241 L256 298 Q163 308 73 299 Q65 266 73 241Z M465 241 Q557 231 648 241 Q655 268 647 298 Q559 309 464 299Z" stroke="#665d52" stroke-width="2.2"/>
+<path d="M79 244 Q161 233 249 243 M469 297 Q558 304 643 296" stroke="#665d52" opacity=".3" stroke-width="1.7"/>
+<path d="M272 270 Q359 265 446 270 M431 258 L448 270 L432 282" stroke="#087e8b" stroke-width="3.3"/>
+<path d="M275 273 Q365 268 443 272" stroke="#087e8b" opacity=".3" stroke-width="1.5"/>
+</g>
+<g font-family="'Segoe Print','Bradley Hand',cursive" font-size="27" fill="#302e2b" text-anchor="middle">
+<text x="360" y="80">Pretreatment</text><text x="360" y="108">health (H)</text>
+<text x="163" y="279" font-size="25">Treatment (A)</text><text x="558" y="279" font-size="25">Survival (Y)</text>
+</g>
+<g font-family="'Segoe UI',sans-serif" font-size="19" fill="#665d52" text-anchor="middle">
+<text x="360" y="24">A proposed common cause</text><text x="360" y="335">What would changing treatment do?</text>
+</g>
+</svg>

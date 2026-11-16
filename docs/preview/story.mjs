@@ -8,22 +8,6 @@ function updateTransport(){
 }
 transportMix.addEventListener('input',updateTransport);
 updateTransport();
-const routeButtons = [...document.querySelectorAll('[data-study-route]')];
-const routeReading = document.querySelector('#study-route-reading');
-const routeCopy = {
-  trial: ['Create the comparison.', 'Assign the treatment strategies at random, then follow the patients. The design addresses treatment-assignment confounding. Treatment definitions, adherence, follow-up and applicability still need an argument.'],
-  observed: ['Reconstruct the comparison.', 'Use care that already happened. Reconstruct the trial you wanted, learn how treatment was chosen, and make the assumptions behind the comparison explicit. Collect more information where the argument needs it.']
-};
-for (const button of routeButtons) {
-  button.addEventListener('click', () => {
-    for (const peer of routeButtons) peer.setAttribute('aria-pressed', String(peer === button));
-    const [heading, body] = routeCopy[button.dataset.studyRoute];
-    routeReading.replaceChildren();
-    const strong = document.createElement('strong'), p = document.createElement('p');
-    strong.textContent = heading; p.textContent = body;
-    routeReading.append(strong,p);
-  });
-}
 // Deep links open the relevant details, including the optional history section.
 function revealAnchor(hash, scroll = false) {
   if (!hash || hash === '#') return;
