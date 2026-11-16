@@ -59,7 +59,7 @@ const QUIZ = [
   ["How did the share of hypofractionated courses change from 2010 to 2022?", "Description", "It summarizes what happened, with no model of what would have happened otherwise."],
   ["Patients treated with hypofractionation had higher 5-year survival in our registry.", "Description", "A crude comparison between groups that differ in age, stage and fitness. It describes an association, not an effect."],
   ["SHAP values show that fractionation is the third most important feature in our XGBoost survival model.", "Prediction", "SHAP describes how the model uses its inputs to predict. It does not say what changing the schedule would do."],
-  ["How would 3-year survival change if the clinic adopted the rule 'hypofractionate whenever travel time exceeds one hour'?", "Cause and effect", "A treatment rule is an intervention. Comparing rules is a causal question (section 6)."],
+  ["How would 3-year survival change if the clinic adopted the rule 'hypofractionate whenever travel time exceeds one hour'?", "Cause and effect", "A treatment rule is an intervention. Comparing rules is a causal question (the treatment-policy extension)."],
   ["Which patients benefit most from hypofractionation?", "Cause and effect", "Who benefits more is a question about treatment effects in subgroups (the CATE), which is causal and needs its own checks."],
 ];
 const KINDS = ["Description", "Prediction", "Cause and effect"];
@@ -272,7 +272,7 @@ function renderSim2() {
   const covers = r.withoutPS.lo <= r.truth && r.truth <= r.withoutPS.hi;
   $("#sim2-readout").innerHTML = s === 0
     ? `<p>With no unrecorded confounding, both models agree: ${signed(r.withPS.estimate, 2)} and ${signed(r.withoutPS.estimate, 2)} units against a truth of ${signed(r.truth)}. Move the slider to the right.</p>`
-    : `<p>With performance status recorded, the estimate is ${signed(r.withPS.estimate, 2)} units (95% interval ${signed(r.withPS.lo, 2)} to ${signed(r.withPS.hi, 2)}). Without it, the estimate is ${signed(r.withoutPS.estimate, 2)} units, ${fmt(Math.abs(off), 2)} units ${off < 0 ? "below" : "above"} the truth, and its interval ${covers ? "still covers" : "excludes"} the true value. Held-out R² is ${fmt(r.withPS.r2, 2)} with performance status and ${fmt(r.withoutPS.r2, 2)} without it. Any estimator given only the recorded covariates, including the machine-learning estimators of section 7, faces the same missing information: no estimator can adjust for a confounder it cannot see.</p>`;
+    : `<p>With performance status recorded, the estimate is ${signed(r.withPS.estimate, 2)} units (95% interval ${signed(r.withPS.lo, 2)} to ${signed(r.withPS.hi, 2)}). Without it, the estimate is ${signed(r.withoutPS.estimate, 2)} units, ${fmt(Math.abs(off), 2)} units ${off < 0 ? "below" : "above"} the truth, and its interval ${covers ? "still covers" : "excludes"} the true value. Held-out R² is ${fmt(r.withPS.r2, 2)} with performance status and ${fmt(r.withoutPS.r2, 2)} without it. Any estimator given only the recorded covariates, including the machine-learning estimators of the estimation step, faces the same missing information: no estimator can adjust for a confounder it cannot see.</p>`;
 }
 $("#sim2-strength").addEventListener("input", renderSim2);
 renderSim2();
@@ -330,14 +330,13 @@ loadSim3().then((d) => {
   $("#sim3-readout").innerHTML = "<p>The precomputed results for this simulation could not be loaded. Reload the page to try again.</p>";
 });
 
-// "Expand all details" opens or closes every collapsible section at once
-// (for reading straight through, or printing).
+// Expand the optional reading without changing the main walkthrough or practice area.
 $("#expand-all").addEventListener("click", (e) => {
   const open = e.currentTarget.getAttribute("aria-pressed") !== "true";
-  // Every disclosure, nested ones included (the path checker is a details.inner).
-  document.querySelectorAll("details").forEach((d) => (d.open = open));
+  // Only disclosures inside the optional reading section.
+  document.querySelectorAll("#explore-more details").forEach((d) => (d.open = open));
   e.currentTarget.setAttribute("aria-pressed", String(open));
-  e.currentTarget.textContent = open ? "Collapse all details" : "Expand all details";
+  e.currentTarget.textContent = open ? "Collapse optional reading" : "Expand optional reading";
   rerenders.forEach((f) => f());
 });
 // Printing shows everything: open all collapsed sections, then restore them.
@@ -381,7 +380,7 @@ new ResizeObserver(() => {
 // Estimator chooser
 // =====================================================================
 const CAST = '<a href="https://ishuryak.github.io/cast_demo_website/tutorial/">CAST walkthrough</a>';
-const CENSOR = " Whatever you choose, it must handle censoring: a survival version of the estimator (or censoring weights), with censoring assumed independent of the outcome given the measured variables, and enough patients still followed at each horizon (section 5).";
+const CENSOR = " Whatever you choose, it must handle censoring: a survival version of the estimator (or censoring weights), with censoring assumed independent of the outcome given the measured variables, and enough patients still followed at each horizon (the identification step).";
 function choose() {
   const v = (n) => document.querySelector(`input[name="${n}"]:checked`).value;
   const time = v("c-time"), goal = v("c-goal"), when = v("c-when");
@@ -391,7 +390,7 @@ function choose() {
   } else if (time === "rule") {
     html = `<p><strong>A rule decided once from baseline factors</strong>, such as "hypofractionate if age is 70 or older or travel exceeds one hour", is a single-time-point policy. AIPW or TMLE can estimate the average outcome if everyone followed the rule, using the same outcome and treatment models as for a static comparison. LMTP software can also do this, with one time point.</p><p>Write the rule down completely before seeing results, and check that patients of every kind the rule covers received the schedule it assigns them.${CENSOR}</p>`;
   } else if (goal === "average" && when === "one") {
-    html = `<p><strong>Start with TMLE or AIPW</strong>, with super learning or cross-fitted machine learning for the outcome and propensity models. Report RMST or survival differences at the prespecified horizons.</p><p>Run IPTW and outcome regression alongside as checks (section 8). If they disagree, find out why before reporting any of them.${CENSOR}</p>`;
+    html = `<p><strong>Start with TMLE or AIPW</strong>, with super learning or cross-fitted machine learning for the outcome and propensity models. Report RMST or survival differences at the prespecified horizons.</p><p>Run IPTW and outcome regression alongside as checks (the sensitivity step). If they disagree, find out why before reporting any of them.${CENSOR}</p>`;
   } else if (goal === "average" && when === "trajectory") {
     html = `<p><strong>Estimate the effect at several horizons</strong> with TMLE or a causal survival forest, then consider CAST to join them into a smooth trajectory with a band. The trajectory adds a smoothing model and assumptions about uncertainty across horizons, so a peak or a crossing is a model-based summary, not a separate finding. The ${CAST} shows this on simulated data.</p><p>Prespecify the horizons.${CENSOR}</p>`;
   } else {
@@ -403,12 +402,16 @@ $("#chooser").addEventListener("change", choose);
 choose();
 
 // =====================================================================
-// Trial argument builder (section 10)
+// Trial argument builder (the next-study extension)
 // =====================================================================
 function argue() {
   const v = (n) => document.querySelector(`input[name="a-${n}"]:checked`).value;
   const r = trialArgument({ aim: v("aim"), prior: v("prior"), bench: v("bench"), ci: v("ci"), bias: v("bias"), support: v("support"), hte: v("hte") });
-  const block = (title, items) => (items.length ? `<p class="arg-h">${title}</p><ul>${items.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : "");
+  // Shared v2 decision logic retains its original section references. Translate
+  // display text here so the existing edition and scientific logic stay unchanged.
+  const references = {2:"the target-trial discussion",4:"the effect-measure discussion",5:"the identification step",9:"the trial-data extension"};
+  const referenceText = text => text.replace(/section (2|4|5|9)\b/g, (_, number) => references[number]);
+  const block = (title, items) => (items.length ? `<p class="arg-h">${title}</p><ul>${items.map((t) => `<li>${esc(referenceText(t))}</li>`).join("")}</ul>` : "");
   $("#argue-answer").innerHTML = `<p class="lean"><strong>${esc(r.lean)}.</strong></p>`
     + block("What the retrospective evidence supports", r.supports)
     + block("What it cannot establish", r.cannot)
@@ -436,7 +439,7 @@ const FIELDS = [
   ["gaps", "Data source and known gaps", "What is missing, and how you will probe it", "[Registry or EHR]. No performance status, toxicity or recurrence. Plan a bias analysis for unrecorded performance status."],
   ["est", "Estimators", "Primary, and the ones you run as checks", "Primary: TMLE with super learning, in its survival form. Checks: IPTW and outcome regression. Effect over follow-up: causal survival forest at prespecified horizons, then CAST."],
   ["checks", "Diagnostics and sensitivity", "How you will challenge the result", "Overlap and balance plots. Agreement across estimators. A planted-effect simulation. Shuffled treatment labels (a software check). A negative-control outcome (it can reveal residual bias). Bias analysis on the RMST scale: could plausible unrecorded performance status move the estimate across the benefit or harm thresholds? If a 5-year mortality risk ratio is also reported, its E-value."],
-  ["trial", "The argument about a new trial", "What each possible result would mean for the next randomized trial (section 10)", "Thresholds: a meaningful RMST difference is [value] months. If the interval includes both a meaningful benefit and harm, or the bias analysis shows plausible unrecorded performance status could cross a threshold, argue for considering a randomized trial in [the population], with [endpoint, or a noninferiority margin if the shorter schedule is meant to be as good] and a sample size from that target. If a precise trial already answered this question in these patients and the emulation reproduces it, argue that a duplicate trial is a low priority."],
+  ["trial", "The argument about a new trial", "What each possible result would mean for the next randomized trial (the next-study extension)", "Thresholds: a meaningful RMST difference is [value] months. If the interval includes both a meaningful benefit and harm, or the bias analysis shows plausible unrecorded performance status could cross a threshold, argue for considering a randomized trial in [the population], with [endpoint, or a noninferiority margin if the shorter schedule is meant to be as good] and a sample size from that target. If a precise trial already answered this question in these patients and the emulation reproduces it, argue that a duplicate trial is a low priority."],
 ];
 const KEY = "causal-roadmap-worksheet-preview-v1";
 const sheet = $("#sheet");

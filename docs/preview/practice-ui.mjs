@@ -1,5 +1,5 @@
 // Ensure checkpoint panels exist before binding their UI, independent of fetch timing.
-import './bleile.mjs';
+import './bleile.mjs?v=20261115-simpler';
 // Select an editor locally; lesson links and copied deep links still work.
 const selector=document.querySelector('#practice-component');
 const editor=document.querySelector('#practice-editor');
@@ -18,6 +18,19 @@ function selectComponent(id, focus=false) {
 }
 selector.addEventListener('change',()=>selectComponent(selector.value));
 document.addEventListener('click',event=>{
+  const lesson=event.target.closest('.practice-lesson-link');
+  if(lesson){
+    const destination=document.querySelector(lesson.getAttribute('href'));
+    if(destination){
+      document.querySelector('.practice-back')?.remove();
+      const back=document.createElement('a');
+      back.className='practice-back';
+      back.href='#bleile-'+selector.value;
+      back.textContent='← Back to '+selector.selectedOptions[0].textContent.toLowerCase()+' in practice';
+      (destination.querySelector(':scope > .wrap')||destination).prepend(back);
+    }
+    return;
+  }
   const link=event.target.closest('.bleile-workbench a[href^="#bleile-"]');
   if(!link)return;
   const id=link.getAttribute('href').slice('#bleile-'.length);
@@ -28,6 +41,7 @@ document.addEventListener('click',event=>{
 },true);
 function revealSharedComponent(){
   if(location.hash.startsWith('#bleile-')){
+    document.querySelector('.practice-back')?.remove();
     const id=location.hash.slice('#bleile-'.length);
     if(selectComponent(id)) requestAnimationFrame(()=>document.getElementById('bleile-'+id).scrollIntoView({block:'nearest'}));
   }

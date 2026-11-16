@@ -30,7 +30,7 @@ function revealAnchor(hash, scroll = false) {
   let target; try { target=document.getElementById(decodeURIComponent(hash.slice(1))); } catch { return; }
   if (!target) return;
   for (let node=target;node;node=node.parentElement) if (node.tagName === 'DETAILS') node.open=true;
-  if (scroll) requestAnimationFrame(() => target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}));
+  if (scroll) requestAnimationFrame(() => target.scrollIntoView({behavior:'auto',block:'start'}));
 }
 document.addEventListener('click', e => {
   const link=e.target.closest('a[href^="#"]');
@@ -39,21 +39,3 @@ document.addEventListener('click', e => {
 window.addEventListener('hashchange',()=>revealAnchor(location.hash));
 document.addEventListener('bleile-ready',()=>revealAnchor(location.hash,true));
 revealAnchor(location.hash);
-document.querySelector('#expand-all')?.addEventListener('click',()=>{
-  const history=document.querySelector('.history-fold');
-  if(history) history.open=document.querySelector('#expand-all').getAttribute('aria-pressed')==='true';
-});
-const chapters=[...document.querySelectorAll('.chapter-track a')];
-const progress=document.querySelector('.story-progress');
-let pending=false;
-function updateReadingPosition(){
-  pending=false;
-  const max=document.documentElement.scrollHeight-innerHeight;
-  if(progress)progress.style.width=(max>0?Math.min(100,Math.max(0,scrollY/max*100)):0)+'%';
-  let active=chapters[0];
-  for(const link of chapters){const section=document.querySelector(link.hash);if(section&&section.getBoundingClientRect().top<180)active=link;}
-  for(const link of chapters){if(link===active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');}
-}
-addEventListener('scroll',()=>{if(!pending){pending=true;requestAnimationFrame(updateReadingPosition);}},{passive:true});
-addEventListener('resize',updateReadingPosition);
-updateReadingPosition();
