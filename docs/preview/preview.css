@@ -132,7 +132,33 @@ section.part.preview-substep { padding-top:25px; }
 .practice-options { margin-top:24px; }
 #explore-more { padding-top:30px; }
 #explore-more h2 { font-size:2rem; }
+/* Give step identity, guiding question and optional depth distinct roles. */
+[data-learning-step]>.wrap>.eyebrow { font-family:var(--body); font-size:1.5rem; font-weight:600; letter-spacing:0; text-transform:none; color:var(--teal); border-top:2px solid var(--line); padding-top:22px; }
+[data-learning-step]>.wrap>h2 { font-size:clamp(1.3rem,2.4vw,1.75rem); margin:12px 0 16px !important; }
+[data-learning-step]>.wrap>.step-purpose { font-size:1rem; max-width:62ch; }
+.step-details>summary { font-size:.92rem; }
+.step-depth h3 { font-size:1.2rem; }
+.step-depth h4 { font-size:1rem; }
+.susan-example { border-left:3px solid var(--teal); background:var(--teal-wash); padding:16px 20px; margin:18px 0; border-radius:0 4px 4px 0; font-size:.95rem; }
+.susan-example p:last-child { margin-bottom:0; }
+.susan-example .example-label { font-size:.75rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--teal); margin:0 0 8px; }
+[data-learning-step]>.wrap>.context-sketch { max-width:42rem; }
+[data-learning-step]>.wrap>.context-sketch img { max-height:none; }
+.study-route-comparison { display:grid; grid-template-columns:1fr 1fr; gap:24px; border-block:1px solid var(--line); padding:18px 0; }
+.study-route-comparison h4 { margin:0 0 10px; }
+.study-route-comparison p { font-size:.9rem; margin:0; }
+.causal-formula { font-family:var(--mono); font-size:.86rem; background:var(--wash); padding:16px; overflow-x:auto; }
+#practice-title { font-size:clamp(1.7rem,3vw,2.3rem); }
+.spotlight-game { margin:24px 0 30px; padding:24px 0; border-block:1px solid var(--line); }
+.spotlight-game h3 { font-size:1.7rem; margin:0 0 16px; }
+.spotlight-game>p { font-size:.95rem; max-width:70ch; }
+.spotlight-game>.eyebrow { font-size:.75rem; }
+.spotlight-game>#spotlight-status { font-size:.82rem; margin:12px 0; }
+#spotlight-stage { margin-top:18px; }
+#spotlight-stage iframe { display:block; width:100%; height:850px; border:1px solid var(--line); border-radius:5px; }
+.spotlight-game .spotlight-link { font-size:.85rem; margin:16px 0 0; }
 @media(max-width:760px) {
+  .study-route-comparison { grid-template-columns:1fr; gap:18px; }
   .optional-block,#roadmap { width:calc(100% - 40px); }
   .optional-block .wrap { width:100%; padding-inline:0; }
   .optional-block>section.part { padding-inline:0; }
@@ -142,3 +168,6 @@ section.part.preview-substep { padding-top:25px; }
   .roadmap-flow .flow-number { font-size:.7rem; }
   .story-top-links { font-size:.75rem; }
 }
+
+[data-learning-step]>.wrap>.step-question { font-family:var(--display); font-size:1.25rem; line-height:1.4; margin:12px 0 16px; }
+[data-learning-step]>.wrap>h2.eyebrow { font-size:1.5rem; }

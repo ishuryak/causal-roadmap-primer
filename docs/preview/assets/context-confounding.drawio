@@ -1,0 +1,15 @@
+<mxfile host="app.diagrams.net" version="24.7.17">
+ <diagram id="context" name="Context and confounding">
+  <mxGraphModel dx="720" dy="360" grid="1" gridSize="10" page="1" pageWidth="720" pageHeight="360">
+   <root>
+    <mxCell id="0"/><mxCell id="1" parent="0"/>
+    <mxCell id="health" value="Pretreatment&#xa;health (H)" style="rounded=1;whiteSpace=wrap;html=0;sketch=1;fillColor=#fffdf8;strokeColor=#665d52;fontFamily=Segoe Print;fontSize=22;" vertex="1" parent="1"><mxGeometry x="250" y="45" width="220" height="75" as="geometry"/></mxCell>
+    <mxCell id="treatment" value="Treatment (A)" style="rounded=1;whiteSpace=wrap;html=0;sketch=1;fillColor=#fffdf8;strokeColor=#665d52;fontFamily=Segoe Print;fontSize=22;" vertex="1" parent="1"><mxGeometry x="70" y="240" width="185" height="60" as="geometry"/></mxCell>
+    <mxCell id="outcome" value="Survival (Y)" style="rounded=1;whiteSpace=wrap;html=0;sketch=1;fillColor=#fffdf8;strokeColor=#665d52;fontFamily=Segoe Print;fontSize=22;" vertex="1" parent="1"><mxGeometry x="465" y="240" width="185" height="60" as="geometry"/></mxCell>
+    <mxCell id="ha" style="edgeStyle=none;rounded=0;sketch=1;endArrow=open;endFill=0;strokeColor=#aa6a3f;strokeWidth=3;" edge="1" source="health" target="treatment" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="hy" style="edgeStyle=none;rounded=0;sketch=1;endArrow=open;endFill=0;strokeColor=#aa6a3f;strokeWidth=3;" edge="1" source="health" target="outcome" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ay" style="edgeStyle=none;rounded=0;sketch=1;endArrow=open;endFill=0;strokeColor=#087e8b;strokeWidth=3;" edge="1" source="treatment" target="outcome" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+   </root>
+  </mxGraphModel>
+ </diagram>
+</mxfile>

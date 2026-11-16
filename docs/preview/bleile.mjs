@@ -1,8 +1,22 @@
 import {COMPONENTS,PRESETS,assess,snapshot,compareAssessment} from '../v2/bleile-model.mjs';
 import {renderStar} from '../v2/bleile-star.mjs';
+import {createSpotlight} from './spotlight.mjs?v=20261116-spotlight';
 
 let profile={...PRESETS.start.scores}, basis={...PRESETS.start.basis}, active='start';
 let baseline=null;
+const spotlight=createSpotlight(document.querySelector('#spotlight-game'),assessment=>{
+  if(COMPONENTS.every(({id})=>profile[id]===assessment.profile[id] && basis[id]===assessment.basis[id]))return;
+  const previous=assess(profile,basis).total;
+  const changed=COMPONENTS.filter(({id})=>profile[id]!==assessment.profile[id]).map(c=>({c,before:profile[c.id]}));
+  ({profile,basis}=assessment);
+  const matches=key=>COMPONENTS.every(({id})=>profile[id]===PRESETS[key].scores[id] && basis[id]===PRESETS[key].basis[id]);
+  active=matches('start')?'start':matches('recover')?'recover':'custom';
+  const total=assess(profile,basis).total;
+  const changes=changed.map(({c,before})=>`${c.short} ${before} → ${profile[c.id]}. ${basis[c.id]==='evidence'?'Available repairs complete.':'Partial repair; basis unchanged until complete.'}`).join(' ');
+  render(total<previous ? changes+' Total '+total+'. Positivity '+profile.positivity+'.' : 'Susan’s spotlight study reset to '+total+' dings.');
+  document.querySelector('#bleile-case').textContent='Susan’s spotlight exercise';
+  document.querySelector('#bleile-story').textContent='Each blue Bleile represents part of a named repair. Completing a component’s available repairs updates its evidence/design basis in this fictional example. Positivity remains at 8.';
+},()=>preset('start',true));
 const basisName={evidence:'Evidence / design',assumption:'Assumption',unresolved:'Unresolved'};
 const panels=[];
 for(const c of COMPONENTS){
@@ -21,10 +35,10 @@ for(const c of COMPONENTS){
   panel.open=true;
   panel.hidden=c.id!=='question';
   const option=document.createElement('option');option.value=c.id;option.textContent=c.short;document.querySelector('#practice-component').append(option);
-  const lesson=document.createElement('a');lesson.href='#'+(c.id==='consistency'?'identify':c.section);lesson.className='practice-lesson-link';lesson.textContent='Read the related explanation';panel.append(lesson);
+  const lesson=document.createElement('a');lesson.href='#'+({consistency:'identify',measurement:'observed-data',transport:'transportability'}[c.id]||c.section);lesson.className='practice-lesson-link';lesson.textContent='Read the related explanation';panel.append(lesson);
   const input=panel.querySelector('input'),select=panel.querySelector('select');
-  input.addEventListener('input',()=>{profile[c.id]=Number(input.value);active='custom';render(`${c.short}: ${profile[c.id]} dings. Moving a slider records a judgment. It does not add evidence.`);});
-  select.addEventListener('change',()=>{basis[c.id]=select.value;active='custom';render(`${c.short}: basis updated.`);});
+  input.addEventListener('input',()=>{const ended=spotlight.pause(input);profile[c.id]=Number(input.value);active='custom';render(`${c.short}: ${profile[c.id]} dings. Moving a slider records a judgment. It does not add evidence.${ended?' The spotlight exercise ended; restarting returns to 60.':''}`);});
+  select.addEventListener('change',()=>{const ended=spotlight.pause(select);basis[c.id]=select.value;active='custom';render(`${c.short}: basis updated.${ended?' The spotlight exercise ended; restarting returns to 60.':''}`);});
   panels.push({c,panel,input,select});
 }
 const profileList=document.querySelector('#bleile-profile');
@@ -97,7 +111,8 @@ document.querySelector('#bleile-download').addEventListener('click',()=>{
   const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));
   const a=document.createElement('a');a.href=url;a.download='bleile-assessment.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
-function preset(key){
+function preset(key,fromSpotlight=false){
+  if(!fromSpotlight)spotlight.pause();
   if(!PRESETS[key])return;
   active=key;profile={...PRESETS[key].scores};basis={...PRESETS[key].basis};
   document.querySelector('#bleile-story').textContent=PRESETS[key].story;

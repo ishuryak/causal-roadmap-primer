@@ -2,9 +2,9 @@ name: Roadmap test edition
 on:
   push:
     branches: [main]
-    paths: ["docs/preview/**", "docs/v2/**", "tests/test_preview.mjs", ".github/workflows/preview.yml"]
+    paths: ["docs/preview/**", "docs/v2/**", "tests/test_preview.mjs", "tests/test_spotlight.mjs", ".github/workflows/preview.yml"]
   pull_request:
-    paths: ["docs/preview/**", "docs/v2/**", "tests/test_preview.mjs", ".github/workflows/preview.yml"]
+    paths: ["docs/preview/**", "docs/v2/**", "tests/test_preview.mjs", "tests/test_spotlight.mjs", ".github/workflows/preview.yml"]
 permissions:
   contents: read
 jobs:
@@ -17,8 +17,18 @@ jobs:
           node-version: "20"
       - run: node tests/test_preview.mjs
       - run: node tests/test_bleile_v2.mjs
+      - run: node tests/test_spotlight.mjs
+      - name: Glasshouses source, targeting and generated bundle
+        working-directory: docs/preview/glasshouses
+        run: |
+          npm ci --ignore-scripts
+          npm test
+          npm run build
+          git diff --exit-code -- index.html
       - run: |
           node --check docs/preview/app.mjs
           node --check docs/preview/bleile.mjs
           node --check docs/preview/story.mjs
           node --check docs/preview/practice-ui.mjs
+          node --check docs/preview/spotlight.mjs
+          node --check docs/preview/spotlight-model.mjs
