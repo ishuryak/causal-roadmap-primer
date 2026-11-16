@@ -15,4 +15,3 @@ const output=path.join(root,'index.html');// The embedded edition needs only ind
 
 fs.writeFileSync(path.join(root,'index.html'),html,'utf8');
 console.log(`Built ${output} (${Math.round(Buffer.byteLength(html)/1024)} KB), with all code and artwork embedded.`);
-

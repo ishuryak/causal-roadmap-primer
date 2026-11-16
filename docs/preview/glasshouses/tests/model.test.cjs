@@ -184,4 +184,3 @@ test('persistent hover stories distinguish planned work from completed recovery 
   const sensitivity=initial.bugs.find(b=>b.component==='sensitivity'&&b.kind==='persistent');
   assert.match(G.getBugDetails(sensitivity,measurementOnly).reason,/planned/);
 });
-

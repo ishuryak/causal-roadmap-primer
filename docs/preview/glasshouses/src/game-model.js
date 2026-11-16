@@ -239,4 +239,3 @@
   }
   return freeze({COMPONENTS,SCENARIOS,initialState,total,scores,reveal,clear,verdict,getBugText,getBugDetails});
 });
-

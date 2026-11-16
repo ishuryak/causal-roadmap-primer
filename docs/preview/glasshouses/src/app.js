@@ -58,4 +58,3 @@
  hintTimer=setTimeout(dismissHint,6000);
  window.BleileApp={getState:()=>state,getSceneDebug:()=>scene.getDebug(),aimAt:id=>{setLight(true);scene.aimAt(id);},setLight,setAmbient,setFocusing,switchScenario};
 })();
-

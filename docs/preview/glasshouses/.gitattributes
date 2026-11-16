@@ -1,0 +1,2 @@
+# Preserve whitespace within the bundled Three.js shader strings.
+index.html -whitespace linguist-generated=true

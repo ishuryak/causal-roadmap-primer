@@ -4563,7 +4563,6 @@ window.BleilePrimer={
   }
   return freeze({COMPONENTS,SCENARIOS,initialState,total,scores,reveal,clear,verdict,getBugText,getBugDetails});
 });
-
 </script><script>(function(){
 'use strict';
 const TAU=Math.PI*2,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -4734,7 +4733,6 @@ class BleileScene{
 }
 window.BleileScene=BleileScene;
 })();
-
 </script><script>(() => {
  'use strict';
  const $=id=>document.getElementById(id), G=window.BleileGame;
@@ -4795,6 +4793,4 @@ window.BleileScene=BleileScene;
  hintTimer=setTimeout(dismissHint,6000);
  window.BleileApp={getState:()=>state,getSceneDebug:()=>scene.getDebug(),aimAt:id=>{setLight(true);scene.aimAt(id);},setLight,setAmbient,setFocusing,switchScenario};
 })();
-
 </script></body></html>
-
