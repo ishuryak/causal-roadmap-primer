@@ -1,0 +1,29 @@
+CLARIFY THE PURPOSE BEFORE THE ANALYSIS
+
+The opening now connects the reader's causal question to planning a comparison,
+examining assumptions, choosing an analysis and interpreting what it supports.
+Susan explicitly uses the roadmap to plan before fitting a model. The protocol's
+role is explained on the main route and expanded in the existing optional detail.
+The wording preserves uncertainty about whether her records support the target.
+
+The target-trial connection uses existing reference 50: Dang and Balzer,
+Epidemiology 2023;34(5):619-623, doi:10.1097/EDE.0000000000001637. Their opening
+and discussion explain why a concrete question is a useful start and why further
+choices and limits remain in randomized and observational studies. The preview
+paraphrase was checked against primary indexed full text. No new reference,
+numerical model, dataset, quiz bank or illustration was introduced.
+
+Independent Claude Fable 5.2 source review used the original transcripts,
+planning context and the revised implementation. A second focused check found
+the three required wording fixes resolved and no remaining blocker for testing
+with Alex. Actual model identity was verified from CLI result metadata. Private
+correspondence, transcripts and full review packets are not in the repository.
+
+Existing preview structure/link checks and desktop/390px browser checks passed.
+All three illustrations remain in the main flow, navigation still has eight
+steps, and optional content starts closed. CI and deployment status are on the PR.
+
+Alex's feedback check and a later novice-reader test answer different questions.
+The latter should ask readers what the opening promises, what a protocol leaves
+unresolved, and whether the final interpretation fulfills that promise. Settle
+that wording before preparing an introductory video.

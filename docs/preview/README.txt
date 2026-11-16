@@ -14,10 +14,14 @@ open the existing self-tests in v2. Artwork attribution remains in the footer.
 
 Changes to review:
 - A short opening and one eight-step index, aligned with Navigator.
+- A clear purpose: plan a credible treatment comparison before fitting models,
+  then interpret the answer in light of the study's assumptions and limits.
 - A concrete Susan example and one optional detail panel per step.
 - Original artwork in the main flow: the opening scene follows Susan's
   introduction, and the cohort and hidden-thread sketches sit in steps 1 and 4.
 - Target-trial planning and the causal estimand within the first step.
+- A brief explanation of how target-trial planning and the broader roadmap
+  connect, grounded in Dang and Balzer (reference 50).
 - Dedicated observed-data and statistical-target steps.
 - Collapsed worksheet and practice area after Susan's actual conclusion.
 - Local practice controls with a compact live interpretation, retaining profiles
