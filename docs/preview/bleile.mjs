@@ -21,7 +21,7 @@ for(const c of COMPONENTS){
   panel.open=true;
   panel.hidden=c.id!=='question';
   const option=document.createElement('option');option.value=c.id;option.textContent=c.short;document.querySelector('#practice-component').append(option);
-  const lesson=document.createElement('a');lesson.href='#'+c.section;lesson.className='practice-lesson-link';lesson.textContent='Read the related explanation';panel.append(lesson);
+  const lesson=document.createElement('a');lesson.href='#'+(c.id==='consistency'?'identify':c.section);lesson.className='practice-lesson-link';lesson.textContent='Read the related explanation';panel.append(lesson);
   const input=panel.querySelector('input'),select=panel.querySelector('select');
   input.addEventListener('input',()=>{profile[c.id]=Number(input.value);active='custom';render(`${c.short}: ${profile[c.id]} dings. Moving a slider records a judgment. It does not add evidence.`);});
   select.addEventListener('change',()=>{basis[c.id]=select.value;active='custom';render(`${c.short}: basis updated.`);});
@@ -114,5 +114,9 @@ if(saved && /^\d+(,\d+){9}$/.test(saved) && saved.split(',').every(n=>Number(n)<
   profile=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,Number(saved.split(',')[i])]));basis=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,({e:'evidence',a:'assumption',u:'unresolved'})[savedBasis[i]]]));active='custom';render('Shared profile loaded.');
 }else preset('start');
 document.dispatchEvent(new Event('bleile-ready'));
+// The optional practice area starts collapsed. Re-measure its chart on reveal.
+document.querySelector('#practice-fold')?.addEventListener('toggle',event=>{
+  if(event.currentTarget.open)requestAnimationFrame(()=>renderStar(document.querySelector('#bleile-star'),profile));
+});
 let starResizePending=false;
 window.addEventListener('resize',()=>{if(!starResizePending){starResizePending=true;requestAnimationFrame(()=>{starResizePending=false;renderStar(document.querySelector('#bleile-star'),profile);});}});

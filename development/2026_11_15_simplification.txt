@@ -1,0 +1,42 @@
+SIMPLER TEST EDITION
+
+The previous preview improved the order but repeated its navigation and
+summaries. The default reading path now contains one short Susan example per
+step, one optional detail panel per step, and a concrete conclusion about the
+current gaps in her evidence. The worksheet, practice area and references
+start closed. Optional-reading expansion leaves the main route alone.
+
+An independent Claude Fable 5.2 source review received both video transcripts,
+the feedback index, the improvement plan and implementation files. A fresh
+second pass received the same original evidence and the simplified sources.
+The actual model was verified from CLI result metadata, not self-identification.
+Full transcripts, inputs and reports are private and are not in this repository.
+
+Review findings addressed:
+- Removed competing navigation, repeated objectives and takeaways.
+- Made Susan's causal purpose and current conclusion explicit.
+- Kept essential identification assumptions visible; clarified that censoring
+  assumptions accompany the three treatment assumptions.
+- Aligned the short route with the inherited primary five-year RMST contrast:
+  average months lived within five years. Survival probabilities remain
+  secondary measures in the detailed example. No numerical model changed.
+- Replaced obsolete section numbers in static and generated preview text.
+- Defined dings, reduced practice controls to the active component and a
+  compact live interpretation, and put longer explanations behind a disclosure.
+- Pointed Strategies to the identification discussion; lesson-return links
+  disappear after use. Added asset versions after a browser cache check.
+
+Validation:
+- Preview structure and links pass; the existing 19 rubric/geometry/assessment
+  checks pass; all four preview controllers pass Node syntax checks.
+- Desktop and 390px browser checks: slider and compact interpretation visible
+  together, ten checkpoint panels, local chart editing, lesson-return links,
+  60-to-50 recorded comparison with positivity unchanged, alternate profile,
+  nested reference deep links, and scoped optional-reading expansion.
+- No console errors during these checks; no horizontal overflow on the phone.
+- Root and v2 sources, scientific models, quiz banks and artwork are unchanged.
+- CI and deployment results are recorded on the pull request.
+
+The review is source-based; browser verification was performed separately.
+Alex still needs to judge whether this realizes his intent. Igor should review
+the teaching adaptation before any decision to replace the current edition.
