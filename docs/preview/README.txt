@@ -15,6 +15,8 @@ open the existing self-tests in v2. Artwork attribution remains in the footer.
 Changes to review:
 - A short opening and one eight-step index, aligned with Navigator.
 - A concrete Susan example and one optional detail panel per step.
+- Original artwork in the main flow: the opening scene follows Susan's
+  introduction, and the cohort and hidden-thread sketches sit in steps 1 and 4.
 - Target-trial planning and the causal estimand within the first step.
 - Dedicated observed-data and statistical-target steps.
 - Collapsed worksheet and practice area after Susan's actual conclusion.
