@@ -89,6 +89,10 @@ section.part.preview-substep { padding-top:25px; }
 .story-opening h2 { font-size:2rem; margin-bottom:15px; }
 .question-types { padding:8px 0 8px 20px; border-left:2px solid var(--line); margin:20px 0; }
 .question-types p { margin:7px 0; font-size:.95rem; }
+.story-opening>.story-hero-art { margin:24px 0; }
+.story-opening>.story-hero-art figcaption { line-height:1.6; }
+[data-learning-step]>.wrap>.story-figure { width:100%; max-width:28rem; margin:24px auto; transform:none; }
+[data-learning-step]>.wrap>.story-figure img { max-height:280px; }
 .intro-depth>section.part { padding:16px 0; }
 .intro-depth .wrap { padding:0; width:100%; }
 .intro-depth h2 { font-size:1.6rem; }
