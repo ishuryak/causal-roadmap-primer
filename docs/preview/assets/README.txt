@@ -15,6 +15,18 @@ scientific captions and links to the full-size originals. Keep the captions
 consistent with any future revisions. They state proposed assumptions, not
 estimated causal effects or a claim that Susan's data identify her target.
 
+The optional clinical examples use the hollow-headed patients, indigo and
+green pen marks, and purple arrows of Andy Wilson's ECA teaching cartoons.
+The two WebP illustrations are web renditions of the AI-assisted drawings
+prepared with Andy for the November 18 roadmap review.
+
+- trial-or-records.webp: Susan considers a new trial and existing records.
+- same-cohort.svg: the same illustrated patients under each hypothetical
+  schedule. The figure reuses the same three drawings in each branch.
+- time-zero-and-frailty.webp: Susan can align dates in her charts. An
+  unrecorded pretreatment confounder requires other evidence or sensitivity
+  analysis.
+
 EARLIER EDITABLE CONFOUNDING SKETCH
 
 context-confounding.svg and context-confounding.drawio retain the earlier

@@ -148,6 +148,117 @@ stopifnot(abs(estimates["ATE", "T"] + 0.048) < 1e-6,
           abs(unname(arm_risk["1"] - arm_risk["0"]) + 0.0992307692) < 1e-6)
 ```
 
+## TMLE and double machine learning on the same records
+
+Susan keeps the five-year risk difference, short minus standard, in all 5,000 eligible patients. In this example both targeted maximum likelihood estimation (TMLE) and cross-fitted augmented inverse probability weighting (AIPW) estimate **−4.80 percentage points**. The six display patients illustrate individual calculations and contribute no observations to any fit or average below.
+
+### Target the difference with TMLE
+
+Start with a deliberately simple outcome fit. Pool the schedules and use the observed mortality rate within each frailty group for both predictions, giving an initial difference of zero. Estimate the probability of short, `e`, separately by frailty. For a short recipient the clever covariate `H` equals `1/e`. For a standard recipient it equals `-1/(1-e)`. Fit one logistic coefficient `epsilon`, using the initial log odds as an offset with no intercept. This coefficient updates the predictions for the **population risk difference**.
+
+```{r targeting}
+group <- train[["L"]] + 1L
+arm <- train[["A"]]
+observed <- train[["Y"]]
+q_initial <- as.numeric(tapply(observed, group, mean))
+g_full <- as.numeric(tapply(arm, group, mean))
+h0 <- -1 / (1 - g_full)
+h1 <- 1 / g_full
+H <- ifelse(arm == 1L, h1[group], h0[group])
+initial_log_odds <- qlogis(q_initial[group])
+fluctuation <- glm(observed ~ 0 + H + offset(initial_log_odds),
+                   family = binomial(), control = glm.control(epsilon = 1e-12))
+epsilon <- unname(coef(fluctuation)[1])
+qstar0 <- plogis(qlogis(q_initial) + epsilon * h0)
+qstar1 <- plogis(qlogis(q_initial) + epsilon * h1)
+qstar_obs <- ifelse(arm == 1L, qstar1[group], qstar0[group])
+tmle_ate <- mean(qstar1[group] - qstar0[group])
+score_before <- mean(H * (observed - q_initial[group]))
+score_after <- mean(H * (observed - qstar_obs))
+knitr::kable(data.frame(frailty = profile_names, initial = q_initial, e = g_full,
+                       H_standard = h0, H_short = h1,
+                       updated_standard = qstar0, updated_short = qstar1), digits = 5)
+stopifnot(abs(epsilon + 0.049149193627) < 1e-9, abs(score_before + 0.048) < 1e-9,
+          abs(score_after) < 1e-9, abs(tmle_ate + 0.048) < 1e-9)
+```
+
+The fitted coefficient is −0.049149. Averaging the updated risks across the target patients gives 24.88169% on short and 29.68169% on standard, a difference of −4.80 points. The mean of `H * (observed - updated risk)` is zero at the fit. An individual residual can increase, and targeting this single difference does not separately calibrate either arm mean or either frailty contrast. [Schuler and Rose on TMLE for observational data](https://doi.org/10.1093/aje/kww165) · [Balzer, Petersen and van der Laan on targeting a difference](https://doi.org/10.1002/sim.6965)
+
+### Train on four folds, score on the fifth
+
+For double machine learning (DML), split every frailty-by-schedule cell into five equal parts. Within a cell of size `n`, label the synthetic rows `j = 0, ..., n-1` in their original order. The fixed permutation `(37*j + 17) %% n` uses only the row label and cell size. The first fifth of permuted ranks goes to fold 1, and so on. Each fold contains 1,000 distinct fitting records and leaves 4,000 to train its models. Outcomes play no part in assigning folds. This is a reproducible stratified teaching split.
+
+```{r honest-folds}
+make_folds <- function(n) {
+  j <- seq_len(n) - 1L
+  rank <- (37L * j + 17L) %% n
+  stopifnot(length(unique(rank)) == n)
+  1L + (5L * rank) %/% n
+}
+fold <- unlist(lapply(cells[["patients"]], make_folds), use.names = FALSE)
+stopifnot(all(table(fold) == 1000L))
+fit_profiles <- function(rows) {
+  frailty <- rows[["L"]]
+  a <- rows[["A"]]
+  y <- rows[["Y"]]
+  data.frame(e = as.numeric(tapply(a, frailty, mean)),
+             q0 = as.numeric(tapply(y[a == 0L], frailty[a == 0L], mean)),
+             q1 = as.numeric(tapply(y[a == 1L], frailty[a == 1L], mean)),
+             m = as.numeric(tapply(y, frailty, mean)))
+}
+fits <- vector("list", 5)
+out_of_fold <- data.frame(e = rep(NA_real_, nrow(train)), q0 = NA_real_,
+                          q1 = NA_real_, m = NA_real_)
+for (k in seq_along(fits)) {
+  held <- fold == k
+  fits[[k]] <- fit_profiles(train[!held, ])
+  out_of_fold[held, ] <- fits[[k]][group[held], ]
+}
+stopifnot(!anyNA(out_of_fold), abs(fits[[1]]$q0[2] - 479/1200) < 1e-12)
+```
+
+For the interactive regression model (IRM), `q0` and `q1` predict the outcome under each schedule. Each held-out record contributes the predicted difference plus a signed, inverse-probability-weighted residual. Averaging those contributions estimates the ATE. No propensity clipping or weight normalization is used here. Positive and negative individual contributions can extend beyond the range of a risk difference.
+
+```{r dml-ate}
+irm_contribution <- function(y, a, fit) {
+  q_received <- ifelse(a == 1L, fit[["q1"]], fit[["q0"]])
+  h <- ifelse(a == 1L, 1 / fit[["e"]], -1 / (1 - fit[["e"]]))
+  fit[["q1"]] - fit[["q0"]] + h * (y - q_received)
+}
+contribution <- irm_contribution(observed, arm, out_of_fold)
+irm_ate <- mean(contribution)
+knitr::kable(data.frame(held_out_fold = 1:5, held_out_n = as.integer(table(fold)),
+                        mean_contribution_pp = 100 * as.numeric(tapply(contribution, fold, mean))),
+             digits = 3)
+stopifnot(abs(irm_ate + 0.048) < 1e-9)
+```
+
+Take display patient P04, a higher-frailty short recipient who died. The model trained without fold 1 gives `q1 = 0.25`, `q0 = 479/1200` and `e = 0.25`. Her illustrative AIPW contribution is about **2.85083**. This number shows how a recorded death enters the average. Her unobserved outcome under standard stays unknown. The agreement of IRM and TMLE here follows from the empirical within-frailty treatment probabilities and balanced folds. They can give different finite-sample estimates in other data. [Chernozhukov et al., sections 3–5](https://doi.org/10.1111/ectj.12097) · [DoubleML score equations](https://docs.doubleml.org/stable/guide/scores.html)
+
+### A separate partially linear comparison
+
+For partially linear regression (PLR), `m` predicts mortality from frailty alone and `e` predicts schedule from frailty. On each held-out record, subtract each prediction from its observed value. Regress the outcome residual on the treatment residual through zero. Here the propensity is the same within every fold, so this cross-fitted slope exactly matches the ordinary Frisch–Waugh–Lovell (FWL) result from regressing `Y` on `A` and frailty.
+
+```{r dml-plr}
+treatment_residual <- arm - out_of_fold[["e"]]
+outcome_residual <- observed - out_of_fold[["m"]]
+num <- sum(treatment_residual * outcome_residual)
+den <- sum(treatment_residual^2)
+plr <- num / den
+fwl <- unname(coef(lm(Y ~ A + factor(L), data = train))["A"])
+cohort_n <- as.numeric(table(group))
+overlap_mass <- cohort_n * g_full * (1 - g_full)
+overlap_weight <- overlap_mass / sum(overlap_mass)
+overlap_target <- sum(overlap_weight * (t1 - t0))
+knitr::kable(data.frame(frailty = profile_names, cohort_share = cohort_n / sum(cohort_n),
+                       overlap_mass, overlap_weight, stratum_difference = t1 - t0), digits = 5)
+stopifnot(abs(num + 43.65) < 1e-9, abs(den - 1005) < 1e-9,
+          max(abs(plr - fwl), abs(plr - overlap_target)) < 1e-9,
+          abs(plr - irm_ate) > 0.004)
+```
+
+The residualized slope is −43.65 / 1,005 = −0.0434328, or **−4.34328 percentage points**. With a binary schedule and heterogeneous effects, the partially linear projection weights each frailty group in proportion to its frequency times `e * (1-e)`. The lower-frailty group therefore gets 62.69% of the weight in this projection and 60% in Susan’s all-eligible ATE. TMLE uses its clever covariate to target an outcome regression. Treatment residualization belongs to the PLR calculation. [Why a partially linear model weights overlap](https://docs.doubleml.org/stable/examples/py_double_ml_plm_irm_hetfx.html)
+
 ## What if one schedule is unavailable?
 
 In another synthetic clinic, a clinical rule makes the short schedule unavailable to every higher-frailty patient. Hold the lower-frailty data fixed. Keep the unavailable risk and full-target contrast unresolved. If Susan asks a new question about the 3,000 lower-frailty patients, those patients contribute evidence for both schedules.

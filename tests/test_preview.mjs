@@ -41,7 +41,7 @@ for(const oldId of [...readFileSync(new URL('../docs/v2/index.html',import.meta.
 const stepSix = html.slice(html.indexOf('id="estimators"'), html.indexOf('id="checks"'));
 assert(stepSix.split('<details')[0].includes('href="estimators/index.html"'), 'The tutorial is visible on the main Step 6 path');
 const overviewFile = new URL('estimators/index.html', file);
-const tutorialPages = ['index.html', 'worksheet.html', 'guide.html', 'paper.html'];
+const tutorialPages = ['index.html', 'worksheet.html', 'cousins.html', 'guide.html', 'paper.html'];
 const pageHtml = name => readFileSync(new URL(name, overviewFile), 'utf8');
 for (const page of tutorialPages) {
   const source = pageHtml(page);
@@ -88,6 +88,8 @@ for (const asset of ['equations-page.webp', 'vendor/pdf.mjs', 'vendor/pdf.worker
   assert(existsSync(new URL(asset, overviewFile)), 'Missing paper reader asset ' + asset);
 }
 assert(pageHtml('worksheet.html').includes('href="analysis.Rmd"'), 'The worked R notebook is available at the worksheet');
+assert(overview.includes('ink/observed.png') && pageHtml('guide.html').includes('ink/fitted.png'), 'The overview and field guide use the original ECA pen drawings');
+assert(pageHtml('cousins.html').includes('href="analysis.Rmd"'), 'The new estimators link to their reproducible fits');
 assert.match(html, /<html\b[^>]*\bdata-theme="light"/, 'The test roadmap uses the white palette');
 const practice = html.slice(html.indexOf('id="spotlight-game"'), html.indexOf('class="bleile-workbench"'));
 assert(practice.includes('https://andystats.github.io/bleile-glasshouses/'), 'Practice links to the standalone confounding game');

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="only light">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Trace a single record through TMLE and double machine learning. Compare the clinic-wide risk difference with the partial regression slope.">
+  <title>TMLE and DML · Causal Roadmap</title>
+  <link rel="stylesheet" href="tutorial.css">
+  <link rel="stylesheet" href="record-figure.css">
+  <link rel="stylesheet" href="cousins.css">
+  <script type="module" src="cousins.mjs"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the example</a>
+<header class="site-head"><div class="frame head-inner">
+  <a class="site-brand" href="../index.html#estimators">Causal Roadmap</a>
+  <nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html">Worksheet</a><a href="cousins.html" aria-current="page">Cousins</a><a href="guide.html">Field guide</a><a href="paper.html">Paper</a></nav>
+</div></header>
+<main class="frame cousin-page" id="main">
+  <header class="cousin-heading">
+    <h1>TMLE and DML</h1>
+    <p>How would five-year mortality change across Susan’s 5,000 eligible patients under short versus standard radiotherapy? Targeted maximum likelihood estimation (TMLE) and double machine learning (DML) both use risk and treatment models to answer her question.</p>
+  </header>
+  <noscript><p>The <a href="analysis.Rmd">R workbook</a> contains the calculations for both methods and the partial regression example.</p></noscript>
+  <div class="cousin-bench">
+    <div class="case-controls">
+      <fieldset class="case-method">
+        <legend>Method</legend>
+        <label><input id="mode-tmle" type="radio" name="method" value="tmle" checked><span>TMLE</span></label>
+        <label><input id="mode-dml" type="radio" name="method" value="dml"><span>DML</span></label>
+      </fieldset>
+      <label class="case-picker">Patient
+        <select id="case-patient"><option>P01</option><option>P02</option><option>P03</option><option selected>P04</option><option>P05</option><option>P06</option></select>
+      </label>
+    </div>
+    <p class="case-intro" id="fit-story">TMLE updates the predicted risk under each schedule, then compares the two averages.</p>
+    <fieldset class="case-steps">
+      <legend class="visually-hidden">Calculation step</legend>
+      <label><input id="step-1" type="radio" name="step" value="1" checked><span id="step-label-1">Start</span></label>
+      <label><input id="step-2" type="radio" name="step" value="2"><span id="step-label-2">Target</span></label>
+      <label><input id="step-3" type="radio" name="step" value="3"><span id="step-label-3">Average</span></label>
+    </fieldset>
+    <figure class="record-figure worked-row" aria-label="One patient’s record, the method’s calculation and its result">
+      <div class="drawing-line">
+        <div class="little-row">
+          <h2><span id="trace-id">P04</span>’s record</h2>
+          <div class="row-cells"><span>Standard</span><span>Short</span><b class="record-cell is-missing" id="trace-y0">?</b><b class="record-cell is-observed" id="trace-y1">1</b></div>
+          <p id="trace-profile">Higher frailty · short</p>
+        </div>
+        <svg class="case-arrow" viewBox="0 0 58 28" aria-hidden="true" focusable="false"><path d="M2 18q11 0 23-4t28-4m-8-6 9 6-8 6"/></svg>
+        <div class="calculation">
+          <h2 id="middle-title">Starting risks</h2>
+          <div class="measure-line"><span id="middle-label-0">Standard</span><b id="middle-value-0">36.25%</b></div>
+          <div class="measure-line"><span id="middle-label-1">Short</span><b id="middle-value-1">36.25%</b></div>
+        </div>
+        <svg class="ink-brace" viewBox="0 0 36 82" aria-hidden="true" focusable="false" preserveAspectRatio="none"><path d="M4 3c13-2 11 14 10 22s1 13 14 16c-12 1-15 10-13 20s0 18-11 18"/></svg>
+        <div class="calculation-result"><h2 id="result-title">Initial difference</h2><output id="result-value">0.00 pp</output></div>
+      </div>
+      <figcaption id="step-note">The starting model uses frailty alone, so it gives the same risk under both schedules.</figcaption>
+    </figure>
+    <p class="case-footnote">The six display patients illustrate the arithmetic. The 5,000 fitting records supply the estimates. A green 1 means a recorded death. A question mark marks the unobserved outcome. Risk differences are in percentage points.</p>
+    <div class="case-folds">
+      <details id="math-disclosure">
+        <summary>Show the math for this step</summary>
+        <div class="fold-copy">
+          <p id="formula" class="case-equation">Q₀(a, L) = E[Y | L]</p>
+          <p id="worked-math">At higher frailty, the pooled mortality risk is 725 / 2,000 = 36.25%.</p>
+          <p id="math-extra"></p>
+        </div>
+      </details>
+      <details id="fwl">
+        <summary>Partialling out frailty · Frisch–Waugh–Lovell</summary>
+        <div class="fold-copy">
+          <p>First regress schedule on frailty and keep the residual. Do the same for mortality. The Frisch–Waugh–Lovell theorem says the slope between these residuals equals the schedule coefficient in the full least-squares regression, using the same rows and adjustment columns.</p>
+          <div class="residual-sketch record-figure" role="group" aria-label="The selected patient’s two residuals and the cohort slope">
+            <div><span>Schedule residual</span><strong id="fwl-a">+0.75</strong></div>
+            <div><span>Mortality residual</span><strong id="fwl-y">+0.64</strong></div>
+            <div class="residual-result"><span>Cohort slope</span><strong id="fwl-out">−4.34 pp</strong></div>
+          </div>
+          <p>Partially linear DML (PLR) extends this idea using predictions from other folds. The patient’s two residuals above use the model trained without fold 1. The slope uses all 5,000 held-out pairs. In this example it matches the ordinary adjusted regression.</p>
+          <p>Look back at the Target and Correct steps. Both use the gap between observed and predicted mortality. TMLE uses that gap to update the risks. DML for the average effect uses it to correct each patient’s contribution.</p>
+          <p>Here the schedule is binary. PLR gives each frailty group weight proportional to its size times <var>e</var>(1 − <var>e</var>), where <var>e</var> is the probability of short. Lower-frailty patients get 62.69% of the weight in that slope and 60% in Susan’s all-eligible average. The two group effects differ, so the answers differ too. <a href="https://doi.org/10.1016/j.spl.2020.108945">Read the FWL result</a>.</p>
+        </div>
+      </details>
+      <details id="how-fit">
+        <summary>The fitting records and sources</summary>
+        <div class="fold-copy">
+          <p>TMLE fits the initial risks and treatment probabilities in the 5,000-record cohort. For DML, each of five folds holds out 1,000 records while the other 4,000 supply the predictions. The six display patients belong to no fold. Their DML illustrations use the model trained without fold 1.</p>
+          <p>For a causal interpretation, Susan needs comparable groups given frailty, a real chance of either schedule within each group, well-defined schedules and complete follow-up in this example. <a href="guide.html#fitting-records">See the counts and assumptions</a>.</p>
+          <p class="source-links"><a href="https://doi.org/10.1093/aje/kww165">Schuler and Rose on TMLE</a><a href="https://doi.org/10.1111/ectj.12097">Chernozhukov et al. on DML, §§4–5</a><a href="https://docs.doubleml.org/stable/examples/py_double_ml_plm_irm_hetfx.html">Partial regression with varying effects</a></p>
+        </div>
+      </details>
+    </div>
+    <p class="visually-hidden" role="status" aria-live="polite" id="case-live"></p>
+  </div>
+  <footer class="case-links"><a id="back-to-patient" href="worksheet.html?method=t&amp;patient=P04">See this patient in the worksheet</a><a href="analysis.Rmd" download>Download the R workbook</a></footer>
+</main>
+</body>
+</html>

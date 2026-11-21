@@ -1,0 +1,31 @@
+/* Outcome-table ink adapted from the ECA teaching slides. */
+:root {
+  --record-ink: #29276b;
+  --record-observed: #167331;
+  --record-missing: #a1273b;
+  --record-fitted: #28529d;
+}
+.record-figure {
+  margin: 0;
+  color: var(--record-ink);
+  background: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.record-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: baseline;
+  text-align: center;
+}
+.record-label { color: var(--record-ink); font-weight: 650; }
+.record-cell { display: inline-block; color: var(--record-ink); }
+.record-cell.is-observed { color: var(--record-observed); font-weight: 700; }
+.record-cell.is-missing { color: var(--record-missing); font-style: italic; }
+.record-cell.is-fitted { color: var(--record-fitted); font-weight: 650; }
+.record-arrow {
+  color: var(--record-ink);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
