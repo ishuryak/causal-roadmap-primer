@@ -18,6 +18,8 @@ Susan first checks what randomized evidence already answers for her patients. Th
 
 The interactive page and its [R Markdown notebook](../docs/preview/estimators/analysis.Rmd) are paired. When changing the example, update both and knit the notebook to run its numerical checks. The 5,000 fitting records determine the models and target populations. The six independent display rows are for the reader to follow through each operation.
 
+The worksheet’s optional math panel connects each patient trace to the paper. Printed page 4158, the third PDF page, contains equations 3–9. The [complete article](../docs/preview/estimators/kunzel-2019.pdf) is the ten-page published PDF from [PubMed Central](https://pmc.ncbi.nlm.nih.gov/articles/PMC6410831/). The authors license it under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/). Keep it intact. The public test edition lives at [the repository’s GitHub Pages tutorial route](https://ishuryak.github.io/causal-roadmap-primer/preview/estimators/).
+
 ## Reader review and next edition
 
 - Ask a reader to explain what remains unknown for patient P04 after selecting X, and why changing the target population changes the answer without refitting the models.

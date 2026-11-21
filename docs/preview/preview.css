@@ -1,5 +1,5 @@
 /* Test edition only. The existing illustrated edition remains unchanged. */
-html { scroll-behavior:auto; }
+html { scroll-behavior:auto; color-scheme:only light; }
 [hidden] { display:none !important; }
 .preview-banner { display:flex; flex-wrap:wrap; gap:8px 24px; align-items:center; padding:12px max(24px,calc((100vw - 1152px)/2)); background:var(--teal-wash); font-size:.78rem; line-height:1.6; }
 .preview-banner strong { color:var(--teal); }

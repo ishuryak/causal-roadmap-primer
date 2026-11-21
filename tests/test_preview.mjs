@@ -43,6 +43,21 @@ for (const anchor of ['estimators', 'causal-verdict']) {
   assert(tutorial.includes('href="../index.html#' + anchor + '"'), 'Tutorial returns to #' + anchor);
 }
 assert(tutorial.includes('href="analysis.Rmd"') && existsSync(new URL('analysis.Rmd', tutorialFile)), 'The worked R notebook is available');
+const paperLinks = [...tutorial.matchAll(/(?:href|src|data)="([^"]*\.pdf)(?:#([^"]*))?"/gi)];
+assert(paperLinks.length > 0, 'The tutorial links to the full article');
+for (const [, path] of paperLinks) {
+  assert(!/^(?:[a-z]+:|\/\/)/i.test(path), 'Serve the PDF from the test edition');
+  const pdf = readFileSync(new URL(path, tutorialFile));
+  assert.equal(pdf.subarray(0, 5).toString(), '%PDF-', 'The article link resolves to a PDF');
+}
+assert(paperLinks.some(([, , fragment]) => fragment?.split('&').includes('page=3')),
+  'A reader can jump to the published learner equations');
+assert.match(tutorial, /<(?:object|iframe)\b[^>]*(?:data|src)="[^"]*\.pdf(?:#[^"]*)?"/i,
+  'The full paper can be read in the tutorial');
+for (const id of ['math', 'paper']) {
+  assert(tutorial.includes('id="' + id + '"') && tutorial.includes('href="#' + id + '"'), 'Readers can link directly to #' + id);
+}
+assert.match(html, /<html\b[^>]*\bdata-theme="light"/, 'The test roadmap uses the white palette');
 const practice = html.slice(html.indexOf('id="spotlight-game"'), html.indexOf('class="bleile-workbench"'));
 assert(practice.includes('https://andystats.github.io/bleile-glasshouses/'), 'Practice links to the standalone confounding game');
 console.log('PASS preview navigation, ordering, deep links, assets, citation and isolated worksheet storage');
