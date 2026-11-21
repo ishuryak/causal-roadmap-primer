@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="only light">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Use six synthetic patient records to see how g-computation, S-, T- and X-learners estimate a treatment effect. An interactive side tutorial for the Causal Roadmap.">
+<title>Six patients, three learners · Causal Roadmap</title>
+<style>
+:root {
+  color-scheme:only light;
+  --paper:#fff; --canvas:#fff; --ink:#1d2b35; --navy:#17364c; --muted:#4e6066;
+  --teal:#096760; --pale:#f0f7f4; --line:#c9d6d3; --light-line:#e2e9e7;
+  --rust:#93401e; --mark:#d9b45e;
+  --serif:"Newsreader","Iowan Old Style",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:"Source Sans 3","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  font-family:var(--sans);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:16px}
+body{margin:0;background:var(--canvas);color:var(--ink);font-size:16px;line-height:1.48}
+button,input{font:inherit}
+a{color:var(--teal);text-underline-offset:3px}
+:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+button {color:inherit;cursor:pointer}
+[hidden]{display:none!important}
+.wrap{width:min(1180px,calc(100% - 64px));margin-inline:auto}
+.skip{position:absolute;top:0;left:18px;z-index:5;transform:translateY(-115%);padding:12px;background:var(--paper)}
+.skip:focus{transform:none}
+.top{background:var(--paper);border-top:5px solid var(--teal);border-bottom:1px solid var(--line)}
+.top .wrap,.foot .wrap,.top nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.top .wrap{min-height:58px}
+.top a,.foot a{font-weight:650}
+.brand{font-family:var(--serif);font-size:1.2rem;color:var(--navy);text-decoration:none}
+.brand span{margin-right:.42rem;font-family:var(--sans)}
+.top nav{font-size:.94rem}
+.hero{padding:38px 0 30px;display:grid;grid-template-columns:minmax(260px,.92fr) minmax(330px,1fr);gap:clamp(20px,6vw,85px);align-items:end}
+h1,h2,h3{font-family:var(--serif);font-weight:500;color:var(--navy);margin:0;line-height:1.1}
+h1{font-size:clamp(2.7rem,5.6vw,5.1rem);letter-spacing:-.052em;line-height:.94;max-width:11ch}
+h2{font-size:clamp(1.7rem,3vw,2.35rem);letter-spacing:-.035em}
+h3{font-size:1.43rem;letter-spacing:-.02em}
+p{margin:0 0 .7rem}
+p:last-child{margin-bottom:0}
+.hero .question{font-family:var(--serif);font-size:clamp(1.3rem,2.2vw,1.75rem);line-height:1.19;color:var(--navy);letter-spacing:-.02em;margin-bottom:.6rem}
+.hero .boundary{max-width:65ch;color:var(--muted);font-size:.98rem}
+.overline,.group-title{font-family:var(--mono);font-size:.77rem;line-height:1.35;font-weight:600;letter-spacing:.065em;text-transform:uppercase}
+.overline{color:var(--teal);margin-bottom:.6rem}
+.lab{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:22px clamp(14px,2.4vw,30px) 20px}
+.sheet-head{display:flex;gap:12px 24px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;margin-bottom:13px}
+.sheet-head p,.fine{color:var(--muted);font-size:.9rem}
+fieldset{padding:0;margin:0;border:0;min-width:0}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.stagebar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-bottom:1px solid var(--line);gap:3px}
+.stagebar label,.pills label{position:relative;cursor:pointer;display:block}
+.stagebar span{display:block;text-align:center;border:0;border-bottom:3px solid transparent;padding:12px 4px 11px;font-weight:650;color:var(--muted);font-size:1rem}
+.stagebar :checked+span{border-color:var(--teal);background:var(--pale);color:var(--teal);border-radius:3px 3px 0 0}
+.stagebar label:hover span,.pills label:hover span{color:var(--teal)}
+.stagebar input:focus-visible+span,.pills input:focus-visible+span{outline:3px solid var(--teal);outline-offset:-3px}
+.method{margin:14px 0 16px;display:flex;align-items:center;gap:12px 24px;justify-content:space-between;flex-wrap:wrap}
+.method p{max-width:87ch;line-height:1.4;font-size:.98rem;margin:0}
+.method label{display:inline-flex;align-items:center;gap:.5rem;color:var(--teal);font-weight:650;font-size:.96rem;cursor:pointer}
+.method input,.choice input{accent-color:var(--teal);width:18px;height:18px;flex:none}
+.worksheet{display:grid;grid-template-columns:minmax(0,1fr) minmax(215px,.34fr);gap:24px;align-items:start}
+.table-box{min-width:0}
+.table-scroll{max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain}
+.scroll-note{font-size:.83rem;color:var(--muted);margin:0 0 .3rem}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:left}
+.patients{font-size:.92rem;line-height:1.25}
+.patients th{font-weight:620}
+.patients thead tr:first-child th{font:600 .72rem/1.3 var(--mono);color:var(--muted);letter-spacing:.01em;padding:7px 4px;text-align:center;border-bottom:1px solid var(--line);vertical-align:bottom}
+.patients thead tr:first-child th:first-child{text-align:left}
+.patients thead tr:nth-child(2) th{font-size:.82rem;padding:8px 4px;background:var(--canvas);color:var(--muted);border-bottom:1px solid var(--line)}
+.patients th:nth-child(n+5),.patients td:nth-child(n+5){text-align:center}
+.patients td,.patients tbody th{padding:6px 4px;border-bottom:1px solid var(--light-line);height:47px}
+.patients [data-split]{border-left:1px solid var(--light-line)}
+.patients tbody tr{cursor:pointer}
+.patients tbody tr:hover,.patients tbody tr.selected{background:var(--pale)}
+.patients tbody tr.selected th:first-child{box-shadow:inset 3px 0 var(--teal)}
+.patients .idbtn{font:650 .88rem var(--mono);background:transparent;border:none;color:var(--navy);padding:6px 3px 6px 7px;min-width:40px;min-height:32px}
+.record-short,.narrow-head{display:none}
+.patients .obs{font:600 .85rem var(--mono);display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:50%;background:var(--navy);color:var(--paper)}
+.unknown,.pending{font:500 .95rem var(--mono);color:var(--muted)}
+.risk{display:inline-block;border:1px solid var(--line);background:var(--paper);border-radius:3px;color:var(--teal);font:600 .85rem var(--mono);padding:3px 4px;white-space:nowrap}
+.risk.pending{background:transparent;border-color:transparent;color:var(--muted)}
+.patients .diff{font:600 .88rem var(--mono);color:var(--navy);white-space:nowrap}
+.patients .source .obs,.patients .source .risk{outline:3px solid var(--mark);outline-offset:1px}
+.trace{border-left:3px solid var(--teal);padding:14px 16px;background:var(--pale);min-width:0}
+.trace h3{margin:0 0 .2rem}
+.trace .profile{font-size:.88rem;color:var(--muted);margin-bottom:.8rem}
+.trace h4{font:650 .87rem var(--sans);margin:12px 0 4px;color:var(--ink)}
+.trace p{font-size:.94rem}
+.trace .equation{font:600 .95rem/1.45 var(--mono);margin:6px 0;overflow-wrap:anywhere}
+.legend{font-size:.86rem;color:var(--muted);margin-top:10px;line-height:1.45}
+.legend span{color:var(--ink);font-weight:650}
+.more{border-top:1px solid var(--line);padding:.8rem 0}
+.more summary{cursor:pointer;font-weight:650;color:var(--teal)}
+.more[open] summary{margin-bottom:.65rem}
+.inset{margin-top:15px}
+.counts{max-width:720px;margin:.6rem 0;font-size:.93rem}
+.counts th,.counts td{border-bottom:1px solid var(--light-line);padding:6px}
+.counts caption{text-align:left;color:var(--muted);font-size:.9rem;margin-bottom:4px}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:clamp(22px,4vw,56px);margin:34px 0}
+.results>section{min-width:0}
+.results h2{font-size:1.8rem;margin-bottom:5px}
+.results .fine{margin:0 0 12px}
+.profiles{border-top:1px solid var(--line);padding-top:3px}
+.profile-line{display:grid;grid-template-columns:7.2rem minmax(50px,1fr) 7.5rem;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--light-line);font-size:.94rem}
+.profile-line output{text-align:right;font:600 .9rem var(--mono)}
+.axis{height:16px;position:relative}
+.axis::before{content:"";position:absolute;height:1px;top:50%;left:0;right:0;background:var(--line)}
+.axis::after{content:"";width:1px;height:100%;background:var(--muted);position:absolute;left:50%}
+.axis i{position:absolute;top:5px;height:6px;background:var(--teal);border-radius:3px;z-index:1}
+.axis i.positive{background:var(--rust)}
+.scale{display:flex;justify-content:space-between;margin:3px 0 0 calc(7.2rem + 10px);width:calc(100% - 14.7rem - 20px);font:500 .73rem var(--mono);color:var(--muted)}
+.pills{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.pills span{display:block;padding:6px 12px;border:1px solid var(--line);background:var(--paper);border-radius:24px;font-size:.91rem;font-weight:620}
+.pills :checked+span{background:var(--teal);color:var(--paper);border-color:var(--teal)}
+.pills :disabled+span{opacity:.7}
+.result-value{font-family:var(--serif);font-size:2.15rem;line-height:1.2;color:var(--navy);margin:8px 0 2px;letter-spacing:-.035em}
+.result-mix{font-size:.9rem;color:var(--muted);margin:0}
+.below{margin:28px 0 40px;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,5vw,70px);border-top:2px solid var(--line);padding-top:26px}
+.below h2{margin:0 0 8px}
+.below h3{margin:20px 0 8px}
+.below h4{margin:13px 0 3px}
+.below>section{min-width:0}
+.below p,.below dl{font-size:.98rem}
+.gloss{margin:0}
+.gloss dt{font-weight:680;color:var(--navy);margin:.72rem 0 .12rem}
+.gloss dd{margin:0}
+.question-box{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:15px;margin:12px 0}
+.choice{display:flex;gap:.45rem;align-items:start;padding:.29rem 0;cursor:pointer}
+.choice input{margin:2px 0 0}
+.feedback{border-left:3px solid var(--teal);padding-left:10px;margin:.75rem 0 0}
+.math-panel{margin:0 0 14px;border-block:1px solid var(--light-line);padding:.45rem 0}
+.math-panel>summary{width:fit-content;padding:2px 0}
+.math-inner{border-left:2px solid var(--line);padding:0 0 0 clamp(9px,2vw,20px);margin:12px 0 6px}
+.math-context{font-size:.9rem;font-weight:650;color:var(--teal);margin:0 0 .6rem}
+.math-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 22px}
+.math-inner h3,.math-inner h4{font:650 .9rem/1.4 var(--sans);color:var(--ink);margin:0 0 3px}
+.math-inner p{font-size:.91rem;margin:0 0 5px}
+.math-inner .formula{font:1.03rem/1.55 var(--serif);overflow-wrap:anywhere;margin-bottom:3px}
+.formula var,.notation var{font-family:var(--serif)}
+.formula sub,.formula sup{font-size:.72em;line-height:0}
+.math-example{color:var(--teal)}
+.arm-equation{border-left:2px solid transparent;padding-left:7px}
+.arm-equation.current{border-color:var(--teal)}
+.math-target{border-top:1px solid var(--light-line);padding-top:8px;margin-top:9px}
+.math-links{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 18px;border-top:1px solid var(--light-line);padding-top:8px;margin-top:10px;font-size:.9rem}
+.notation{flex-basis:auto}.notation summary{font-weight:600}
+.notation[open]{flex-basis:100%}.notation p{max-width:88ch;margin:.4rem 0}
+.paper{border-top:1px solid var(--line);margin:-12px 0 32px;padding:15px 0}
+.paper h3{max-width:52ch;margin:.2rem 0 .35rem}
+.paper .paper-links{display:flex;flex-wrap:wrap;gap:5px 18px;font-size:.96rem}
+.paper iframe{display:block;width:100%;height:clamp(340px,64vh,700px);border:1px solid var(--line);border-radius:3px;margin-top:12px;background:#fff}
+.foot{border-top:1px solid var(--line);background:var(--paper);padding:20px 0 26px}
+.foot a{font-size:.96rem}
+@media(max-width:1050px){.worksheet{grid-template-columns:minmax(0,1fr) 220px;gap:16px}.wrap{width:calc(100% - 40px)}.lab{padding-inline:18px}.patients .risk{padding-inline:2px}.trace{padding:12px}}
+@media(max-width:900px){.worksheet{grid-template-columns:1fr}.trace{min-height:0}.trace .profile{margin-bottom:.3rem}.trace p{margin-bottom:.35rem}.trace h4{margin-top:.5rem}.trace .equation{margin:3px 0}.hero{gap:24px}}
+@media(max-width:700px){
+ .wrap{width:calc(100% - 28px)} .top .wrap{min-height:51px}.top nav{gap:12px}.brand{font-size:1rem}.top nav a{font-size:.85rem}
+ .hero{display:block;padding:27px 0 20px}h1{font-size:clamp(2.5rem,9vw,3.6rem);max-width:none;margin-bottom:14px}.hero .question{font-size:1.35rem}.hero .boundary{font-size:.91rem}
+ .lab{padding:15px 10px}.sheet-head{margin-bottom:7px;gap:3px}.sheet-head h2{font-size:1.65rem}.sheet-head p{font-size:.83rem}
+ .stagebar{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;border:0;margin-top:10px}
+ .stagebar label{grid-column:span 2}.stagebar label:nth-last-child(-n+2){grid-column:span 3}
+ .stagebar span{display:grid;place-items:center;min-height:42px;border:1px solid var(--line);border-radius:4px;font-size:.9rem;padding:6px 4px}
+ .stagebar :checked+span{border-color:var(--teal);border-radius:4px;box-shadow:inset 0 -2px 0 var(--teal)}
+ .method{margin:11px 1px 8px;gap:8px}.method p{font-size:.9rem}
+ .math-grid{grid-template-columns:1fr;gap:9px}.math-panel{margin-bottom:8px}.paper iframe{height:52vh;min-height:274px}
+ .patients .record-long{display:none}.patients .record-short{display:table-cell}.patients .idbtn{padding-block:3px}.patients .mobile-profile{display:block;color:var(--muted);font:500 .75rem/1.2 var(--sans);text-align:left;padding:0 0 2px 7px}
+ .mobile-profile span+span::before{content:" · "}
+ .patients td,.patients tbody th{height:40px;padding:3px 1px}.patients thead tr:first-child th,.patients thead tr:nth-child(2) th{font-size:.73rem;padding:5px 2px;text-align:center}.patients thead tr:nth-child(2) th:first-child{text-align:left}
+ .patients .obs{width:21px;height:21px;font-size:.76rem}.patients .risk,.patients .diff{font-size:.76rem}.patients .risk{padding:2px 3px}.patients tbody th{text-align:left}
+ .worksheet{gap:11px}.legend{margin-top:7px}.results,.below{grid-template-columns:1fr;gap:24px}.results{margin:23px 0}.below{margin-top:24px;padding-top:20px}
+ .counts{font-size:.84rem}.profile-line{grid-template-columns:6.3rem minmax(50px,1fr) 6.2rem;gap:5px}.scale{margin-left:calc(6.3rem + 5px);width:calc(100% - 12.5rem - 10px)}.foot .wrap{align-items:start}
+}
+@media(max-width:370px){
+ .wrap{width:calc(100% - 16px)}.lab{padding:12px 6px}.top nav{gap:7px}.brand span{margin-right:.15rem}
+ .wide-head{display:none}.narrow-head{display:inline}.patients .risk,.patients .diff{font-size:.74rem}
+ .patients thead tr:first-child th{font-size:.67rem}.patients .mobile-profile{padding-left:3px}
+ .mobile-profile span{display:block}.mobile-profile span+span::before{content:none}.patients .idbtn{padding-left:3px}
+}
+@media(min-width:701px){.mobile-profile{display:none}}
+@media print{.wrap{width:100%}.top nav,.stagebar,.foot,.pills,.choice input,.skip,.paper iframe{display:none}.hero{padding:15px 0}.lab,.trace,.question-box{break-inside:avoid}.worksheet{display:block}.trace{margin-top:10px}.below{display:block}.overline{color:#000}}
+</style>
+</head>
+<body>
+<a class="skip" href="#worksheet">Skip to the worksheet</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../index.html#estimators"><span aria-hidden="true">←</span> Causal Roadmap</a>
+  <nav aria-label="In this tutorial"><a href="#field-guide">Field guide</a><a href="#paper">Paper</a></nav>
+</div></header>
+<main class="wrap">
+  <header class="hero">
+    <div><h1>Six patients, three learners</h1></div>
+    <div><p class="question">Would a shorter radiotherapy schedule change five-year mortality for older or frailer patients eligible for either schedule?</p>
+    <p class="boundary">Susan’s worksheet counts deaths by five years in synthetic data with complete follow-up. Her main roadmap measures months lived over those five years.</p></div>
+  </header>
+  <section id="worksheet" class="lab" aria-labelledby="sheet-title">
+    <div class="sheet-head"><h2 id="sheet-title">Patient worksheet</h2><p>Select an ID to follow one patient across methods.</p></div>
+    <fieldset class="stagebar"><legend class="sr">Method shown on the worksheet</legend>
+      <label><input class="sr" type="radio" name="stage" value="observed" checked><span>Observed</span></label>
+      <label><input class="sr" type="radio" name="stage" value="crude"><span>Arm means</span></label>
+      <label><input class="sr" type="radio" name="stage" value="s"><span>S-learner</span></label>
+      <label><input class="sr" type="radio" name="stage" value="t"><span>T-learner</span></label>
+      <label><input class="sr" type="radio" name="stage" value="x"><span>X-learner</span></label>
+    </fieldset>
+    <div class="method"><p id="method-note">Each patient has one recorded outcome. Select Arm means to fill the two risk columns.</p>
+      <label id="s-setting" hidden><input type="checkbox" id="interaction" checked> Allow a different frailty slope for each schedule</label></div>
+    <details class="more math-panel" id="math">
+      <summary>Show the math</summary>
+      <div class="math-inner">
+        <p class="math-context" id="math-context">Observed data · P04</p>
+        <div id="math-observed">
+          <h3>One observed outcome</h3>
+          <p class="formula"><var>Y</var><sub>i</sub> = <var>Y</var><sub>i</sub>(<var>W</var><sub>i</sub>)</p>
+          <p id="math-observed-value" class="math-example">P04 received short, so the observed outcome is Y(1).</p>
+          <p>Select S, T or X above to see the corresponding paper equations.</p>
+        </div>
+        <div id="math-crude" hidden>
+          <h3>Unadjusted arm means</h3>
+          <p class="formula">Ȳ<sub>short</sub> − Ȳ<sub>standard</sub> = 587 / 2,600 − 780 / 2,400 ≈ −9.92 percentage points</p>
+          <p>Each mean uses the patients who actually received that schedule.</p>
+        </div>
+        <div id="math-s" hidden>
+          <h3>S-learner · Eq. 4</h3>
+          <p class="formula"><var>τ̂</var><sub>S</sub>(<var>x</var>) = <var>μ̂</var>(<var>x</var>, 1) − <var>μ̂</var>(<var>x</var>, 0)</p>
+          <p id="math-s-value" class="math-example"></p><p id="math-s-model"></p>
+        </div>
+        <div id="math-t" hidden>
+          <h3>T-learner · Eq. 3</h3>
+          <p class="formula"><var>τ̂</var><sub>T</sub>(<var>x</var>) = <var>μ̂</var><sub>1</sub>(<var>x</var>) − <var>μ̂</var><sub>0</sub>(<var>x</var>)</p>
+          <p id="math-t-value" class="math-example"></p><p>Fit the short risk in short recipients and the standard risk in standard recipients.</p>
+        </div>
+        <div class="math-grid" id="math-x" hidden>
+          <div><h3>Fit two risks · Eqs. 5–6</h3>
+            <p class="formula"><var>μ</var><sub>0</sub>(<var>x</var>) = E[<var>Y</var>(0) | <var>X</var> = <var>x</var>]<br><var>μ</var><sub>1</sub>(<var>x</var>) = E[<var>Y</var>(1) | <var>X</var> = <var>x</var>]</p>
+            <p id="math-x-risks" class="math-example"></p>
+          </div>
+          <div><h3>Form a signed pseudo-outcome</h3>
+            <div class="arm-equation" id="math-arm-short"><p class="formula"><var>D̃</var><sub>i</sub><sup>1</sup> = <var>Y</var><sub>i</sub><sup>1</sup> − <var>μ̂</var><sub>0</sub>(<var>X</var><sub>i</sub><sup>1</sup>) <small>· Eq. 7</small></p></div>
+            <div class="arm-equation" id="math-arm-standard"><p class="formula"><var>D̃</var><sub>i</sub><sup>0</sup> = <var>μ̂</var><sub>1</sub>(<var>X</var><sub>i</sub><sup>0</sup>) − <var>Y</var><sub>i</sub><sup>0</sup> <small>· Eq. 8</small></p></div>
+            <p id="math-x-pseudo" class="math-example"></p>
+          </div>
+          <div id="x-weights"><h3>Fit effects by arm and blend · Eq. 9</h3>
+            <p class="formula"><var>τ̂</var>(<var>x</var>) = <var>g</var>(<var>x</var>) <var>τ̂</var><sub>0</sub>(<var>x</var>) + [1 − <var>g</var>(<var>x</var>)] <var>τ̂</var><sub>1</sub>(<var>x</var>)</p>
+            <p id="math-x-fits"></p><p id="math-x-blend" class="math-example"></p>
+          </div>
+        </div>
+        <div class="math-target" id="math-target" hidden>
+          <h3 id="math-target-name">Average the fitted effects</h3>
+          <p class="formula" id="math-ate"><var>τ̂</var><sub>ATE</sub> = (1 / <var>N</var>) ∑<sub>i</sub> <var>τ̂</var>(<var>X</var><sub>i</sub>)</p>
+          <p class="formula" id="math-att" hidden><var>τ̂</var><sub>ATT</sub> = (1 / <var>N</var><sub>1</sub>) ∑<sub>i : Wᵢ = 1</sub> <var>τ̂</var>(<var>X</var><sub>i</sub>)</p>
+          <p id="math-target-value" class="math-example"></p><p><a href="#target-title">Change the target population</a>.</p>
+        </div>
+        <div class="math-links">
+          <details class="notation"><summary>Paper notation</summary>
+            <p><var>X</var> is baseline frailty. <var>W</var> is the schedule (0 standard, 1 short). <var>Y</var>(<var>w</var>) is the outcome under schedule <var>w</var>. In Eqs. 7–8 the superscript on <var>Y</var><sub>i</sub> or <var>X</var><sub>i</sub> labels a record from that arm.</p>
+            <p><var>μ</var> is mean risk, <var>τ</var> a short-minus-standard effect and <var>D̃</var> a signed pseudo-outcome. A hat marks a fit. Eq. 9 allows any weight <var>g</var>(<var>x</var>) between 0 and 1. Here it is the short-schedule propensity at that frailty.</p>
+          </details>
+          <a href="#paper">Read the original paper</a><a href="analysis.Rmd" download>Download the R workbook</a>
+        </div>
+      </div>
+    </details>
+    <noscript><p>Enable JavaScript to change methods and trace patients. You can also use the <a href="analysis.Rmd">R workbook</a> or <a href="kunzel-2019.pdf#page=3">original PDF</a>.</p></noscript>
+    <div class="worksheet">
+      <div class="table-box">
+        <p id="scroll-hint" class="scroll-note" hidden>Scroll the table sideways to see every column. You can also focus the table area and use the arrow keys.</p>
+        <div class="table-scroll" id="table-scroll" role="region" aria-label="Patient worksheet columns" tabindex="0">
+        <table class="patients" id="patients" aria-describedby="table-legend">
+          <caption class="sr">Six invented display patients. Select a patient by pressing their ID button. Binary factual outcomes and model-predicted risks occupy separate columns.</caption>
+          <thead>
+            <tr><th class="record-long" scope="colgroup" colspan="4">Recorded data</th><th class="record-short" scope="col">Record</th><th data-split scope="colgroup" colspan="2">Potential outcomes</th><th data-split scope="colgroup" colspan="2">Predicted risk</th><th data-split scope="col"><span class="wide-head">Contrast</span><span class="narrow-head">Effect</span></th></tr>
+            <tr><th scope="col">Patient</th><th class="record-long" scope="col">Frailty</th><th class="record-long" scope="col">Schedule</th><th class="record-long" scope="col"><abbr title="Observed five-year outcome">Y</abbr></th><th data-split scope="col" aria-label="Standard schedule"><span class="wide-head">Standard</span><abbr class="narrow-head" title="Standard schedule">Std.</abbr></th><th scope="col">Short</th><th data-split scope="col" aria-label="Standard schedule"><span class="wide-head">Standard</span><abbr class="narrow-head" title="Standard schedule">Std.</abbr></th><th scope="col">Short</th><th data-split scope="col" aria-label="Effect of short minus standard in percentage points"><span id="contrast-label" class="wide-head">Short − std.</span><abbr class="narrow-head" title="Percentage points">pp</abbr></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        </div>
+        <p class="legend" id="table-legend"><span>0</span> alive at five years · <span>1</span> died by five years · <span>?</span> unobserved. Outlined percentages are fitted risks. The contrast is short minus standard in percentage points. <span id="x-key" hidden>Gold outlines mark the two inputs to this row’s signed pseudo-outcome.</span></p>
+      </div>
+      <aside class="trace" aria-labelledby="trace-title"><p class="overline">Patient trace</p><h3 id="trace-title">P04</h3><p class="profile" id="trace-profile"></p><div id="trace-body"></div></aside>
+    </div>
+    <div id="live-note" class="sr" aria-live="polite" aria-atomic="true"></div>
+    <details class="more inset" id="fitting-records"><summary>Fitting data and assumptions</summary>
+      <p>All methods start with 5,000 synthetic fitting records. An arm-specific model uses its own schedule group. The six display rows are new patients.</p>
+      <table class="counts"><caption>Deaths by five years / people receiving the schedule</caption><thead><tr><th scope="col">Baseline frailty</th><th scope="col">Standard</th><th scope="col">Short</th></tr></thead>
+      <tbody><tr><th scope="row">Lower</th><td>180 / 900</td><td>462 / 2,100</td></tr><tr><th scope="row">Higher</th><td>600 / 1,500</td><td>125 / 500</td></tr></tbody></table>
+      <p class="fine">We assume well-defined schedules, consistency, no interference, exchangeability within frailty groups and access to both schedules in each group.</p>
+    </details>
+  </section>
+
+  <div class="results" aria-label="Frailty and population results">
+    <section aria-labelledby="profile-title"><h2 id="profile-title">Effects by frailty</h2><p class="fine" id="profile-note">Select a method to compare the two schedules.</p>
+      <div class="profiles">
+        <div class="profile-line"><span>Lower frailty</span><span class="axis" aria-hidden="true"><i id="bar-lower"></i></span><output id="effect-lower" aria-label="Lower frailty contrast">Awaiting fit</output></div>
+        <div class="profile-line"><span>Higher frailty</span><span class="axis" aria-hidden="true"><i id="bar-higher"></i></span><output id="effect-higher" aria-label="Higher frailty contrast">Awaiting fit</output></div>
+        <div class="scale" aria-hidden="true"><span>−20</span><span>0</span><span>+20</span></div>
+      </div>
+    </section>
+    <section class="result" aria-labelledby="target-title"><h2 id="target-title">Who contributes?</h2><p class="fine">Keep each frailty contrast and change the people over whom it is averaged.</p>
+      <fieldset class="pills" id="target-pills" disabled><legend class="sr">Target population</legend>
+        <label><input type="radio" class="sr" name="target" value="ate" checked><span>All eligible · ATE</span></label>
+        <label><input type="radio" class="sr" name="target" value="att"><span>Short recipients · ATT</span></label>
+      </fieldset>
+      <p class="result-value" id="target-value">Awaiting fit</p><p class="result-mix" id="target-note">The six display rows illustrate the calculation. The target cohort supplies the weights.</p>
+    </section>
+  </div>
+  <div class="below">
+    <section aria-labelledby="read-title"><h2 id="read-title">Clinical interpretation</h2>
+      <details class="more" id="support"><summary>What if a clinic never offers one schedule?</summary>
+        <p>A second clinic offers only standard to higher-frailty patients. Among lower-frailty patients the outcomes stay the same, with 180 deaths among 900 on standard and 462 among 2,100 on short.</p>
+        <table class="counts"><caption>Patients receiving each schedule in the second clinic</caption><thead><tr><th scope="col">Baseline frailty</th><th scope="col">Standard</th><th scope="col">Short</th></tr></thead><tbody><tr><th scope="row">Lower</th><td>900</td><td>2,100</td></tr><tr><th scope="row">Higher</th><td>2,000</td><td><strong>0</strong></td></tr></tbody></table>
+        <fieldset class="question-box"><legend>Whose contrast should Susan report?</legend>
+          <label class="choice"><input type="radio" name="support-target" value="all" checked>All 5,000 patients meeting the original age or frailty criteria</label>
+          <label class="choice"><input type="radio" name="support-target" value="lower">The 3,000 lower-frailty patients</label>
+          <p id="support-answer" class="feedback" aria-live="polite">The all-patient effect is unidentified from this clinic’s data under the stated assumptions. There are no short-schedule outcomes in the higher-frailty stratum.</p>
+        </fieldset>
+        <p>The first clinic had 500 higher-frailty short recipients. In the main roadmap all frail patients received short. Either missing arm prevents a within-group comparison.</p>
+      </details>
+      <details class="more"><summary>How does this fit the trial evidence?</summary>
+        <p>Randomization makes groups comparable in expectation at assignment. Susan checks which indications, schedules and frailty profiles a trial represents before using clinic records to study patients seen less often in it.</p>
+        <p>When follow-up ends early, estimating survival or months lived also requires methods that address censoring. <a href="../index.html#causal-verdict">Return to Susan’s clinical decision</a>.</p>
+      </details>
+    </section>
+    <section id="field-guide" aria-labelledby="guide-title"><h2 id="guide-title">Field guide</h2>
+      <details class="more"><summary>Targets, estimates and learners</summary><dl class="gloss">
+        <dt>Estimand, estimator and estimate</dt><dd>The estimand is the target quantity, here a five-year risk difference. The estimator is the rule applied to data. Its result is the estimate.</dd>
+        <dt>CATE, ATE and ATT</dt><dd>The conditional average treatment effect (CATE) is a mean contrast at a baseline profile. The average treatment effect (ATE) averages over all eligible patients. The average treatment effect among the treated (ATT) averages over short recipients here.</dd>
+        <dt>Base learner and meta-learner</dt><dd>A base learner fits a prediction function, such as a regression or forest. A meta-learner arranges fits to estimate an effect.</dd>
+        <dt>Nuisance functions and Super Learner</dt><dd>Nuisance functions, such as outcome risks or treatment probabilities, help estimate the target. Super Learner uses cross-validation to combine prediction algorithms for such a fit.</dd>
+      </dl></details>
+      <details class="more"><summary>Families of estimators</summary><dl class="gloss">
+        <dt>Outcome regression and g-computation</dt><dd>S and T predict outcomes under both schedules. Standardization averages those predictions over the same target patients.</dd>
+        <dt>Effect regression</dt><dd>X models signed pseudo-outcomes separately by arm. The R-learner relates residual outcome variation to residual treatment variation after accounting for covariates.</dd>
+        <dt>Propensity and weighting</dt><dd>A propensity score is the conditional probability of short. Inverse probability weighting (IPW) uses treatment probabilities to reweight observed outcomes.</dd>
+        <dt>Augmentation and targeting</dt><dd>Augmented IPW (AIPW) adds a weighted residual correction to outcome predictions. Targeted maximum likelihood estimation (TMLE) updates initial predictions using treatment probabilities and the target parameter.</dd>
+      </dl></details>
+      <details class="more"><summary>Imputation, cross-fitting and overlap</summary><dl class="gloss">
+        <dt>Cross-arm imputation</dt><dd>X uses the fitted risk under the opposite schedule to construct a pseudo-outcome. The unobserved binary outcome stays unknown.</dd>
+        <dt>Cross-fitting and double machine learning (DML)</dt><dd>Cross-fitting predicts each held-out fold from models trained on other folds. DML commonly uses it with an orthogonal score designed to be insensitive to small first-order errors in the nuisance fits.</dd>
+        <dt>Overlap and positivity</dt><dd>Both schedules must be possible at each relevant baseline profile. A small arm can yield unstable estimates. A structural zero removes the within-profile comparison.</dd>
+      </dl></details>
+    </section>
+  </div>
+  <details class="more paper" id="paper">
+    <summary>Read the original paper</summary>
+    <h3>Metalearners for estimating heterogeneous treatment effects using machine learning</h3>
+    <p>Sören R. Künzel, Jasjeet S. Sekhon, Peter J. Bickel and Bin Yu. <cite>PNAS</cite> 116 (10), 4156–4165 (2019). Equations 3–9 appear on printed page 4158, the third PDF page.</p>
+    <p class="fine">© 2019 the authors. Published by PNAS under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>.</p>
+    <p class="paper-links"><a href="kunzel-2019.pdf#page=3">Open PDF at page 4158</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6410831/">Accessible full text</a><a href="https://doi.org/10.1073/pnas.1804597116">Publisher record</a><a href="#math">Show the worksheet math</a></p>
+    <iframe title="Original Künzel et al. article, starting at PDF page 3" src="kunzel-2019.pdf#page=3" loading="lazy"></iframe>
+  </details>
+</main>
+<footer class="foot"><div class="wrap"><a href="../index.html#estimators">← Estimation in the roadmap</a><a href="../index.html#causal-verdict">Susan’s decision →</a></div></footer>
+<script>
+(() => {
+  'use strict';
+
+  const profiles = [
+    {label: 'Lower', standard: {people: 900, deaths: 180}, short: {people: 2100, deaths: 462}},
+    {label: 'Higher', standard: {people: 1500, deaths: 600}, short: {people: 500, deaths: 125}}
+  ];
+  const people = [
+    {id: 'P01', group: 0, a: 0, y: 0}, {id: 'P02', group: 0, a: 1, y: 0},
+    {id: 'P03', group: 0, a: 1, y: 1}, {id: 'P04', group: 1, a: 1, y: 1},
+    {id: 'P05', group: 1, a: 0, y: 1}, {id: 'P06', group: 1, a: 0, y: 0}
+  ];
+  const schedule = ['standard', 'short'];
+  const eligible = profiles.map(p => p.standard.people + p.short.people);
+  const treated = profiles.map(p => p.short.people);
+  const profileRisks = profiles.map(p => schedule.map(a => p[a].deaths / p[a].people));
+  const crudeRisks = schedule.map(a => sum(profiles.map(p => p[a].deaths)) / sum(profiles.map(p => p[a].people)));
+  // Fitted probabilities from the unpenalized binomial GLM in analysis.Rmd.
+  // Array order is [standard, short] within each frailty group.
+  const sharedSlopeRisks = [
+    [0.2411727171242990, 0.2023545498251430],
+    [0.3752963697266447, 0.3241108908399532]
+  ];
+  const instructions = {
+    observed: 'Each patient has one recorded outcome. Select Arm means to fill the two risk columns.',
+    crude: 'Compare observed schedule groups. Their frailty mix differs, so this is an unadjusted association.',
+    s: 'Use one logistic regression to predict twice. Change the frailty slope and inspect the lower-frailty contrast.',
+    t: 'Use one regression per schedule. Compare the risks with S when each schedule has its own frailty slope.',
+    x: 'Keep T’s two risk fits. Pair each observed outcome with the opposite-arm prediction, then fit and blend the effects.'
+  };
+  const stageName = {observed:'Observed data', crude:'Arm means', s:'S-learner', t:'T-learner', x:'X-learner'};
+  const byId = id => document.getElementById(id);
+  const signed = (x, digits) => (x < 0 ? '−' : x > 0 ? '+' : '') + Math.abs(x).toFixed(digits);
+  const percent = x => (x * 100).toFixed(2).replace(/\.00$/, '') + '%';
+  const points = x => signed(x * 100, 2);
+  const decimal = x => x.toFixed(2);
+  const nf = x => x.toLocaleString('en-US');
+  const pp = (text,cls='') => '<p' + (cls ? ' class="' + cls + '"' : '') + '>' + text + '</p>';
+  const equation = text => pp(text,'equation');
+  const state = {stage:'observed', selected:3, allowInteraction:true, target:'ate'};
+  const rowElements = [];
+
+  function sum(xs) { return xs.reduce((total, x) => total + x, 0); }
+  function risksFor(group) {
+    if (state.stage === 'observed') return null;
+    if (state.stage === 'crude') return crudeRisks;
+    if (state.stage === 's' && !state.allowInteraction) return sharedSlopeRisks[group];
+    return profileRisks[group];
+  }
+  function xFits(group) {
+    const p = profiles[group];
+    const [q0,q1] = profileRisks[group];
+    // One fitted mean in each frailty stratum, using the actual arm's event counts.
+    const d0 = (p.standard.deaths * (q1-1) + (p.standard.people-p.standard.deaths) * q1) / p.standard.people;
+    const d1 = (p.short.deaths * (1-q0) + (p.short.people-p.short.deaths) * (-q0)) / p.short.people;
+    const e = p.short.people / eligible[group];
+    return {d0,d1,e,blended:e*d0 + (1-e)*d1};
+  }
+  function contrastFor(group) {
+    const q = risksFor(group);
+    if (!q) return null;
+    return state.stage === 'x' ? xFits(group).blended : q[1]-q[0];
+  }
+  function rowPseudo(p, q) {
+    return p.a
+      ? {value:p.y - q[0], subtraction:p.y + ' − ' + decimal(q[0])}
+      : {value:q[1] - p.y, subtraction:decimal(q[1]) + ' − ' + p.y};
+  }
+  function targetEstimate() {
+    const counts = state.target === 'ate' ? eligible : treated;
+    const total = sum(counts);
+    return {counts, total, effect:sum(counts.map((n, group) => n * contrastFor(group))) / total};
+  }
+  function updateMath() {
+    const p = people[state.selected];
+    const stage = state.stage;
+    const q = risksFor(p.group);
+    const group = profiles[p.group];
+    const adjusted = ['s','t','x'].includes(stage);
+    byId('math-context').textContent = stageName[stage] + ' · ' + p.id + ' · ' + group.label.toLowerCase() + ' frailty';
+    for (const method of Object.keys(stageName)) byId('math-' + method).hidden = method !== stage;
+    byId('math-target').hidden = !adjusted;
+    if (stage === 'observed') {
+      byId('math-observed-value').textContent = p.id + ' received ' + schedule[p.a] + ', so Y(' + p.a + ') = ' + p.y + '. Y(' + (1-p.a) + ') is unknown.';
+    }
+    if (!adjusted) return;
+    if (stage === 'x') {
+      const {d0,d1,e,blended} = xFits(p.group);
+      const pseudo = rowPseudo(p,q);
+      byId('math-x-risks').textContent = 'Fitted risk at this frailty is ' + percent(q[0]) + ' under standard and ' + percent(q[1]) + ' under short.';
+      byId('math-arm-short').classList.toggle('current', p.a === 1);
+      byId('math-arm-standard').classList.toggle('current', p.a === 0);
+      byId('math-x-pseudo').textContent = p.id + ' (' + schedule[p.a] + ') uses Eq. ' + (p.a ? '7' : '8') + '. ' + pseudo.subtraction + ' = ' + signed(pseudo.value,2) + '.';
+      byId('math-x-fits').textContent = 'Average training pseudo-outcomes at this frailty within each arm. The standard fit is ' + points(d0) + ' points and the short fit is ' + points(d1) + '. Here g = ' + nf(group.short.people) + ' / ' + nf(eligible[p.group]) + '.';
+      byId('math-x-blend').textContent = decimal(e) + ' × (' + points(d0) + ') + ' + decimal(1-e) + ' × (' + points(d1) + ') = ' + points(blended) + ' points.';
+    } else {
+      byId('math-' + stage + '-value').textContent = p.id + ' at this frailty gives ' + percent(q[1]) + ' − ' + percent(q[0]) + ' ≈ ' + points(contrastFor(p.group)) + ' percentage points.';
+      if (stage === 's') byId('math-s-model').textContent = state.allowInteraction
+        ? 'A treatment-by-frailty interaction gives each schedule its own intercept and slope. Here the two fitted risks match T.'
+        : 'The pooled model shares a frailty slope on the log-odds scale. The common treatment odds ratio can still give different risk differences.';
+    }
+    const isAte = state.target === 'ate';
+    const {counts,total,effect} = targetEstimate();
+    byId('math-ate').hidden = !isAte;
+    byId('math-att').hidden = isAte;
+    byId('math-target-name').textContent = 'Worksheet population average · ' + (isAte ? 'all eligible patients (ATE)' : 'short recipients (ATT)');
+    byId('math-target-value').textContent = '[' + nf(counts[0]) + ' × (' + points(contrastFor(0)) + ') + ' + nf(counts[1]) + ' × (' + points(contrastFor(1)) + ')] / ' + nf(total) + ' ≈ ' + points(effect) + ' points.';
+  }
+
+  function buildRows() {
+    const body = byId('patients').tBodies[0];
+    people.forEach((person, index) => {
+      const row = body.insertRow();
+      const group = profiles[person.group].label;
+      const arm = schedule[person.a];
+      const armTitle = person.a ? 'Short' : 'Standard';
+      const status = person.y ? 'died by five years' : 'alive at five years';
+      const idCell = document.createElement('th');
+      idCell.scope = 'row';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'idbtn';
+      button.textContent = person.id;
+      button.setAttribute('aria-label', 'Trace ' + person.id + ', ' + group.toLowerCase() + ' frailty, ' + arm + ', ' + status);
+      idCell.append(button);
+      const compact = document.createElement('span');
+      compact.className = 'mobile-profile';
+      compact.setAttribute('aria-hidden','true');
+      const mobileGroup = document.createElement('span');
+      mobileGroup.textContent = group;
+      const mobileArm = document.createElement('span');
+      mobileArm.textContent = person.a ? 'Short' : 'Std.';
+      compact.append(mobileGroup,mobileArm);
+      idCell.append(compact);
+      row.append(idCell);
+      for (const value of [group, armTitle, String(person.y)]) {
+        const cell = row.insertCell();
+        cell.className = 'record-long';
+        cell.textContent = value;
+      }
+      const factual = schedule.map((name, a) => {
+        const cell = row.insertCell();
+        if (a===0) cell.dataset.split = '';
+        const value = document.createElement('span');
+        value.className = person.a === a ? 'obs' : 'unknown';
+        value.textContent = person.a === a ? String(person.y) : '?';
+        value.setAttribute('aria-label', person.a === a ? 'Observed ' + person.y + ', ' + status : 'Unobserved outcome under ' + name);
+        cell.append(value);
+        return cell;
+      });
+      const risks = schedule.map((name, a) => {
+        const cell = row.insertCell();
+        if (a===0) cell.dataset.split = '';
+        const value = document.createElement('span');
+        cell.append(value);
+        return {cell,value};
+      });
+      const delta = row.insertCell();
+      delta.dataset.split = '';
+      delta.className = 'diff';
+      rowElements.push({row,button,factual,risks,delta});
+      row.addEventListener('click', () => {
+        state.selected = index;
+        render();
+      });
+    });
+  }
+  function updateTable() {
+    byId('contrast-label').textContent = state.stage === 'x' ? 'X effect' : 'Short − std.';
+    byId('x-key').hidden = state.stage !== 'x';
+    people.forEach((person, index) => {
+      const cells = rowElements[index];
+      const selected = index === state.selected;
+      const q = risksFor(person.group);
+      const effect = contrastFor(person.group);
+      cells.row.classList.toggle('selected', selected);
+      cells.button.setAttribute('aria-pressed', String(selected));
+      cells.factual.forEach((cell, a) => cell.classList.toggle('source', selected && state.stage === 'x' && person.a === a));
+      cells.risks.forEach(({cell,value}, a) => {
+        value.className = q ? 'risk' : 'risk pending';
+        value.textContent = q ? percent(q[a]) : '·';
+        value.setAttribute('aria-label', q ? 'Predicted risk under ' + schedule[a] + ': ' + percent(q[a]) : 'Risk has not been fitted');
+        cell.classList.toggle('source', selected && state.stage === 'x' && person.a !== a);
+      });
+      cells.delta.textContent = effect === null ? '·' : points(effect);
+      cells.delta.setAttribute('aria-label', effect === null ? 'Effect not estimated' : points(effect) + ' percentage points');
+    });
+  }
+  function updateTableViewport() {
+    const area = byId('table-scroll');
+    const canScroll = area.scrollWidth > area.clientWidth + 1;
+    area.tabIndex = canScroll ? 0 : -1;
+    byId('scroll-hint').hidden = !canScroll;
+  }
+
+  function updateTrace() {
+    const p = people[state.selected];
+    const arm = schedule[p.a];
+    const alternate = schedule[1-p.a];
+    const q = risksFor(p.group);
+    const effect = contrastFor(p.group);
+    byId('trace-title').textContent = p.id;
+    byId('trace-profile').textContent = profiles[p.group].label + ' frailty · ' + arm + ' schedule';
+    let content;
+    if (state.stage === 'observed') {
+      const outcome = p.y ? 'died by five years' : 'was alive at five years';
+      content = pp(p.id + ' ' + outcome + ' after ' + arm + '. Their observed ' + p.y + ' fills that schedule’s outcome column. What would have happened under ' + alternate + '?');
+    } else if (state.stage === 'x') {
+      const {d0,d1} = xFits(p.group);
+      const pseudo = rowPseudo(p,q);
+      content = '<h4>Signed pseudo-outcome</h4>' + equation(pseudo.subtraction + ' = ' + signed(pseudo.value,2));
+      content += pp(p.a ? 'Observed short outcome minus predicted standard risk.' : 'Predicted short risk minus observed standard outcome.');
+      content += '<h4>Effect at this frailty</h4>' + pp('Standard fit ' + points(d0) + ' points. Short fit ' + points(d1) + ' points. Their blend gives ' + points(effect) + ' points. <a href="#math">See the weights</a>.');
+    } else {
+      content = '<h4>' + (state.stage === 'crude' ? 'Observed arm averages' : 'Two predicted risks') + '</h4>';
+      content += equation(percent(q[1]) + ' − ' + percent(q[0]) + ' ≈ ' + points(effect) + ' points');
+      if (state.stage === 'crude') content += pp('Every row gets these same two arm averages.');
+      if (state.stage === 's') content += pp(state.allowInteraction ? 'One fit gives each schedule its own intercept and frailty slope.' : 'One fit shares its frailty slope across both schedules.');
+      if (state.stage === 't') content += pp('Both arm-specific fits use this patient’s baseline frailty.');
+    }
+    byId('trace-body').innerHTML = content;
+  }
+  function updateResults() {
+    const fitted = state.stage !== 'observed';
+    const adjusted = fitted && state.stage !== 'crude';
+    byId('target-pills').disabled = !adjusted;
+    byId('profile-note').textContent = !fitted ? 'Select a method to compare the two schedules.' : adjusted ? 'Five-year mortality risk under short minus standard, in percentage points.' : 'Arm means ignore frailty. Both rows repeat the same crude association.';
+    ['lower','higher'].forEach((key, group) => {
+      const effect = contrastFor(group);
+      const out = byId('effect-' + key);
+      const bar = byId('bar-' + key);
+      out.textContent = fitted ? points(effect) + ' pp' : 'Awaiting fit';
+      bar.hidden = !fitted;
+      if (fitted) {
+        const width = Math.abs(effect) / .40 * 100;
+        bar.style.width = width + '%';
+        bar.style.left = (effect < 0 ? 50-width : 50) + '%';
+        bar.classList.toggle('positive', effect > 0);
+      }
+    });
+    if (!adjusted) {
+      byId('target-value').textContent = fitted ? points(contrastFor(0)) + ' points, crude' : 'Awaiting fit';
+      byId('target-note').textContent = fitted ? 'The observed arm averages compare 2,600 short recipients with 2,400 standard recipients. Select S, T or X to average contrasts over a common target.' : 'The six display rows illustrate the calculation. The target cohort supplies the weights.';
+      return;
+    }
+    const {counts,total,effect} = targetEstimate();
+    byId('target-value').textContent = points(effect) + ' percentage points';
+    byId('target-note').textContent = 'Among ' + nf(total) + (state.target === 'ate' ? ' eligible patients' : ' short-schedule recipients') + ', ' + nf(counts[0]) + ' have lower frailty and ' + nf(counts[1]) + ' have higher frailty. Each patient contributes equally within this target.';
+  }
+  function render() {
+    byId('method-note').textContent = instructions[state.stage];
+    byId('s-setting').hidden = state.stage !== 's';
+    updateTable();
+    updateTableViewport();
+    updateTrace();
+    updateResults();
+    updateMath();
+    const person = people[state.selected];
+    const risks = risksFor(person.group);
+    let summary = stageName[state.stage] + ', ' + person.id + '. ' + byId('trace-profile').textContent + '. ';
+    if (state.stage === 'x') {
+      summary += 'Signed pseudo-outcome ' + signed(rowPseudo(person,risks).value,2) + '. ';
+    }
+    if (risks) summary += 'Profile contrast ' + points(contrastFor(person.group)) + ' percentage points. ';
+    byId('live-note').textContent = summary + byId('target-value').textContent + '.';
+  }
+  const checked = name => document.querySelector('input[name="' + name + '"]:checked');
+  function readControls() {
+    state.stage = checked('stage').value;
+    state.target = checked('target').value;
+    state.allowInteraction = byId('interaction').checked;
+    byId('support-answer').textContent = checked('support-target').value === 'all'
+      ? 'The all-patient effect is unidentified from this clinic’s data under the stated assumptions. There are no short-schedule outcomes in the higher-frailty stratum.'
+      : 'For the 3,000 lower-frailty patients who could receive either schedule, the estimated risk difference is +2.00 points. Naming this group changes the target population.';
+    render();
+  }
+  function revealSection(hash) {
+    if (hash === '#math' || hash === '#paper') byId(hash.slice(1)).open = true;
+    if (hash === '#x-weights') {
+      byId('math').open = true;
+      document.querySelector('input[name="stage"][value="x"]').checked = true;
+      readControls();
+    }
+  }
+  document.addEventListener('click', event => {
+    const link = event.target.closest('a[href^="#"]');
+    if (link && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) revealSection(link.hash);
+  });
+  window.addEventListener('hashchange', () => revealSection(location.hash));
+  document.querySelectorAll('input').forEach(input => input.addEventListener('change', readControls));
+  window.addEventListener('pagehide', () => {
+    const radios = Array.from(document.querySelectorAll('input[type="radio"]:checked'), input => input.value);
+    history.replaceState({patient: state.selected, radios, interaction: state.allowInteraction}, '');
+  });
+  window.addEventListener('pageshow', () => {
+    // Browsers may restore checked inputs after pageshow, without a change event.
+    setTimeout(() => {
+      const saved = history.state;
+      if (saved && people[saved.patient] && Array.isArray(saved.radios)) {
+        state.selected = saved.patient;
+        for (const radio of document.querySelectorAll('input[type="radio"]')) {
+          radio.checked = saved.radios.includes(radio.value);
+        }
+        byId('interaction').checked = saved.interaction;
+      }
+      readControls();
+      revealSection(location.hash);
+    }, 0);
+  });
+  buildRows();
+  readControls();
+  revealSection(location.hash);
+  if (typeof ResizeObserver === 'function') {
+    const tableObserver = new ResizeObserver(updateTableViewport);
+    tableObserver.observe(byId('table-scroll'));
+    tableObserver.observe(byId('patients'));
+  }
+})();
+</script>
+</body>
+</html>

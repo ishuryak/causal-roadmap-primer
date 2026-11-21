@@ -35,4 +35,29 @@ const controller=readFileSync(new URL('../docs/preview/app.mjs',import.meta.url)
 assert(controller.includes('causal-roadmap-worksheet-preview-v1'),'Preview worksheet state is isolated');
 for(const c of COMPONENTS)assert(ids.includes(c.section),'Each game component has a lesson destination');
 for(const oldId of [...readFileSync(new URL('../docs/v2/index.html',import.meta.url),'utf8').matchAll(/<section\b[^>]*id="([^"]+)"/g)].map(m=>m[1]))assert(ids.includes(oldId),'Preserve old section link '+oldId);
+const stepSix = html.slice(html.indexOf('id="estimators"'), html.indexOf('id="checks"'));
+assert(stepSix.split('<details')[0].includes('href="estimators/index.html"'), 'The tutorial is visible on the main Step 6 path');
+const tutorialFile = new URL('estimators/index.html', file);
+const tutorial = readFileSync(tutorialFile, 'utf8');
+for (const anchor of ['estimators', 'causal-verdict']) {
+  assert(tutorial.includes('href="../index.html#' + anchor + '"'), 'Tutorial returns to #' + anchor);
+}
+assert(tutorial.includes('href="analysis.Rmd"') && existsSync(new URL('analysis.Rmd', tutorialFile)), 'The worked R notebook is available');
+const paperLinks = [...tutorial.matchAll(/(?:href|src|data)="([^"]*\.pdf)(?:#([^"]*))?"/gi)];
+assert(paperLinks.length > 0, 'The tutorial links to the full article');
+for (const [, path] of paperLinks) {
+  assert(!/^(?:[a-z]+:|\/\/)/i.test(path), 'Serve the PDF from the test edition');
+  const pdf = readFileSync(new URL(path, tutorialFile));
+  assert.equal(pdf.subarray(0, 5).toString(), '%PDF-', 'The article link resolves to a PDF');
+}
+assert(paperLinks.some(([, , fragment]) => fragment?.split('&').includes('page=3')),
+  'A reader can jump to the published learner equations');
+assert.match(tutorial, /<(?:object|iframe)\b[^>]*(?:data|src)="[^"]*\.pdf(?:#[^"]*)?"/i,
+  'The full paper can be read in the tutorial');
+for (const id of ['math', 'paper']) {
+  assert(tutorial.includes('id="' + id + '"') && tutorial.includes('href="#' + id + '"'), 'Readers can link directly to #' + id);
+}
+assert.match(html, /<html\b[^>]*\bdata-theme="light"/, 'The test roadmap uses the white palette');
+const practice = html.slice(html.indexOf('id="spotlight-game"'), html.indexOf('class="bleile-workbench"'));
+assert(practice.includes('https://andystats.github.io/bleile-glasshouses/'), 'Practice links to the standalone confounding game');
 console.log('PASS preview navigation, ordering, deep links, assets, citation and isolated worksheet storage');
