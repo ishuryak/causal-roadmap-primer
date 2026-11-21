@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {runInNewContext} from 'node:vm';
 import {COMPONENTS} from '../docs/v2/bleile-model.mjs';
 const file=new URL('../docs/preview/index.html',import.meta.url);
 const html=readFileSync(file,'utf8');
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(new Set(ids).size,ids.length,'IDs must remain unique for deep links and controller selectors');
-const dynamicIds=new Set(COMPONENTS.map(c=>'bleile-'+c.id));
-for(const [,id] of html.matchAll(/href="#([^"]+)"/g))assert(ids.includes(id)||dynamicIds.has(id),'Broken anchor #'+id);
+for(const [,id] of html.matchAll(/href="#([^"]+)"/g))assert(ids.includes(id),'Broken anchor #'+id);
 for(const [,path] of html.matchAll(/(?:src|href)="([^"#]+)"/g)){
   if(/^(https?:|mailto:|data:)/.test(path))continue;
   assert(existsSync(resolve(dirname(fileURLToPath(file)),path.split(/[?#]/)[0])),'Missing local asset '+path);
@@ -33,37 +33,61 @@ assert(!/\bsections? \d/i.test(html),'Cross-references must not retain the super
 assert(!html.includes('0000000000001636'),'Preview citation points to the intended article');
 const controller=readFileSync(new URL('../docs/preview/app.mjs',import.meta.url),'utf8');
 assert(controller.includes('causal-roadmap-worksheet-preview-v1'),'Preview worksheet state is isolated');
-for(const c of COMPONENTS)assert(ids.includes(c.section),'Each game component has a lesson destination');
+for (const component of COMPONENTS) {
+  assert(ids.includes(component.section), 'Each game component has a lesson destination');
+  assert(ids.includes('bleile-' + component.id), 'Checkpoint link exists before game initialization: ' + component.id);
+}
 for(const oldId of [...readFileSync(new URL('../docs/v2/index.html',import.meta.url),'utf8').matchAll(/<section\b[^>]*id="([^"]+)"/g)].map(m=>m[1]))assert(ids.includes(oldId),'Preserve old section link '+oldId);
 const stepSix = html.slice(html.indexOf('id="estimators"'), html.indexOf('id="checks"'));
 assert(stepSix.split('<details')[0].includes('href="estimators/index.html"'), 'The tutorial is visible on the main Step 6 path');
-const tutorialFile = new URL('estimators/index.html', file);
-const tutorial = readFileSync(tutorialFile, 'utf8');
-for (const anchor of ['estimators', 'causal-verdict']) {
-  assert(tutorial.includes('href="../index.html#' + anchor + '"'), 'Tutorial returns to #' + anchor);
+const overviewFile = new URL('estimators/index.html', file);
+const tutorialPages = ['index.html', 'worksheet.html', 'guide.html', 'paper.html'];
+const pageHtml = name => readFileSync(new URL(name, overviewFile), 'utf8');
+for (const page of tutorialPages) {
+  const source = pageHtml(page);
+  const nav = source.match(/<nav\b[^>]*aria-label="Estimator tutorial"[^>]*>([\s\S]*?)<\/nav>/)?.[1];
+  assert(nav, 'Shared navigation is available on ' + page);
+  assert.deepEqual([...nav.matchAll(/href="([^"]+)"/g)].map(match => match[1]), tutorialPages);
+  assert.match(nav, new RegExp('<a\\b(?=[^>]*href="' + page + '")(?=[^>]*aria-current="page")[^>]*>'));
+  const ids = [...source.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(new Set(ids).size, ids.length, 'IDs are unique on ' + page);
+  for (const [, target] of source.matchAll(/(?:href|src)="([^"]+)"/g)) {
+    if (/^(https?:|mailto:|data:)/.test(target)) continue;
+    const linked = new URL(target, new URL(page, overviewFile));
+    assert(existsSync(linked), page + ' links to missing ' + target);
+    if (linked.hash && linked.pathname.endsWith('.html')) {
+      const linkedHtml = readFileSync(linked, 'utf8');
+      assert(linkedHtml.includes('id="' + linked.hash.slice(1) + '"'), page + ' links to missing anchor ' + target);
+    }
+  }
 }
-assert(tutorial.includes('href="analysis.Rmd"') && existsSync(new URL('analysis.Rmd', tutorialFile)), 'The worked R notebook is available');
-const paperLinks = [...tutorial.matchAll(/(?:href|src|data)="([^"]*\.pdf)(?:#([^"]*))?"/gi)];
-assert(paperLinks.length > 0, 'The tutorial links to the full article');
-for (const [, path] of paperLinks) {
-  assert(!/^(?:[a-z]+:|\/\/)/i.test(path), 'Serve the PDF from the test edition');
-  const pdf = readFileSync(new URL(path, tutorialFile));
-  assert.equal(pdf.subarray(0, 5).toString(), '%PDF-', 'The article link resolves to a PDF');
+const overview = pageHtml('index.html');
+assert.equal([...overview.matchAll(/type="radio" name="family"/g)].length, 4, 'The methods map has four branches');
+assert(!overview.includes('paper-reader.mjs') && !overview.includes('worksheet.mjs'),
+  'The introduction loads independently of the worksheet and PDF reader');
+const legacyScript = overview.match(/<script>([\s\S]*?)<\/script>/)[1];
+for (const [hash, expected] of Object.entries({
+  '': null, '#main': null, '#methods-map': null, '#unknown': null, '#worksheet': 'worksheet.html',
+  '#math': 'worksheet.html?view=math', '#x-weights': 'worksheet.html?method=x&patient=P04&view=math',
+  '#field-guide': 'guide.html', '#paper': 'paper.html', '#support': 'guide.html#support',
+  '#fitting-records': 'guide.html#fitting-records'
+})) {
+  const from = new URL(hash, 'https://example.org/preview/estimators/');
+  let destination = null;
+  runInNewContext(legacyScript, {URL, location: {hash, href: from.href, replace(url) {destination = url.href;}}});
+  assert.equal(destination, expected && new URL(expected, from).href, 'Bookmark ' + hash);
 }
-assert(paperLinks.some(([, , fragment]) => fragment?.split('&').includes('page=3')),
-  'A reader can jump to the published learner equations');
-const readerFile = new URL('paper-reader.mjs', tutorialFile);
-assert(tutorial.includes('src="paper-reader.mjs"') && existsSync(readerFile), 'The white inline reader is available');
-const reader = readFileSync(readerFile, 'utf8');
-assert(reader.includes(paperLinks[0][1]) && reader.includes('pdfjs.getDocument'),
-  'The inline reader loads the article linked by the tutorial');
+const paper = pageHtml('paper.html');
+const pdfPath = paper.match(/href="([^":]+\.pdf)#page=3"/)?.[1];
+assert(pdfPath, 'Readers can open the local PDF at the published equations');
+assert.equal(readFileSync(new URL(pdfPath, overviewFile)).subarray(0, 5).toString(), '%PDF-');
+const reader = pageHtml('paper-reader.mjs');
+assert(paper.includes('src="paper-reader.mjs"') && reader.includes(pdfPath) && reader.includes('pdfjs.getDocument'),
+  'The inline white reader opens the same complete article');
 for (const asset of ['equations-page.webp', 'vendor/pdf.mjs', 'vendor/pdf.worker.mjs', 'vendor/LICENSE']) {
-  assert(existsSync(new URL(asset, readerFile)), 'Missing local paper reader asset ' + asset);
+  assert(existsSync(new URL(asset, overviewFile)), 'Missing paper reader asset ' + asset);
 }
-assert(!/<(?:iframe|object)\b[^>]*(?:data|src)="[^"]*\.pdf/.test(tutorial), 'Use the white reader for embedded pages');
-for (const id of ['math', 'paper']) {
-  assert(tutorial.includes('id="' + id + '"') && tutorial.includes('href="#' + id + '"'), 'Readers can link directly to #' + id);
-}
+assert(pageHtml('worksheet.html').includes('href="analysis.Rmd"'), 'The worked R notebook is available at the worksheet');
 assert.match(html, /<html\b[^>]*\bdata-theme="light"/, 'The test roadmap uses the white palette');
 const practice = html.slice(html.indexOf('id="spotlight-game"'), html.indexOf('class="bleile-workbench"'));
 assert(practice.includes('https://andystats.github.io/bleile-glasshouses/'), 'Practice links to the standalone confounding game');

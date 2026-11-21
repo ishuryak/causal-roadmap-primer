@@ -1,5 +1,6 @@
 /* Test edition only. The existing illustrated edition remains unchanged. */
-html { scroll-behavior:auto; color-scheme:only light; }
+html { scroll-behavior:auto; scroll-padding-top:1rem; color-scheme:only light; }
+.story-opening,.story-lab,.story-transport,.bleile-roadmap,.bleile-game-intro,.bleile-checkpoint { scroll-margin-top:0; }
 [hidden] { display:none !important; }
 .preview-banner { display:flex; flex-wrap:wrap; gap:8px 24px; align-items:center; padding:12px max(24px,calc((100vw - 1152px)/2)); background:var(--teal-wash); font-size:.78rem; line-height:1.6; }
 .preview-banner strong { color:var(--teal); }
@@ -41,6 +42,13 @@ section.part.preview-substep { padding-top:25px; }
 .practice-editor>label { display:block; font-size:.85rem; font-weight:600; margin-bottom:8px; }
 .practice-editor>select { width:100%; font:inherit; font-size:1rem; padding:10px; color:var(--ink); background:var(--paper); border:1px solid var(--line); }
 .practice-editor .bleile-checkpoint { padding:10px 0; border:0; background:none; margin:10px 0; }
+.practice-editor .bleile-checkpoint:empty { height:0; margin:0; padding:0; overflow:hidden; }
+/* Keep the editor's footprint steady when component descriptions wrap differently. */
+@media screen {
+  #practice-panels { display:grid; }
+  #practice-panels>.bleile-checkpoint { grid-area:1 / 1; min-width:0; }
+  #practice-panels>.bleile-checkpoint[hidden] { display:block !important; visibility:hidden; }
+}
 .practice-editor .bleile-checkpoint>p { font-size:.85rem; }
 .practice-editor .bleile-check-head { font-size:.9rem; }
 .practice-editor .bleile-return { display:none; }

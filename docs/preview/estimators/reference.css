@@ -1,0 +1,84 @@
+.reference-body {
+  width: min(100%, 52rem);
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 50px) 0 42px;
+}
+.reference-intro { margin: 0 0 22px; }
+.reference-intro h1 {
+  margin: 0 0 10px;
+  font-size: clamp(2.1rem, 4.5vw, 3.35rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.reference-intro p { max-width: 71ch; margin: 8px 0; }
+.reference-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; }
+.reference-links a { padding-block: 3px; text-underline-offset: .16em; }
+.reference-end { margin: 24px 0 0; }
+
+.method-reference { margin: 0 0 18px; }
+.method-reference > div {
+  display: grid;
+  grid-template-columns: minmax(9rem, 23%) minmax(0, 1fr);
+  column-gap: clamp(16px, 3vw, 36px);
+  padding: 13px 0;
+  border-top: 1px solid var(--rule);
+}
+.method-reference dt { font-weight: 650; }
+.method-reference dt span { display: block; color: var(--secondary); font-size: .94rem; font-weight: 400; }
+.method-reference dd { margin: 0; }
+.fold-body p { max-width: 76ch; margin: .45rem 0; }
+.support-picker { min-width: 0; padding: 0; margin: 0; border: 0; }
+.support-picker legend { padding: 0; margin-bottom: 8px; font-weight: 650; }
+
+.guide-folds { border-top: 1px solid var(--rule); }
+.guide-fold { border-bottom: 1px solid var(--rule); scroll-margin-top: 12px; }
+.guide-fold > summary { padding: 12px 2px; color: var(--teal); font-weight: 650; cursor: pointer; }
+.guide-fold > summary::marker { font-size: .84em; }
+.fold-body { padding: 0 4px 13px 1.2rem; }
+.reference-terms { margin: 12px 0 0; }
+.reference-terms > div { display: grid; grid-template-columns: 4rem 1fr; gap: 5px; margin: 5px 0; }
+.reference-terms dt { font-weight: 700; }
+.reference-terms dd { margin: 0; }
+.reference-counts { width: min(100%, 32rem); margin: 14px 0; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.reference-counts caption { margin-bottom: 5px; color: var(--secondary); text-align: left; }
+.reference-counts th, .reference-counts td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--rule); }
+.reference-counts th:first-child { padding-left: 0; text-align: left; }
+.support-picker { margin-top: 14px; }
+.support-options { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: start; gap: 0 8px; }
+.support-options > input { width: 17px; height: 17px; margin: 8px 0 0; accent-color: var(--teal); }
+.support-options > label { padding: 4px 0 6px; cursor: pointer; }
+.support-feedback { grid-column: 1 / -1; margin-top: 6px; border-left: 2px solid var(--teal); padding: 0 12px; }
+.support-feedback p { display: none; }
+#support-all:checked ~ .support-feedback #answer-all,
+#support-lower:checked ~ .support-feedback #answer-lower { display: block; }
+
+.paper-reference { width: min(100%, 58rem); }
+.paper-reference .reference-intro { margin-bottom: 14px; }
+.paper-reference h1 { font-size: clamp(1.75rem, 3.5vw, 2.7rem); }
+.paper-byline, .paper-credit { color: var(--secondary); }
+.paper-reader { border: 1px solid var(--rule); border-radius: 4px; color-scheme: light; background: #fff; color: #203039; }
+.paper-reader [hidden] { display: none; }
+.paper-tools { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 16px; padding: 6px 10px; border-bottom: 1px solid var(--rule); }
+.paper-paging, .paper-zoom { display: flex; align-items: center; gap: 8px; }
+.paper-paging output { min-width: 6rem; text-align: center; font-variant-numeric: tabular-nums; }
+.paper-tools button, .paper-zoom select { min-height: 42px; padding: 3px 9px; border: 1px solid var(--rule); border-radius: 4px; background: #fff; color: var(--teal); font: inherit; cursor: pointer; }
+.paper-tools button:disabled { color: var(--secondary); opacity: .6; cursor: default; }
+.paper-viewport { width: 100%; max-height: clamp(310px, 75vh, 860px); overflow: auto; overscroll-behavior-x: contain; background: #fff; }
+.paper-viewport:focus-visible { outline-offset: -3px; }
+.paper-sheet { width: 100%; background: #fff; }
+.paper-sheet img, .paper-sheet canvas { display: block; width: 100%; max-width: none; height: auto; background: #fff; }
+.paper-note { margin: 0; padding: 8px 12px; border-top: 1px solid var(--rule); color: var(--secondary); font-size: .91rem; }
+.paper-credit { margin: 9px 0 0; font-size: .9rem; }
+@media (max-width: 650px) {
+  .fold-body { padding-left: .5rem; }
+}
+@media (max-width: 500px) {
+  .method-reference > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .method-reference dt span { display: inline; margin-left: 8px; }
+}
+@media (max-width: 410px) {
+  .paper-tools { padding: 7px; }
+  .paper-paging { width: 100%; justify-content: space-between; }
+  .paper-paging output { min-width: 0; }
+  .paper-viewport { max-height: 68vh; }
+}
