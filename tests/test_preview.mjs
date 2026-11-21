@@ -35,4 +35,14 @@ const controller=readFileSync(new URL('../docs/preview/app.mjs',import.meta.url)
 assert(controller.includes('causal-roadmap-worksheet-preview-v1'),'Preview worksheet state is isolated');
 for(const c of COMPONENTS)assert(ids.includes(c.section),'Each game component has a lesson destination');
 for(const oldId of [...readFileSync(new URL('../docs/v2/index.html',import.meta.url),'utf8').matchAll(/<section\b[^>]*id="([^"]+)"/g)].map(m=>m[1]))assert(ids.includes(oldId),'Preserve old section link '+oldId);
+const stepSix = html.slice(html.indexOf('id="estimators"'), html.indexOf('id="checks"'));
+assert(stepSix.split('<details')[0].includes('href="estimators/index.html"'), 'The tutorial is visible on the main Step 6 path');
+const tutorialFile = new URL('estimators/index.html', file);
+const tutorial = readFileSync(tutorialFile, 'utf8');
+for (const anchor of ['estimators', 'causal-verdict']) {
+  assert(tutorial.includes('href="../index.html#' + anchor + '"'), 'Tutorial returns to #' + anchor);
+}
+assert(tutorial.includes('href="analysis.Rmd"') && existsSync(new URL('analysis.Rmd', tutorialFile)), 'The worked R notebook is available');
+const practice = html.slice(html.indexOf('id="spotlight-game"'), html.indexOf('class="bleile-workbench"'));
+assert(practice.includes('https://andystats.github.io/bleile-glasshouses/'), 'Practice links to the standalone confounding game');
 console.log('PASS preview navigation, ordering, deep links, assets, citation and isolated worksheet storage');

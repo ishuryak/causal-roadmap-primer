@@ -1,0 +1,178 @@
+---
+title: "Six patients, three learners"
+subtitle: "An R companion to Susan’s Causal Roadmap tutorial"
+output:
+  html_document:
+    self_contained: true
+    mathjax: null
+    toc: true
+---
+
+Susan asks how five-year mortality would change under a shorter radiation schedule for older or frailer patients eligible for either schedule. A negative risk difference means fewer deaths under the shorter schedule. The main roadmap’s primary outcome is restricted mean survival time through five years, the average time alive during that window. This exercise uses a fully ascertained binary outcome so every step can be checked by hand.
+
+Open this file in RStudio and select **Knit**, or run `rmarkdown::render("analysis.Rmd")` in its directory. All data are synthetic. The estimators use base R. The tables use **knitr**.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = FALSE, error = FALSE, comment = "#>")
+options(knitr.kable.NA = "")
+```
+
+## The records Susan has
+
+The 5,000 training records contain baseline frailty (`L`, 1 for higher), received schedule (`A`, 1 for short), and death by five years (`Y`, 1 for death). The causal interpretation assumes consistent treatment definitions, exchangeability given baseline frailty, and both schedules available in each target stratum. These are features of the teaching example. Applying it to clinical records would require clinical justification.
+
+```{r counts}
+cells <- data.frame(
+  L = c(0L, 0L, 1L, 1L), A = c(0L, 1L, 0L, 1L),
+  patients = c(900L, 2100L, 1500L, 500L),
+  deaths = c(180L, 462L, 600L, 125L)
+)
+expand_records <- function(cells) {
+  data.frame(
+    L = rep(cells$L, cells$patients),
+    A = rep(cells$A, cells$patients),
+    Y = as.integer(sequence(cells$patients) <= rep(cells$deaths, cells$patients))
+  )
+}
+train <- expand_records(cells)
+profiles <- data.frame(L = 0:1)
+profile_names <- c("Lower frailty", "Higher frailty")
+stopifnot(nrow(train) == 5000L)
+knitr::kable(cells)
+```
+
+The crude comparison uses the two groups as observed. More higher-frailty people received the standard schedule.
+
+```{r observed}
+arm_risk <- tapply(train$Y, train$A, mean)
+round(100 * c(standard = unname(arm_risk["0"]), short = unname(arm_risk["1"]),
+              difference = unname(arm_risk["1"] - arm_risk["0"])), 2)
+```
+
+## S and T ask for the same two risks
+
+The S-learner fits one logistic regression. The schedule-by-frailty interaction gives each arm its own intercept and slope. The T-learner fits a separate regression in each arm. Both predict each baseline profile under each schedule. The difference between those conditional mean risks estimates the **conditional average treatment effect** (CATE).
+
+```{r two-risks}
+s_full <- glm(Y ~ A * L, data = train, family = binomial())
+s_shared <- glm(Y ~ A + L, data = train, family = binomial())
+t_standard <- glm(Y ~ L, data = train, subset = A == 0L, family = binomial())
+t_short <- glm(Y ~ L, data = train, subset = A == 1L, family = binomial())
+
+risk <- function(fit, rows) unname(predict(fit, newdata = rows, type = "response"))
+standard <- transform(profiles, A = 0L)
+short <- transform(profiles, A = 1L)
+s0 <- risk(s_full, standard)
+s1 <- risk(s_full, short)
+t0 <- risk(t_standard, profiles)
+t1 <- risk(t_short, profiles)
+shared0 <- risk(s_shared, standard)
+shared1 <- risk(s_shared, short)
+
+knitr::kable(data.frame(profile = profile_names,
+  standard_pct = 100*t0, short_pct = 100*t1,
+  S_difference_pp = 100*(s1 - s0), T_difference_pp = 100*(t1 - t0),
+  shared_S_difference_pp = 100*(shared1 - shared0)), digits = 2)
+stopifnot(max(abs(s0 - t0), abs(s1 - t1)) < 1e-6)
+```
+
+Under the unpenalized, fully interacted fit, the likelihood separates into the two arm-specific fits, so S and T agree. Removing the interaction gives both frailty groups a common schedule odds ratio. Read the lower-frailty row again. The estimated risk difference changes sign.
+
+## One outcome per patient
+
+The six display patients are held out of model fitting. Consistency tells Susan which potential outcome she observed. The paired outcome under the other schedule stays blank. The two predicted risks apply to people with that baseline profile.
+
+```{r display-patients}
+display <- data.frame(
+  id = sprintf("P%02d", 1:6), L = c(0, 0, 0, 1, 1, 1),
+  A = c(0, 1, 1, 1, 0, 0), Y = c(0, 0, 1, 1, 1, 0)
+)
+display$observed_under_standard <- ifelse(display$A == 0L, display$Y, NA_integer_)
+display$observed_under_short <- ifelse(display$A == 1L, display$Y, NA_integer_)
+display$risk_standard <- risk(t_standard, display)
+display$risk_short <- risk(t_short, display)
+knitr::kable(display, digits = 2)
+```
+
+## X brings the observed outcome back
+
+In the short arm, the pseudo-effect is observed outcome minus fitted standard risk. In the standard arm it is fitted short risk minus observed outcome. Both use the same direction. For a higher-frailty death these are +0.60 (P04) and −0.75 (P05). The two large, noisy pseudo-effects explain why the next step regresses them on baseline characteristics.
+
+```{r x-learner}
+pseudo_effect <- function(rows) {
+  ifelse(rows$A == 1L, rows$Y - risk(t_standard, rows),
+                       risk(t_short, rows) - rows$Y)
+}
+train$D <- pseudo_effect(train)
+display$D <- pseudo_effect(display)
+stopifnot(abs(display$D[4] - 0.60) < 1e-6,
+          abs(display$D[5] + 0.75) < 1e-6)
+
+x_standard <- lm(D ~ L, data = train, subset = A == 0L)
+x_short <- lm(D ~ L, data = train, subset = A == 1L)
+tau0 <- unname(predict(x_standard, profiles))
+tau1 <- unname(predict(x_short, profiles))
+e <- risk(glm(A ~ L, data = train, family = binomial()), profiles)
+tau_x <- e*tau0 + (1 - e)*tau1
+knitr::kable(data.frame(profile = profile_names, probability_short = e,
+  from_standard_pp = 100*tau0, from_short_pp = 100*tau1,
+  X_difference_pp = 100*tau_x), digits = 2)
+stopifnot(max(abs(tau_x - (t1 - t0))) < 1e-6)
+```
+
+Here each stage fits a separate mean in each frailty stratum, so both second-stage fits reproduce the same conditional difference. Try the blend with two *hypothetical* second-stage predictions that disagree. At a probability of short of 0.25, the standard-arm fit gets weight 0.25. The short-arm fit uses the opposite arm’s prediction of standard risk.
+
+```{r unequal-blend}
+example_blend <- 0.25*(-0.02) + (1 - 0.25)*(-0.06)
+stopifnot(abs(example_blend + 0.05) < 1e-8)
+100*example_blend
+```
+
+## Whose average?
+
+First standardize to all 5,000 eligible patients (ATE). Then use the baseline distribution of the 2,600 short-schedule recipients (ATT). Both sets of weights use the training cohort. Changing which six display patients are shown leaves these weights intact.
+
+```{r standardization}
+weights <- rbind(
+  ATE = as.numeric(prop.table(table(train$L))),
+  ATT = as.numeric(prop.table(table(train$L[train$A == 1L])))
+)
+risk_columns <- cbind(standard = t0, short = t1, S = s1 - s0,
+  T = t1 - t0, X = tau_x, shared_S = shared1 - shared0)
+estimates <- weights %*% risk_columns
+knitr::kable(100*estimates, digits = 2,
+  caption = "Two arm risks in percent, followed by four risk differences in percentage points.")
+stopifnot(abs(estimates["ATE", "T"] + 0.048) < 1e-6,
+          abs(estimates["ATT", "T"] + 33/2600) < 1e-6,
+          abs(unname(arm_risk["1"] - arm_risk["0"]) + 0.0992307692) < 1e-6)
+```
+
+## What if one schedule is unavailable?
+
+In another synthetic clinic, a clinical rule makes the short schedule unavailable to every higher-frailty patient. Hold the lower-frailty data fixed. Keep the unavailable risk and full-target contrast unresolved. If Susan asks a new question about the 3,000 lower-frailty patients, those patients contribute evidence for both schedules.
+
+```{r support}
+second_clinic <- cells
+high <- second_clinic$L == 1L
+second_clinic$patients[high] <- c(2000L, 0L)
+second_clinic$deaths[high] <- c(800L, 0L)
+
+counts <- xtabs(patients ~ L + A, data = second_clinic)
+deaths <- xtabs(deaths ~ L + A, data = second_clinic)
+risks <- deaths / counts
+risks[counts == 0] <- NA_real_
+supported <- counts[, "0"] > 0 & counts[, "1"] > 0
+difference <- risks[, "1"] - risks[, "0"]
+target_n <- rowSums(counts)
+full_target <- weighted.mean(difference, target_n)
+shared_target <- weighted.mean(difference[supported], target_n[supported])
+stopifnot(is.na(full_target), sum(target_n[supported]) == 3000L,
+          abs(shared_target - 0.02) < 1e-8)
+knitr::kable(data.frame(profile = profile_names,
+  standard_n = as.integer(counts[, "0"]), short_n = as.integer(counts[, "1"]),
+  difference_pp = as.numeric(100*difference)), digits = 2)
+```
+
+The revised target has a **+2 percentage-point** estimated risk difference. In real data, an empty sample cell can also arise by chance. Susan would ask the clinicians whether both schedules were realistic options before redefining whom her conclusion covers.
+
+Künzel and colleagues describe the S-, T- and X-learners and the weighting convention used here. [Original methods and equations 3–9](https://doi.org/10.1073/pnas.1804597116)
