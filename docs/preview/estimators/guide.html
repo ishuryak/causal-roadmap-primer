@@ -44,6 +44,19 @@
       </dl>
 
       <div class="guide-folds">
+        <details class="guide-fold" id="vocabulary" open>
+          <summary>Learner, estimator and estimate</summary>
+          <div class="fold-body">
+            <dl class="reference-terms vocabulary-terms">
+              <div><dt>Estimand</dt><dd>The quantity Susan wants to know. Here it is the difference in five-year mortality if all 5,000 eligible patients received short versus if all received standard.</dd></div>
+              <div><dt>Base learner</dt><dd>An algorithm that fits a pattern to data. For example, logistic regression can estimate mortality risk from frailty.</dd></div>
+              <div><dt>Meta-learner</dt><dd>A rule for putting those fits together. The T-learner fits one risk model per schedule. By subtracting the two risks at a given frailty, T is itself an estimator of that group’s risk difference.</dd></div>
+              <div><dt>Estimator</dt><dd>The rule for calculating a particular quantity from data. To estimate the clinic-wide difference, Susan predicts both risks for every eligible patient using T, subtracts standard from short, then averages.</dd></div>
+              <div><dt>Estimate</dt><dd>The number the rule gives for these records. Average mortality risk is 23.2% under short and 28.0% under standard, a difference of <strong>−4.80 percentage points</strong>.</dd></div>
+            </dl>
+            <p><strong>When do the estimates agree?</strong> Here S with a schedule-by-frailty interaction, T and X all give +2 points at lower frailty and −15 at higher frailty. Averaging over the same patients gives the same −4.80 points. If S shares a frailty slope across schedules, its estimate for the same clinic changes to −4.38 points. <a href="worksheet.html?method=s&amp;view=effects&amp;target=ate&amp;slope=shared">Try the shared slope</a>.</p>
+          </div>
+        </details>
         <details class="guide-fold" id="original-sketch">
           <summary>Andy’s original six-row sketch</summary>
           <div class="fold-body">
@@ -70,7 +83,7 @@
         <details class="guide-fold">
           <summary>Which patients? CATE, ATE and ATT</summary>
           <div class="fold-body">
-            <p>The <strong>estimand</strong> states the contrast and population. An <strong>estimator</strong> is the rule for calculating it. The resulting number is the <strong>estimate</strong>. Here, short minus standard is a five-year mortality risk difference. A negative difference means lower mortality under short.</p>
+            <p>Each comparison uses short minus standard for five-year mortality. A negative difference means lower estimated mortality under short.</p>
             <dl class="reference-terms">
               <div><dt>CATE</dt><dd>The conditional average treatment effect compares the two risks at the same baseline profile, such as higher frailty.</dd></div>
               <div><dt>ATE</dt><dd>The average treatment effect gives each of the 5,000 eligible patients equal weight.</dd></div>
@@ -79,9 +92,9 @@
           </div>
         </details>
         <details class="guide-fold">
-          <summary>Base learners, Super Learner and cross-fitting</summary>
+          <summary>Super Learner, cross-fitting and partial regression</summary>
           <div class="fold-body">
-            <p>A <strong>base learner</strong> is a prediction algorithm, such as logistic regression or a forest. A <strong>meta-learner</strong> arranges prediction fits to estimate treatment effects. <strong>Super Learner</strong> uses cross-validation to combine candidate algorithms for a prediction task, such as fitting mortality risk inside a T-learner.</p>
+            <p><strong>Super Learner</strong> uses cross-validation to combine predictions from several algorithms. It can supply the mortality risk fit within either arm of a T-learner.</p>
             <p>Outcome risks and treatment probabilities are <strong>nuisance functions</strong> used to estimate the causal contrast. <strong>Cross-fitting</strong> trains on other folds before predicting for the held-out fold. DML pairs cross-fitting with an <strong>orthogonal score</strong> that reduces first-order sensitivity to small errors in these fits. The <strong>interactive regression model (IRM)</strong> allows the two schedules to have different effects across frailty profiles.</p>
             <p><strong>Partially linear regression (PLR)</strong> relates residual mortality to residual treatment. In this cohort it gives more weight to profiles where clinicians commonly chose either schedule. <a href="cousins.html?method=plr#fwl">See the Frisch–Waugh–Lovell example</a>.</p>
           </div>

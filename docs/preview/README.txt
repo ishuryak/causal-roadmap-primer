@@ -16,12 +16,14 @@ assets/illustrations/. See assets/README.txt for their sources.
 Keep that dependency in mind if v2 assets are ever moved. Quiz links explicitly
 open the existing self-tests in v2. Artwork attribution remains in the footer.
 
-Step 6 opens estimators/index.html, the brief introduction and four-branch
-methods map. worksheet.html has the six patients, effects and optional math.
-cousins.html works through TMLE and cross-fitted DML on the same cohort and
-shows how the FWL partial-regression slope weights the frailty groups. The guide
-and the complete paper each have a page in the same directory. The guide
-includes two original pen drawings from Andy Wilson's ECA slides 56 and 60.
+Step 6 opens “Different learners, the same estimate?” at estimators/index.html.
+In worksheet.html, readers follow six illustrative patients through S-, T- and
+X-learner fits. In cousins.html, readers compare how TMLE and cross-fitted DML
+estimate the average effect for all 5,000 eligible patients. The FWL example
+shows how its partial-regression slope weights the frailty groups.
+guide.html#vocabulary defines the estimator terms. The guide includes two
+original pen drawings from Andy Wilson's ECA slides 56 and 60. The complete
+paper has its own page in the same directory.
 analysis.Rmd reproduces the training counts, learner fits and target averages.
 Bookmarked fragments from the original single-page tutorial resolve to the
 corresponding new pages. The journal article opens at the equations on PDF page 3.

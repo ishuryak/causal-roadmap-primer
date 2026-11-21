@@ -1,4 +1,4 @@
-// All estimates use the fitting cohort. A display patient can be traced through an existing fit.
+// All cohort estimates use the same 5,000 synthetic fitting records.
 const cells = [
   {group: 0, a: 0, n: 900, deaths: 180},
   {group: 0, a: 1, n: 2100, deaths: 462},
@@ -88,19 +88,22 @@ function fitDml() {
     const training = cells.map((cell, i) => ({...cell, n: cell.n - holdoutCells[i].n,
       deaths: cell.deaths - holdoutCells[i].deaths}));
     const profiles = fitProfiles(training);
-    let pseudoSum = 0, plrNumerator = 0, plrDenominator = 0;
+    let initialSum = 0, correctionSum = 0, plrNumerator = 0, plrDenominator = 0;
     for (const cell of holdoutCells) {
       for (const y of [0, 1]) {
         const count = y ? cell.deaths : cell.n - cell.deaths;
         const trace = dmlTrace({a: cell.a, y}, profiles[cell.group]);
-        pseudoSum += count * trace.pseudoOutcome;
+        initialSum += count * trace.riskDifference;
+        correctionSum += count * trace.correction;
         plrNumerator += count * trace.treatmentResidual * trace.outcomeResidual;
         plrDenominator += count * trace.treatmentResidual ** 2;
       }
     }
     const holdoutN = holdoutCells.reduce((sum, cell) => sum + cell.n, 0);
+    const initialDifference = initialSum / holdoutN;
+    const meanCorrection = correctionSum / holdoutN;
     return {id: index + 1, trainN: total - holdoutN, holdoutN, holdoutCells, profiles,
-      ate: pseudoSum / holdoutN, plrNumerator, plrDenominator};
+      initialDifference, meanCorrection, ate: initialDifference + meanCorrection, plrNumerator, plrDenominator};
   });
   const ate = folds.reduce((sum, f) => sum + f.holdoutN * f.ate, 0) / total;
   const plrNumerator = folds.reduce((sum, f) => sum + f.plrNumerator, 0);

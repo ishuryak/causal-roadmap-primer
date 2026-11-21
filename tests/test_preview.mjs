@@ -4,6 +4,7 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {runInNewContext} from 'node:vm';
 import {COMPONENTS} from '../docs/v2/bleile-model.mjs';
+import {renderDrawing} from '../docs/preview/estimators/cohort-drawings.mjs';
 const file=new URL('../docs/preview/index.html',import.meta.url);
 const html=readFileSync(file,'utf8');
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
@@ -90,6 +91,21 @@ for (const asset of ['equations-page.webp', 'vendor/pdf.mjs', 'vendor/pdf.worker
 assert(pageHtml('worksheet.html').includes('href="analysis.Rmd"'), 'The worked R notebook is available at the worksheet');
 assert(overview.includes('ink/observed.png') && pageHtml('guide.html').includes('ink/fitted.png'), 'The overview and field guide use the original ECA pen drawings');
 assert(pageHtml('cousins.html').includes('href="analysis.Rmd"'), 'The new estimators link to their reproducible fits');
+assert(overview.includes('guide.html#vocabulary'), 'The introduction connects learners with the estimator vocabulary');
+assert(!pageHtml('cousins.html').includes('id="case-patient"'), 'The process walk-through uses the cohort');
+// Exercise the same SVG renderer as the interactive board, including every held-out fold.
+for (const method of ['tmle', 'dml']) {
+  for (const step of [1, 2, 3]) {
+    for (const fold of method === 'dml' ? [0, 1, 2, 3, 4] : [0]) {
+      const svg = {setAttribute() {}, innerHTML: ''};
+      renderDrawing(svg, method, step, fold);
+      assert.match(svg.innerHTML, /<title>[^<]+<\/title><desc>[^<]+<\/desc>/);
+      assert.doesNotMatch(svg.innerHTML, /NaN|undefined|Infinity/);
+      if (method === 'dml' && step < 3) assert.match(svg.innerHTML, new RegExp('fold ' + (fold + 1), 'i'));
+      if (step === 3) assert(svg.innerHTML.includes('−4.80'), 'The cohort figure shows the fitted estimate');
+    }
+  }
+}
 assert.match(html, /<html\b[^>]*\bdata-theme="light"/, 'The test roadmap uses the white palette');
 const practice = html.slice(html.indexOf('id="spotlight-game"'), html.indexOf('class="bleile-workbench"'));
 assert(practice.includes('https://andystats.github.io/bleile-glasshouses/'), 'Practice links to the standalone confounding game');
