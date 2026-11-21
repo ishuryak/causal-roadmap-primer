@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="only light">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Estimator field guide · Causal Roadmap</title>
+  <link rel="stylesheet" href="tutorial.css">
+  <link rel="stylesheet" href="reference.css">
+</head>
+<body>
+  <a class="ref-skip" href="#main">Skip to content</a>
+  <header class="site-head"><div class="frame head-inner">
+    <a class="site-brand" href="../index.html#estimators">Causal Roadmap</a>
+    <nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html">Worksheet</a><a href="guide.html" aria-current="page">Field guide</a><a href="paper.html">Paper</a></nav>
+  </div></header>
+
+  <main class="frame" id="main" tabindex="-1">
+    <div class="reference-body">
+      <header class="reference-intro">
+        <h1>Estimator field guide</h1>
+        <p>Susan wants to compare five-year mortality under short and standard radiation schedules. How does each method use her records?</p>
+      </header>
+
+      <dl class="method-reference" aria-label="Four estimator families">
+        <div>
+          <dt>Outcome regression<span>S- and T-learners</span></dt>
+          <dd>S fits one outcome model with schedule as an input. T fits a separate model per schedule. Both predict two risks per baseline profile. Averaging each risk over the same patients and subtracting standard from short gives the <strong>g-computation</strong> estimate.</dd>
+        </div>
+        <div>
+          <dt>Effect regression<span>X- and R-learners</span></dt>
+          <dd>X pairs each observed outcome with the fitted risk under the other schedule to form a signed <strong>pseudo-outcome</strong>. It fits these contrasts by arm and blends the predictions. R removes predictable variation in treatment and outcome, then uses the residuals to estimate the effect at each baseline profile.</dd>
+        </div>
+        <div>
+          <dt>Weighting<span>IPW</span></dt>
+          <dd>For the average treatment effect, inverse probability weighting (IPW) weights each observed outcome by the inverse probability of the schedule received. The <strong>propensity score</strong> is the probability of short given baseline characteristics.</dd>
+        </div>
+        <div>
+          <dt>Combined methods<span>AIPW and TMLE</span></dt>
+          <dd>Augmented IPW (AIPW) corrects predicted risks using inverse-probability-weighted residuals. Targeted maximum likelihood estimation (TMLE) uses treatment probabilities to update the predicted risks, then averages the updated risks under each schedule.</dd>
+        </div>
+      </dl>
+
+      <div class="guide-folds">
+        <details class="guide-fold">
+          <summary>Which patients? CATE, ATE and ATT</summary>
+          <div class="fold-body">
+            <p>The <strong>estimand</strong> states the contrast and population. An <strong>estimator</strong> is the rule for calculating it. The resulting number is the <strong>estimate</strong>. Here, short minus standard is a five-year mortality risk difference. A negative difference means lower mortality under short.</p>
+            <dl class="reference-terms">
+              <div><dt>CATE</dt><dd>The conditional average treatment effect compares the two risks at the same baseline profile, such as higher frailty.</dd></div>
+              <div><dt>ATE</dt><dd>The average treatment effect gives each of the 5,000 eligible patients equal weight.</dd></div>
+              <div><dt>ATT</dt><dd>The average treatment effect among the treated uses the baseline mix of the 2,600 patients who received short.</dd></div>
+            </dl>
+          </div>
+        </details>
+        <details class="guide-fold">
+          <summary>Base learners, Super Learner and cross-fitting</summary>
+          <div class="fold-body">
+            <p>A <strong>base learner</strong> is a prediction algorithm, such as logistic regression or a forest. A <strong>meta-learner</strong> arranges prediction fits to estimate treatment effects. <strong>Super Learner</strong> uses cross-validation to combine candidate algorithms for a prediction task, such as fitting mortality risk inside a T-learner.</p>
+            <p>Outcome risks and treatment probabilities are <strong>nuisance functions</strong> used to estimate the causal contrast. <strong>Cross-fitting</strong> trains such functions on other folds before predicting for a held-out fold. <strong>Double machine learning (DML)</strong> commonly pairs cross-fitting with an orthogonal score that reduces first-order sensitivity to small errors in those fits.</p>
+          </div>
+        </details>
+        <details class="guide-fold" id="fitting-records">
+          <summary>Fitting records and assumptions</summary>
+          <div class="fold-body">
+            <p>The 5,000 synthetic records below supply the fits. The six worksheet patients are separate illustrations. An arm-specific fit uses only records from its own schedule.</p>
+            <table class="reference-counts">
+              <caption>Deaths by five years / patients receiving the schedule</caption>
+              <thead><tr><th scope="col">Baseline frailty</th><th scope="col">Standard</th><th scope="col">Short</th></tr></thead>
+              <tbody><tr><th scope="row">Lower</th><td>180 / 900</td><td>462 / 2,100</td></tr><tr><th scope="row">Higher</th><td>600 / 1,500</td><td>125 / 500</td></tr></tbody>
+            </table>
+            <p>For a causal interpretation, each schedule must be well defined and a patient’s observed outcome must agree with their outcome under the schedule received (<strong>consistency</strong>). We assume one patient’s schedule does not affect another patient’s outcome, frailty captures the common causes of treatment and mortality (<strong>conditional exchangeability</strong>), and either schedule is possible in each target group (<strong>positivity</strong>). The exercise assumes complete five-year follow-up.</p>
+          </div>
+        </details>
+        <details class="guide-fold" id="support">
+          <summary>Try a clinic missing one schedule</summary>
+          <div class="fold-body">
+            <p>A second synthetic clinic offers only standard to its 2,000 higher-frailty patients. Among lower-frailty patients, deaths were 180 of 900 on standard and 462 of 2,100 on short.</p>
+            <fieldset class="support-picker">
+              <legend>Whose risk difference could Susan report?</legend>
+              <div class="support-options">
+                <input type="radio" name="support-target" id="support-all" value="all" checked aria-describedby="answer-all"><label for="support-all">All 5,000 patients meeting the original age or frailty criteria</label>
+                <input type="radio" name="support-target" id="support-lower" value="lower" aria-describedby="answer-lower"><label for="support-lower">The 3,000 lower-frailty patients</label>
+                <div class="support-feedback" id="support-answer" role="status" aria-live="polite">
+                  <p id="answer-all">The full-population effect is unidentified from this clinic’s data under the stated assumptions. No higher-frailty patient received short, so their short-schedule risk is unknown.</p>
+                  <p id="answer-lower">Both schedules were used in this group. Short risk is 22% and standard risk is 20%, giving <strong>+2 percentage points</strong>. The estimate applies to lower-frailty patients.</p>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </details>
+        <details class="guide-fold">
+          <summary>How does this fit the trial evidence?</summary>
+          <div class="fold-body">
+            <p>Randomization makes treatment groups comparable in expectation at assignment. Susan starts with the fractionation trials and asks which patients, schedules and endpoints they cover. The CHHiP trial measured biochemical or clinical failure. Susan’s main roadmap asks about time alive through five years.</p>
+            <p>For older or frailer patients seen less often in trials, she checks whether comparable people in her records could receive either schedule. A group with only one realistic option needs further evidence. <a href="../index.html#causal-verdict">Read Susan’s trial decision</a>.</p>
+          </div>
+        </details>
+      </div>
+      <p class="reference-links reference-end"><a href="worksheet.html">Open the worksheet</a><a href="analysis.Rmd" download>Download the R workbook</a></p>
+    </div>
+  </main>
+  <script>
+    function openBookmarkedSection() {
+      const section = document.getElementById(location.hash.slice(1));
+      if (section instanceof HTMLDetailsElement) {
+        section.open = true;
+        section.querySelector('summary').focus({preventScroll: true});
+      }
+    }
+    window.addEventListener('hashchange', openBookmarkedSection);
+    openBookmarkedSection();
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+:root {
+  color-scheme: only light;
+  --paper: #fff;
+  --ink: #233634;
+  --secondary: #53645f;
+  --teal: #14655c;
+  --teal-light: #eef5f1;
+  --rule: #d8e0da;
+  --serif: "Newsreader", "Iowan Old Style", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  font: 100%/1.55 var(--sans);
+}
+* { box-sizing: border-box; }
+html { scrollbar-gutter: stable; background: var(--paper); }
+body { margin: 0; color: var(--ink); background: var(--paper); }
+.frame { width: min(1120px, calc(100% - clamp(36px, 9vw, 104px))); margin-inline: auto; }
+a { color: var(--teal); text-underline-offset: .2em; }
+a:hover { text-decoration-thickness: 2px; }
+button, select, input { font: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; }
+[hidden] { display: none !important; }
+.skip, .ref-skip {
+  position: absolute; left: 12px; top: 0; z-index: 2; transform: translateY(-150%);
+  padding: 8px 16px; background: #fff; color: var(--teal);
+}
+.skip:focus, .ref-skip:focus { transform: none; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+.site-head { border-bottom: 1px solid var(--rule); }
+.head-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 70px; }
+.site-brand { font: 500 1.4rem/1.15 var(--serif); color: var(--ink); text-decoration: none; }
+.section-nav { display: flex; flex-wrap: wrap; align-items: stretch; gap: clamp(14px, 3vw, 32px); }
+.section-nav a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  border-bottom: 2px solid transparent; color: var(--secondary); text-decoration: none; font-size: .98rem;
+}
+.section-nav a[aria-current="page"] { border-color: var(--teal); font-weight: 650; color: var(--teal); }
+.section-nav a:hover, .site-brand:hover { color: var(--teal); }
+h1, h2, h3 { font-family: var(--serif); color: var(--ink); }
+h1 { font-size: clamp(2.2rem, 4.4vw, 3.65rem); line-height: 1.08; font-weight: 500; letter-spacing: -.037em; }
+h2 { font-size: clamp(1.6rem, 3vw, 2.35rem); line-height: 1.18; font-weight: 500; letter-spacing: -.025em; }
+p { text-wrap: pretty; }
+@media (max-width: 600px) {
+  .head-inner { flex-direction: column; align-items: flex-start; gap: 2px; padding-top: 14px; }
+  .site-brand { font-size: 1.23rem; }
+  .section-nav { gap: 0; width: 100%; justify-content: space-between; }
+  .section-nav a { font-size: .94rem; }
+}
+@media print { .site-head, .skip, .ref-skip { display: none; } .frame { width: 100%; } }

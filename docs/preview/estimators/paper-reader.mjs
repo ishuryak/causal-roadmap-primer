@@ -1,6 +1,5 @@
 // The equation-page image stays visible until an actual PDF page has finished painting.
 const byId = id => document.getElementById(id);
-const paper = byId('paper');
 const viewport = byId('paper-viewport');
 const sheet = byId('paper-sheet');
 const previous = byId('paper-prev');
@@ -53,7 +52,7 @@ function cancelRequest() {
 
 async function draw() {
   const availableWidth = viewport.clientWidth;
-  if (!paper.open || !availableWidth) return;
+  if (!availableWidth) return;
   const number = wantedPage;
   const magnification = Number(zoom.value);
   const density = window.devicePixelRatio || 1;
@@ -138,19 +137,12 @@ function movePage(step) {
 
 function scheduleResize() {
   clearTimeout(resizeTimer);
-  if (paper.open) resizeTimer = setTimeout(draw, 100);
+  resizeTimer = setTimeout(draw, 100);
 }
 
 previous.addEventListener('click', () => movePage(-1));
 next.addEventListener('click', () => movePage(1));
 zoom.addEventListener('change', draw);
-paper.addEventListener('toggle', () => {
-  if (paper.open) draw();
-  else {
-    clearTimeout(resizeTimer);
-    cancelRequest();
-  }
-});
 if (typeof ResizeObserver === 'function') new ResizeObserver(scheduleResize).observe(viewport);
 window.addEventListener('resize', scheduleResize);
-if (paper.open) draw();
+draw();

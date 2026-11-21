@@ -352,15 +352,6 @@ window.addEventListener("afterprint", () => {
   document.querySelectorAll("details").forEach((d, i) => (d.open = openBeforePrint[i] ?? d.open));
   openBeforePrint = null;
 });
-// A link to an anchor inside a closed section opens that section first.
-function openTo(hash) {
-  const el = hash && hash.length > 1 ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
-  for (let d = el?.closest("details"); d; d = d.parentElement?.closest("details")) d.open = true;
-  el?.scrollIntoView();
-}
-window.addEventListener("hashchange", () => openTo(location.hash));
-openTo(location.hash);
-
 // Charts inside a closed section have no width yet: redraw when it opens.
 document.addEventListener("toggle", (e) => {
   if (e.target.open && e.target.querySelector(".chart")) rerenders.forEach((f) => f());

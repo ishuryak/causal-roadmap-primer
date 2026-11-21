@@ -19,11 +19,9 @@ const spotlight=createSpotlight(document.querySelector('#spotlight-game'),assess
 },()=>preset('start',true));
 const basisName={evidence:'Evidence / design',assumption:'Assumption',unresolved:'Unresolved'};
 const panels=[];
+const initialComponent = COMPONENTS.find(c => '#bleile-' + c.id === location.hash) || COMPONENTS[0];
 for(const c of COMPONENTS){
-  const host=document.querySelector('#practice-panels');
-  if(!host)throw new Error(`Missing roadmap checkpoint ${c.section}`);
-  const panel=document.createElement('details');
-  panel.className='bleile-checkpoint'; panel.id=`bleile-${c.id}`;
+  const panel=document.getElementById(`bleile-${c.id}`);
   panel.setAttribute('aria-labelledby',`bleile-title-${c.id}`);
   panel.dataset.component=c.id;
   panel.innerHTML=`<summary class="bleile-check-head"><span id="bleile-title-${c.id}">Assess ${c.short.toLowerCase()}</span><span class="bleile-dings"><output for="bleile-input-${c.id}" id="bleile-out-${c.id}"></output><small> / 10 dings</small></span></summary>
@@ -31,9 +29,8 @@ for(const c of COMPONENTS){
     <div class="bleile-scale" id="bleile-scale-${c.id}"><span><b>0</b> ${c.rubric[0]}</span><span><b>5</b> ${c.rubric[1]}</span><span><b>10</b> ${c.rubric[2]}</span></div>
     <label class="bleile-basis">What supports your judgment?<select id="bleile-basis-${c.id}" aria-label="Basis for ${c.label}"><option value="evidence">Observed evidence or study design</option><option value="assumption">An assumption still to challenge</option><option value="unresolved">Unresolved or not yet checked</option></select></label>
     <p class="bleile-concern"></p><a class="bleile-return" href="#bleile-game">Return to the roadmap exercise ↑</a>`;
-  host.append(panel);
   panel.open=true;
-  panel.hidden=c.id!=='question';
+  panel.hidden=c !== initialComponent;
   const option=document.createElement('option');option.value=c.id;option.textContent=c.short;document.querySelector('#practice-component').append(option);
   const lesson=document.createElement('a');lesson.href='#'+({consistency:'identify',measurement:'observed-data',transport:'transportability'}[c.id]||c.section);lesson.className='practice-lesson-link';lesson.textContent='Read the related explanation';panel.append(lesson);
   const input=panel.querySelector('input'),select=panel.querySelector('select');
@@ -41,6 +38,8 @@ for(const c of COMPONENTS){
   select.addEventListener('change',()=>{const ended=spotlight.pause(select);basis[c.id]=select.value;active='custom';render(`${c.short}: basis updated.${ended?' The spotlight exercise ended; restarting returns to 60.':''}`);});
   panels.push({c,panel,input,select});
 }
+document.querySelector('#practice-component').value = initialComponent.id;
+document.querySelector('#practice-panels').inert = false;
 const profileList=document.querySelector('#bleile-profile');
 for(const c of COMPONENTS){
   const link=document.createElement('a');link.href=`#bleile-${c.id}`;link.dataset.profile=c.id;
@@ -128,7 +127,6 @@ const query=new URLSearchParams(location.search), saved=query.get('bleile'), sav
 if(saved && /^\d+(,\d+){9}$/.test(saved) && saved.split(',').every(n=>Number(n)<=10) && /^[eau]{10}$/.test(savedBasis||'')){
   profile=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,Number(saved.split(',')[i])]));basis=Object.fromEntries(COMPONENTS.map((c,i)=>[c.id,({e:'evidence',a:'assumption',u:'unresolved'})[savedBasis[i]]]));active='custom';render('Shared profile loaded.');
 }else preset('start');
-document.dispatchEvent(new Event('bleile-ready'));
 // The optional practice area starts collapsed. Re-measure its chart on reveal.
 document.querySelector('#practice-fold')?.addEventListener('toggle',event=>{
   if(event.currentTarget.open)requestAnimationFrame(()=>renderStar(document.querySelector('#bleile-star'),profile));

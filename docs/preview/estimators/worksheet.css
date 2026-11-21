@@ -1,0 +1,114 @@
+.worksheet-heading{margin:clamp(24px,5vw,50px) 0 24px}
+.worksheet-heading h1{margin:0 0 7px;line-height:1.05}
+.worksheet-heading p{max-width:66ch;margin:0}
+.workbench{
+  --canvas:#fff;--navy:var(--ink);--pale:var(--teal-light);--muted:var(--secondary);
+  --line:var(--rule);--light-line:#e5ebe9;--rust:#93401e;--mark:#d9b45e;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color:var(--ink);overflow-anchor:none;min-width:0
+}
+.workbench [hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.worksheet-controls{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.65fr) minmax(0,1.1fr) minmax(0,1.1fr);gap:11px 20px;max-width:940px;padding:0 0 16px}
+.worksheet-controls label{display:grid;gap:4px;min-width:0;font-size:.88rem;color:var(--muted);font-weight:600}
+.worksheet-controls select{width:100%;min-width:0;height:42px;padding:3px 6px;background:#fff;color:var(--ink);font:inherit;font-size:1rem;border:1px solid var(--line);border-radius:3px}
+.worksheet-controls select:disabled{color:var(--muted);background:#f7f9f8}
+.view-choice{display:flex;gap:5px;border:0;border-bottom:1px solid var(--line);padding:0;margin:0;min-width:0}
+.view-choice label{display:block;position:relative;cursor:pointer}
+.view-choice span{display:block;padding:10px 12px 8px;border-bottom:3px solid transparent;color:var(--muted);font-weight:600}
+.view-choice input:checked+span{color:var(--teal);border-color:var(--teal)}
+.view-choice input:focus-visible+span,.workbench :focus-visible{outline:3px solid var(--teal);outline-offset:-2px}
+.work-view{min-width:0;min-height:clamp(280px,46vh,410px);padding:18px 0 6px}
+.work-view h2{font-size:clamp(1.45rem,3vw,1.9rem);line-height:1.2;margin:0 0 7px}
+.work-view p{margin:0 0 .55rem}
+.view-note{color:var(--muted);font-size:.95rem;max-width:76ch}
+.method-note{min-height:1.5em}
+.work-links{display:flex;gap:8px 22px;flex-wrap:wrap;border-top:1px solid #dce5e2;margin:16px 0 34px;padding-top:14px;font-size:.94rem}
+.workbench .overline{font:600 .76rem/1.35 var(--mono);text-transform:uppercase;letter-spacing:.045em;color:var(--teal);margin-bottom:.4rem}
+.worksheet{display:grid;grid-template-columns:minmax(0,1fr) minmax(215px,.34fr);gap:24px;align-items:start}
+.table-box{min-width:0}
+.table-scroll{max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain}
+.scroll-note{font-size:.83rem;color:var(--muted);margin:0 0 .3rem}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:left}
+.patients{font-size:.92rem;line-height:1.25}
+.patients th{font-weight:620}
+.patients thead tr:first-child th{font:600 .72rem/1.3 var(--mono);color:var(--muted);letter-spacing:.01em;padding:7px 4px;text-align:center;border-bottom:1px solid var(--line);vertical-align:bottom}
+.patients thead tr:first-child th:first-child{text-align:left}
+.patients thead tr:nth-child(2) th{font-size:.82rem;padding:8px 4px;background:var(--canvas);color:var(--muted);border-bottom:1px solid var(--line)}
+.patients th:nth-child(n+5),.patients td:nth-child(n+5){text-align:center}
+.patients td,.patients tbody th{padding:6px 4px;border-bottom:1px solid var(--light-line);height:47px}
+.patients [data-split]{border-left:1px solid var(--light-line)}
+.patients tbody tr{cursor:pointer}
+.patients tbody tr:hover,.patients tbody tr.selected{background:var(--pale)}
+.patients tbody tr.selected th:first-child{box-shadow:inset 3px 0 var(--teal)}
+.patients .idbtn{font:650 .88rem var(--mono);background:transparent;border:none;color:var(--navy);padding:6px 3px 6px 7px;min-width:40px;min-height:32px}
+.record-short,.narrow-head{display:none}
+.patients .obs{font:600 .85rem var(--mono);display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:50%;background:var(--navy);color:var(--paper)}
+.unknown,.pending{font:500 .95rem var(--mono);color:var(--muted)}
+.risk{display:inline-block;border:1px solid var(--line);background:var(--paper);border-radius:3px;color:var(--teal);font:600 .85rem var(--mono);padding:3px 4px;white-space:nowrap}
+.risk.pending{background:transparent;border-color:transparent;color:var(--muted)}
+.patients .diff{font:600 .88rem var(--mono);color:var(--navy);white-space:nowrap}
+.patients .source .obs,.patients .source .risk{outline:3px solid var(--mark);outline-offset:1px}
+.trace{border-left:3px solid var(--teal);padding:14px 16px;background:var(--pale);min-width:0}
+.trace h3{margin:0 0 .2rem}
+.trace .profile{font-size:.88rem;color:var(--muted);margin-bottom:.8rem}
+.trace h4{font:650 .87rem var(--sans);margin:12px 0 4px;color:var(--ink)}
+.trace p{font-size:.94rem}
+.trace .equation{font:600 .95rem/1.45 var(--mono);margin:6px 0;overflow-wrap:anywhere}
+.legend{font-size:.86rem;color:var(--muted);margin-top:10px;line-height:1.45}
+.legend span{color:var(--ink);font-weight:650}
+.profiles{border-top:1px solid var(--line);padding-top:3px}
+.profile-line{display:grid;grid-template-columns:7.2rem minmax(50px,1fr) 7.5rem;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--light-line);font-size:.94rem}
+.profile-line output{text-align:right;font:600 .9rem var(--mono)}
+.axis{height:16px;position:relative}
+.axis::before{content:"";position:absolute;height:1px;top:50%;left:0;right:0;background:var(--line)}
+.axis::after{content:"";width:1px;height:100%;background:var(--muted);position:absolute;left:50%}
+.axis i{position:absolute;top:5px;height:6px;background:var(--teal);border-radius:3px;z-index:1}
+.axis i.positive{background:var(--rust)}
+.scale{display:flex;justify-content:space-between;margin:3px 0 0 calc(7.2rem + 10px);width:calc(100% - 14.7rem - 20px);font:500 .73rem var(--mono);color:var(--muted)}
+.effect-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px 48px}
+.effect-grid>section{min-width:0}
+.effect-result{font:500 clamp(1.6rem,3.6vw,2.5rem)/1.2 var(--serif);color:var(--navy)}
+.arm-totals{max-width:580px;margin:11px 0 12px}
+.arm-totals th,.arm-totals td{padding:7px 8px;border-bottom:1px solid var(--light-line)}
+.arm-totals thead{color:var(--muted);font-size:.9rem}
+.math-inner{max-width:1020px}
+.math-context{color:var(--teal);font-weight:650;font-size:.95rem}
+.math-inner h3{font:650 1rem/1.4 var(--sans);margin:0 0 .25rem;color:var(--ink)}
+.math-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px}
+.math-inner p{font-size:.95rem}
+.math-inner .formula{font:1.15rem/1.5 var(--serif);overflow-wrap:anywhere;margin:.25rem 0}
+.formula sub,.formula sup{font-size:.7em;line-height:0}
+.math-example{color:var(--teal);font-variant-numeric:tabular-nums}
+.arm-equation{border-left:2px solid transparent;padding-left:7px}
+.arm-equation.current{border-color:var(--teal)}
+.math-target{border-top:1px solid var(--light-line);margin-top:12px;padding-top:11px}
+.math-links{padding-top:8px;margin-top:10px}
+.math-links .notation{max-width:75ch}
+.notation summary{cursor:pointer;color:var(--teal);font-weight:600}
+.notation[open] summary{margin-bottom:6px}
+@media(max-width:920px){.worksheet{grid-template-columns:1fr;gap:15px}.trace{padding:10px 12px}.math-grid{grid-template-columns:1fr}.effect-grid{gap:23px}}
+@media(max-width:700px){
+ .worksheet-heading{margin:20px 0 17px}.worksheet-heading p{font-size:.95rem}
+ .worksheet-controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;padding-bottom:8px}
+ .worksheet-controls select{font-size:.93rem}.worksheet-controls label{font-size:.82rem}
+ .view-choice{gap:2px}.view-choice span{padding:8px 9px;font-size:.91rem}
+ .work-view{padding-top:12px}.method-note{min-height:3em}
+ .patients .record-long{display:none}.patients .record-short{display:table-cell}
+ .patients .idbtn{padding-block:3px}.patients .mobile-profile{display:block;color:var(--muted);font:500 .75rem/1.2 var(--sans);text-align:left;padding:0 0 2px 7px}
+ .mobile-profile span+span::before{content:" · "}
+ .patients td,.patients tbody th{height:40px;padding:3px 1px}
+ .patients thead tr:first-child th,.patients thead tr:nth-child(2) th{font-size:.73rem;padding:5px 2px;text-align:center}
+ .patients thead tr:nth-child(2) th:first-child,.patients tbody th{text-align:left}
+ .patients .obs{width:21px;height:21px;font-size:.76rem}.patients .risk,.patients .diff{font-size:.76rem}.patients .risk{padding:2px 3px}
+ .effect-grid{grid-template-columns:1fr}
+ .profile-line{grid-template-columns:6.3rem minmax(50px,1fr) 6.2rem;gap:5px}
+ .scale{margin-left:calc(6.3rem + 5px);width:calc(100% - 12.5rem - 10px)}
+}
+@media(max-width:390px){
+ .wide-head{display:none}.narrow-head{display:inline}.patients .risk,.patients .diff{font-size:.74rem}
+ .patients thead tr:first-child th{font-size:.67rem}.patients .mobile-profile{padding-left:3px}
+ .mobile-profile span{display:block}.mobile-profile span+span::before{content:none}.patients .idbtn{padding-left:3px}
+}
+@media(min-width:701px){.mobile-profile{display:none}}

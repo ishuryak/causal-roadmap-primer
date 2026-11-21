@@ -1,6 +1,6 @@
 # Six patients, three learners
 
-The [test roadmap](../docs/preview/index.html#estimators) offers an optional [estimator tutorial](../docs/preview/estimators/index.html) at Step 6. It is written for residents, postdocs and early-career researchers in radiation oncology or radiobiology who know regression. Susan’s clinical decision can be read from start to finish with the tutorial closed.
+The [test roadmap](../docs/preview/index.html#estimators) offers an optional [estimator tutorial](../docs/preview/estimators/index.html) at Step 6. The introduction is a hand-drawn map with four branches that readers can explore at their own pace. The [patient worksheet](../docs/preview/estimators/worksheet.html), [field guide](../docs/preview/estimators/guide.html) and [original paper](../docs/preview/estimators/paper.html) have separate pages. The intended readers are residents, postdocs and early-career researchers in radiation oncology or radiobiology who know regression.
 
 ## What the reader does
 
@@ -16,7 +16,7 @@ The [test roadmap](../docs/preview/index.html#estimators) offers an optional [es
 
 Susan first checks what randomized evidence already answers for her patients. The roadmap’s outcome is average months alive through five years. The tutorial uses a simpler outcome, death by five years with complete ascertainment. Its estimates illustrate arithmetic and carry no clinical recommendation. A resident can return directly to Step 6 or to Susan’s Step 8 decision.
 
-The interactive page and its [R Markdown notebook](../docs/preview/estimators/analysis.Rmd) are paired. When changing the example, update both and knit the notebook to run its numerical checks. The 5,000 fitting records determine the models and target populations. The six independent display rows are for the reader to follow through each operation.
+The worksheet and its [R Markdown notebook](../docs/preview/estimators/analysis.Rmd) are paired. When changing the example, update both and knit the notebook to run its numerical checks. The 5,000 fitting records determine the models and target populations. The six independent display rows are for the reader to follow through each operation.
 
 The worksheet’s optional math panel connects each patient trace to the paper. Printed page 4158, the third PDF page, contains equations 3–9. The [complete article](../docs/preview/estimators/kunzel-2019.pdf) is the ten-page published PDF from [PubMed Central](https://pmc.ncbi.nlm.nih.gov/articles/PMC6410831/). The authors license it under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/). Keep it intact. The public test edition lives at [the repository’s GitHub Pages tutorial route](https://ishuryak.github.io/causal-roadmap-primer/preview/estimators/).
 

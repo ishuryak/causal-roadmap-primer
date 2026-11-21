@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="only light"><meta name="robots" content="noindex,nofollow">
+  <title>Patient worksheet · Causal Roadmap</title>
+  <link rel="stylesheet" href="tutorial.css"><link rel="stylesheet" href="worksheet.css">
+  <script src="worksheet.mjs" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to worksheet</a>
+<header class="site-head"><div class="frame head-inner"><a class="site-brand" href="../index.html#estimators">Causal Roadmap</a><nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html" aria-current="page">Worksheet</a><a href="guide.html">Field guide</a><a href="paper.html">Paper</a></nav></div></header>
+<main class="frame" id="main">
+  <header class="worksheet-heading"><h1>Patient worksheet</h1><p>Follow six synthetic patients through estimates of five-year mortality under short and standard radiotherapy schedules.</p></header>
+  <noscript><p>Enable JavaScript to change the worksheet. The <a href="analysis.Rmd">R workbook</a> contains the same patients and calculations.</p></noscript>
+  <div class="workbench">
+    <div class="worksheet-controls">
+      <label>Method<select id="method"><option value="observed">Observed</option><option value="crude">Arm means</option><option value="s">S-learner</option><option value="t">T-learner</option><option value="x">X-learner</option></select></label>
+      <label>Patient<select id="patient" aria-label="Selected patient"><option>P01</option><option>P02</option><option>P03</option><option selected>P04</option><option>P05</option><option>P06</option></select></label>
+      <label>Target population<select id="target" disabled><option value="ate">All eligible (ATE)</option><option value="att">Short arm (ATT)</option></select></label>
+      <label id="s-setting" hidden>Frailty slope in S<select id="interaction"><option value="separate">Separate slopes</option><option value="shared">Shared slope</option></select></label>
+    </div>
+    <fieldset class="view-choice"><legend class="sr">Worksheet view</legend>
+      <label><input type="radio" class="sr" name="view" value="patients" aria-controls="view-patients" checked><span>Patients</span></label>
+      <label><input type="radio" class="sr" name="view" value="effects" aria-controls="view-effects"><span>Effects</span></label>
+      <label><input type="radio" class="sr" name="view" value="math" aria-controls="view-math"><span>Show the math</span></label>
+    </fieldset>
+    <section id="view-patients" class="work-view" aria-label="Patient calculations">
+      <p class="view-note method-note" id="method-note">One outcome is observed. Choose Arm means to fill both risks.</p>
+    <div class="worksheet">
+      <div class="table-box">
+        <p id="scroll-hint" class="scroll-note" hidden>Scroll the table sideways to see every column. You can also focus the table area and use the arrow keys.</p>
+        <div class="table-scroll" id="table-scroll" role="region" aria-label="Patient worksheet columns" tabindex="0">
+        <table class="patients" id="patients" aria-describedby="table-legend">
+          <caption class="sr">Six invented display patients. Select a patient by pressing their ID button. Binary factual outcomes and model-predicted risks occupy separate columns.</caption>
+          <thead>
+            <tr><th class="record-long" scope="colgroup" colspan="4">Recorded data</th><th class="record-short" scope="col">Record</th><th data-split scope="colgroup" colspan="2">Potential outcomes</th><th data-split scope="colgroup" colspan="2">Predicted risk</th><th data-split scope="col"><span class="wide-head">Contrast</span><span class="narrow-head">Effect</span></th></tr>
+            <tr><th scope="col">Patient</th><th class="record-long" scope="col">Frailty</th><th class="record-long" scope="col">Schedule</th><th class="record-long" scope="col"><abbr title="Observed five-year outcome">Y</abbr></th><th data-split scope="col" aria-label="Standard schedule"><span class="wide-head">Standard</span><abbr class="narrow-head" title="Standard schedule">Std.</abbr></th><th scope="col">Short</th><th data-split scope="col" aria-label="Standard schedule"><span class="wide-head">Standard</span><abbr class="narrow-head" title="Standard schedule">Std.</abbr></th><th scope="col">Short</th><th data-split scope="col" aria-label="Effect of short minus standard in percentage points"><span id="contrast-label" class="wide-head">Short − std.</span><abbr class="narrow-head" title="Percentage points">pp</abbr></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        </div>
+        <p class="legend" id="table-legend"><span>0</span> alive at five years · <span>1</span> died by five years · <span>?</span> unobserved. Outlined percentages are fitted risks. The contrast is short minus standard in percentage points. <span id="x-key" hidden>Gold outlines mark the two inputs to this row’s signed pseudo-outcome.</span></p>
+      </div>
+      <aside class="trace" aria-labelledby="trace-title"><p class="overline">Patient trace</p><h3 id="trace-title">P04</h3><p class="profile" id="trace-profile"></p><div id="trace-body"></div></aside>
+    </div>
+    </section>
+    <section id="view-effects" class="work-view" aria-label="Effects" hidden>
+      <div id="effects-observed">
+        <h2 id="observed-title">Observed mortality by schedule</h2>
+        <table class="arm-totals"><caption class="sr">Deaths and number receiving each schedule in the training cohort</caption><thead><tr><th scope="col">Schedule</th><th scope="col">Deaths / recipients</th><th scope="col">Risk</th></tr></thead><tbody><tr><th scope="row">Standard</th><td>780 / 2,400</td><td>32.50%</td></tr><tr><th scope="row">Short</th><td>587 / 2,600</td><td>22.58%</td></tr></tbody></table>
+        <p id="unadjusted-note" class="view-note"></p>
+      </div>
+      <div id="effects-adjusted" class="effect-grid" hidden>
+        <section><h2>Effects by frailty</h2><p class="view-note">Short minus standard, in percentage points.</p>
+      <div class="profiles">
+        <div class="profile-line"><span>Lower frailty</span><span class="axis" aria-hidden="true"><i id="bar-lower"></i></span><output id="effect-lower" aria-label="Lower frailty contrast"></output></div>
+        <div class="profile-line"><span>Higher frailty</span><span class="axis" aria-hidden="true"><i id="bar-higher"></i></span><output id="effect-higher" aria-label="Higher frailty contrast"></output></div>
+        <div class="scale" aria-hidden="true"><span>−20</span><span>0</span><span>+20</span></div>
+      </div>
+        </section>
+        <section><h2 id="target-title">Population effect</h2>
+          <p class="effect-result" id="target-value"></p><p class="view-note" id="target-note"></p>
+        </section>
+      </div>
+    </section>
+    <section id="view-math" class="work-view" aria-label="Equations" hidden>
+      <div class="math-inner">
+        <p class="math-context" id="math-context">Observed data · P04</p>
+        <div id="math-observed">
+          <h3>One observed outcome</h3>
+          <p class="formula"><var>Y</var><sub>i</sub> = <var>Y</var><sub>i</sub>(<var>W</var><sub>i</sub>)</p>
+          <p id="math-observed-value" class="math-example">P04 received short, so the observed outcome is Y(1).</p>
+          <p>Choose S, T or X for the paper’s method-specific equations.</p>
+        </div>
+        <div id="math-crude" hidden>
+          <h3>Unadjusted arm means</h3>
+          <p class="formula">Ȳ<sub>short</sub> − Ȳ<sub>standard</sub> = 587 / 2,600 − 780 / 2,400 ≈ −9.92 percentage points</p>
+          <p>Each mean uses the patients who actually received that schedule.</p>
+        </div>
+        <div id="math-s" hidden>
+          <h3>S-learner · Eq. 4</h3>
+          <p class="formula"><var>τ̂</var><sub>S</sub>(<var>x</var>) = <var>μ̂</var>(<var>x</var>, 1) − <var>μ̂</var>(<var>x</var>, 0)</p>
+          <p id="math-s-value" class="math-example"></p><p id="math-s-model"></p>
+        </div>
+        <div id="math-t" hidden>
+          <h3>T-learner · Eq. 3</h3>
+          <p class="formula"><var>τ̂</var><sub>T</sub>(<var>x</var>) = <var>μ̂</var><sub>1</sub>(<var>x</var>) − <var>μ̂</var><sub>0</sub>(<var>x</var>)</p>
+          <p id="math-t-value" class="math-example"></p><p>Fit the short risk in short recipients and the standard risk in standard recipients.</p>
+        </div>
+        <div class="math-grid" id="math-x" hidden>
+          <div><h3>Fit two risks · Eqs. 5–6</h3>
+            <p class="formula"><var>μ</var><sub>0</sub>(<var>x</var>) = E[<var>Y</var>(0) | <var>X</var> = <var>x</var>]<br><var>μ</var><sub>1</sub>(<var>x</var>) = E[<var>Y</var>(1) | <var>X</var> = <var>x</var>]</p>
+            <p id="math-x-risks" class="math-example"></p>
+          </div>
+          <div><h3>Form a signed pseudo-outcome</h3>
+            <div class="arm-equation" id="math-arm-short"><p class="formula"><var>D̃</var><sub>i</sub><sup>1</sup> = <var>Y</var><sub>i</sub><sup>1</sup> − <var>μ̂</var><sub>0</sub>(<var>X</var><sub>i</sub><sup>1</sup>) <small>· Eq. 7</small></p></div>
+            <div class="arm-equation" id="math-arm-standard"><p class="formula"><var>D̃</var><sub>i</sub><sup>0</sup> = <var>μ̂</var><sub>1</sub>(<var>X</var><sub>i</sub><sup>0</sup>) − <var>Y</var><sub>i</sub><sup>0</sup> <small>· Eq. 8</small></p></div>
+            <p id="math-x-pseudo" class="math-example"></p>
+          </div>
+          <div id="x-weights"><h3>Fit effects by arm and blend · Eq. 9</h3>
+            <p class="formula"><var>τ̂</var>(<var>x</var>) = <var>g</var>(<var>x</var>) <var>τ̂</var><sub>0</sub>(<var>x</var>) + [1 − <var>g</var>(<var>x</var>)] <var>τ̂</var><sub>1</sub>(<var>x</var>)</p>
+            <p id="math-x-fits"></p><p id="math-x-blend" class="math-example"></p>
+          </div>
+        </div>
+        <div class="math-target" id="math-target" hidden>
+          <h3 id="math-target-name">Average the fitted effects</h3>
+          <p class="formula" id="math-ate"><var>τ̂</var><sub>ATE</sub> = (1 / <var>N</var>) ∑<sub>i</sub> <var>τ̂</var>(<var>X</var><sub>i</sub>)</p>
+          <p class="formula" id="math-att" hidden><var>τ̂</var><sub>ATT</sub> = (1 / <var>N</var><sub>1</sub>) ∑<sub>i : Wᵢ = 1</sub> <var>τ̂</var>(<var>X</var><sub>i</sub>)</p>
+          <p id="math-target-value" class="math-example"></p>
+        </div>
+        <div class="math-links">
+          <details class="notation"><summary>Paper notation</summary>
+            <p><var>X</var> is baseline frailty. <var>W</var> is the schedule (0 standard, 1 short). <var>Y</var>(<var>w</var>) is the outcome under schedule <var>w</var>. In Eqs. 7–8 the superscript on <var>Y</var><sub>i</sub> or <var>X</var><sub>i</sub> labels a record from that arm.</p>
+            <p><var>μ</var> is mean risk, <var>τ</var> a short-minus-standard effect and <var>D̃</var> a signed pseudo-outcome. A hat marks a fit. Eq. 9 allows any weight <var>g</var>(<var>x</var>) between 0 and 1. Here it is the short-schedule propensity at that frailty.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+    <p id="live-note" class="sr" aria-live="polite" aria-atomic="true"></p>
+  </div>
+  <footer class="work-links"><a href="guide.html">Fitting data and assumptions</a><a href="paper.html">Original paper</a><a href="analysis.Rmd" download>R workbook</a></footer>
+</main>
+</body></html>
