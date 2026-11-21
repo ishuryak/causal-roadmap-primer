@@ -52,8 +52,15 @@ for (const [, path] of paperLinks) {
 }
 assert(paperLinks.some(([, , fragment]) => fragment?.split('&').includes('page=3')),
   'A reader can jump to the published learner equations');
-assert.match(tutorial, /<(?:object|iframe)\b[^>]*(?:data|src)="[^"]*\.pdf(?:#[^"]*)?"/i,
-  'The full paper can be read in the tutorial');
+const readerFile = new URL('paper-reader.mjs', tutorialFile);
+assert(tutorial.includes('src="paper-reader.mjs"') && existsSync(readerFile), 'The white inline reader is available');
+const reader = readFileSync(readerFile, 'utf8');
+assert(reader.includes(paperLinks[0][1]) && reader.includes('pdfjs.getDocument'),
+  'The inline reader loads the article linked by the tutorial');
+for (const asset of ['equations-page.webp', 'vendor/pdf.mjs', 'vendor/pdf.worker.mjs', 'vendor/LICENSE']) {
+  assert(existsSync(new URL(asset, readerFile)), 'Missing local paper reader asset ' + asset);
+}
+assert(!/<(?:iframe|object)\b[^>]*(?:data|src)="[^"]*\.pdf/.test(tutorial), 'Use the white reader for embedded pages');
 for (const id of ['math', 'paper']) {
   assert(tutorial.includes('id="' + id + '"') && tutorial.includes('href="#' + id + '"'), 'Readers can link directly to #' + id);
 }

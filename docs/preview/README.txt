@@ -20,6 +20,11 @@ Step 6 links to estimators/index.html, a self-contained six-patient worksheet.
 Its analysis.Rmd reproduces the training counts, learner fits and target averages.
 Its math panel follows the selected patient. The complete journal article in
 estimators/kunzel-2019.pdf opens at the learner equations on PDF page 3.
+The inline reader loads the PDF from this directory. Its two Mozilla PDF.js
+modules in estimators/vendor/ are the standard pdfjs-dist 5.4.624 build
+(384c6208b), distributed under the included Apache 2.0 license. The opening
+image is a lossless rendering of PDF page 3 at 135 dpi. It stays available
+while the reader loads or when a browser cannot render the document.
 For the teaching sequence, reader checkpoints and proposed dose extension, see
 development/2026_11_21_estimator_tutorial.md at the repository root.
 

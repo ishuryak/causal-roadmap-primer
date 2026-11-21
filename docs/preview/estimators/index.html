@@ -154,7 +154,18 @@ th,td{text-align:left}
 .paper{border-top:1px solid var(--line);margin:-12px 0 32px;padding:15px 0}
 .paper h3{max-width:52ch;margin:.2rem 0 .35rem}
 .paper .paper-links{display:flex;flex-wrap:wrap;gap:5px 18px;font-size:.96rem}
-.paper iframe{display:block;width:100%;height:clamp(340px,64vh,700px);border:1px solid var(--line);border-radius:3px;margin-top:12px;background:#fff}
+.paper-reader{width:min(100%,940px);margin:16px auto 0;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--ink)}
+.paper-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 18px;padding:7px 10px;border-bottom:1px solid var(--line);background:#fff}
+.paper-paging,.paper-zoom{display:flex;align-items:center;gap:8px}
+.paper-paging output{min-width:7.2rem;text-align:center;font:600 .9rem var(--sans);font-variant-numeric:tabular-nums}
+.paper-tools button,.paper-tools select{min-height:40px;background:#fff;border:1px solid var(--line);border-radius:3px;color:var(--teal);font:600 .9rem var(--sans);padding:4px 10px}
+.paper-tools button:disabled{color:var(--muted);opacity:.6;cursor:default}
+.paper-zoom{font-size:.89rem;color:var(--muted)}
+.paper-viewport{width:100%;max-height:clamp(310px,74vh,860px);overflow:auto;background:#fff;overscroll-behavior-x:contain}
+.paper-viewport:focus-visible{outline-offset:-3px}
+.paper-sheet{width:100%;background:#fff}
+.paper-sheet img,.paper-sheet canvas{display:block;width:100%;max-width:none;height:auto;background:#fff}
+.paper-reader .paper-note{margin:0;padding:7px 12px;background:#fff;color:var(--muted);font-size:.88rem;border-top:1px solid var(--light-line)}
 .foot{border-top:1px solid var(--line);background:var(--paper);padding:20px 0 26px}
 .foot a{font-size:.96rem}
 @media(max-width:1050px){.worksheet{grid-template-columns:minmax(0,1fr) 220px;gap:16px}.wrap{width:calc(100% - 40px)}.lab{padding-inline:18px}.patients .risk{padding-inline:2px}.trace{padding:12px}}
@@ -168,7 +179,7 @@ th,td{text-align:left}
  .stagebar span{display:grid;place-items:center;min-height:42px;border:1px solid var(--line);border-radius:4px;font-size:.9rem;padding:6px 4px}
  .stagebar :checked+span{border-color:var(--teal);border-radius:4px;box-shadow:inset 0 -2px 0 var(--teal)}
  .method{margin:11px 1px 8px;gap:8px}.method p{font-size:.9rem}
- .math-grid{grid-template-columns:1fr;gap:9px}.math-panel{margin-bottom:8px}.paper iframe{height:52vh;min-height:274px}
+ .math-grid{grid-template-columns:1fr;gap:9px}.math-panel{margin-bottom:8px}
  .patients .record-long{display:none}.patients .record-short{display:table-cell}.patients .idbtn{padding-block:3px}.patients .mobile-profile{display:block;color:var(--muted);font:500 .75rem/1.2 var(--sans);text-align:left;padding:0 0 2px 7px}
  .mobile-profile span+span::before{content:" · "}
  .patients td,.patients tbody th{height:40px;padding:3px 1px}.patients thead tr:first-child th,.patients thead tr:nth-child(2) th{font-size:.73rem;padding:5px 2px;text-align:center}.patients thead tr:nth-child(2) th:first-child{text-align:left}
@@ -182,8 +193,9 @@ th,td{text-align:left}
  .patients thead tr:first-child th{font-size:.67rem}.patients .mobile-profile{padding-left:3px}
  .mobile-profile span{display:block}.mobile-profile span+span::before{content:none}.patients .idbtn{padding-left:3px}
 }
+@media(max-width:450px){.paper-tools{padding:6px}.paper-paging{width:100%;justify-content:space-between}.paper-paging output{min-width:0}.paper-viewport{max-height:68vh}}
 @media(min-width:701px){.mobile-profile{display:none}}
-@media print{.wrap{width:100%}.top nav,.stagebar,.foot,.pills,.choice input,.skip,.paper iframe{display:none}.hero{padding:15px 0}.lab,.trace,.question-box{break-inside:avoid}.worksheet{display:block}.trace{margin-top:10px}.below{display:block}.overline{color:#000}}
+@media print{.wrap{width:100%}.top nav,.stagebar,.foot,.pills,.choice input,.skip,.paper-reader{display:none}.hero{padding:15px 0}.lab,.trace,.question-box{break-inside:avoid}.worksheet{display:block}.trace{margin-top:10px}.below{display:block}.overline{color:#000}}
 </style>
 </head>
 <body>
@@ -350,7 +362,22 @@ th,td{text-align:left}
     <p>Sören R. Künzel, Jasjeet S. Sekhon, Peter J. Bickel and Bin Yu. <cite>PNAS</cite> 116 (10), 4156–4165 (2019). Equations 3–9 appear on printed page 4158, the third PDF page.</p>
     <p class="fine">© 2019 the authors. Published by PNAS under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>.</p>
     <p class="paper-links"><a href="kunzel-2019.pdf#page=3">Open PDF at page 4158</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6410831/">Accessible full text</a><a href="https://doi.org/10.1073/pnas.1804597116">Publisher record</a><a href="#math">Show the worksheet math</a></p>
-    <iframe title="Original Künzel et al. article, starting at PDF page 3" src="kunzel-2019.pdf#page=3" loading="lazy"></iframe>
+    <div class="paper-reader" aria-label="Article reader" role="region">
+      <div class="paper-tools">
+        <div class="paper-paging">
+          <button id="paper-prev" type="button" aria-controls="paper-sheet" hidden>Previous</button>
+          <output id="paper-page" aria-live="polite" aria-atomic="true">Page 3 of 10</output>
+          <button id="paper-next" type="button" aria-controls="paper-sheet" hidden>Next</button>
+        </div>
+        <label id="paper-zoom-tools" class="paper-zoom" hidden>Zoom
+          <select id="paper-zoom" aria-controls="paper-sheet"><option value="1">Fit width</option><option value="1.5">150%</option><option value="2">200%</option><option value="3">300%</option></select>
+        </label>
+      </div>
+      <div class="paper-viewport" id="paper-viewport" role="region" aria-label="Article page, scroll to read" tabindex="0">
+        <div class="paper-sheet" id="paper-sheet"><img src="equations-page.webp" width="585" height="783" loading="lazy" alt="Printed page 4158 of the original article, with equations 3–9 for the T-, S- and X-learners. The accessible full text is linked above."></div>
+      </div>
+      <p class="paper-note" id="paper-note" role="status">Equation-page preview. <a href="kunzel-2019.pdf#page=3">Read all ten pages in the PDF</a> or use the accessible full text above.</p>
+    </div>
   </details>
 </main>
 <footer class="foot"><div class="wrap"><a href="../index.html#estimators">← Estimation in the roadmap</a><a href="../index.html#causal-verdict">Susan’s decision →</a></div></footer>
@@ -674,5 +701,6 @@ th,td{text-align:left}
   }
 })();
 </script>
+<script type="module" src="paper-reader.mjs"></script>
 </body>
 </html>
