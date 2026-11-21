@@ -100,8 +100,9 @@ In the short arm, the pseudo-effect is observed outcome minus fitted standard ri
 
 ```{r x-learner}
 pseudo_effect <- function(rows) {
-  ifelse(rows$A == 1L, rows$Y - risk(t_standard, rows),
-                       risk(t_short, rows) - rows$Y)
+  observed <- rows[["Y"]]
+  ifelse(rows[["A"]] == 1L, observed - risk(t_standard, rows),
+                           risk(t_short, rows) - observed)
 }
 train$D <- pseudo_effect(train)
 display$D <- pseudo_effect(display)
