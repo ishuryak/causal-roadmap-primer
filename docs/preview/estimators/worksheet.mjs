@@ -21,13 +21,8 @@
     [0.2411727171242990, 0.2023545498251430],
     [0.3752963697266447, 0.3241108908399532]
   ];
-  const instructions = {
-    observed: 'One outcome is observed. Choose Arm means to fill both risks.',
-    crude: 'Arm means compare groups with different frailty mixes.',
-    s: 'Predict twice from one regression. Try sharing its frailty slope.',
-    t: 'Predict once from each arm’s regression at the same frailty.',
-    x: 'Trace the observed outcome and the opposite-arm risk.'
-  };
+  const fitLabels = {observed:'No risk fit', crude:'Arm means', s:'One risk model', t:'Two risk models', x:'Cross-arm risks'};
+  const effectLabels = {observed:'Individual effect', crude:'Crude difference', s:'Profile effect', t:'Profile effect', x:'Blended profile effect'};
   const stageName = {observed:'Observed data', crude:'Arm means', s:'S-learner', t:'T-learner', x:'X-learner'};
   const byId = id => document.getElementById(id);
   const signed = (x, digits) => (x < 0 ? '−' : x > 0 ? '+' : '') + Math.abs(x).toFixed(digits);
@@ -70,6 +65,52 @@
     const counts = state.target === 'ate' ? eligible : treated;
     const total = sum(counts);
     return {counts, total, effect:sum(counts.map((n, group) => n * contrastFor(group))) / total};
+  }
+  function updateRecordFigure(person) {
+    const stage = state.stage;
+    const q = risksFor(person.group);
+    const figure = byId('row-figure');
+    figure.dataset.method = stage;
+    figure.dataset.arm = schedule[person.a];
+    byId('record-id').textContent = person.id;
+    byId('record-fit-label').textContent = fitLabels[stage];
+    schedule.forEach((arm, index) => {
+      const observed = index === person.a;
+      const outcomeCell = byId('record-y' + index);
+      outcomeCell.textContent = observed ? String(person.y) : '?';
+      outcomeCell.className = 'record-cell ' + (observed ? 'is-observed' : 'is-missing');
+      outcomeCell.classList.toggle('is-source', stage === 'x' && observed);
+      outcomeCell.setAttribute('aria-label', arm + ' outcome: ' + (observed ? person.y + ', observed' : 'unknown'));
+      const riskCell = byId('record-q' + index);
+      riskCell.textContent = q ? percent(q[index]) : '—';
+      riskCell.classList.toggle('is-fitted', Boolean(q));
+      riskCell.classList.toggle('is-source', stage === 'x' && !observed);
+      riskCell.setAttribute('aria-label', arm + ' risk: ' + (q ? percent(q[index]) : 'not fitted'));
+    });
+    byId('record-pseudo').hidden = stage !== 'x';
+    byId('record-note').hidden = stage === 'x';
+    byId('record-result-label').textContent = effectLabels[stage];
+    const effect = q ? points(contrastFor(person.group)) : null;
+    const resultCell = byId('record-result');
+    resultCell.textContent = effect ? effect + ' pp' : '?';
+    resultCell.setAttribute('aria-label', effect ? effect + ' percentage points' : 'Unknown individual effect');
+    if (stage === 'x') {
+      const pseudo = rowPseudo(person,q);
+      byId('record-subtraction').textContent = pseudo.subtraction;
+      byId('record-pseudo-value').textContent = signed(pseudo.value,2);
+      return;
+    }
+    let caption;
+    if (stage === 's') {
+      caption = state.allowInteraction ? 'One regression predicts twice, allowing a different frailty slope in each arm.' : 'One regression predicts both schedules using a shared frailty slope.';
+    } else if (stage === 't') {
+      caption = 'Two arm-specific regressions predict at the same frailty.';
+    } else if (stage === 'crude') {
+      caption = 'Every row gets the two arm means. Their frailty mixes differ.';
+    } else {
+      caption = 'The green digit is recorded. The other outcome stays unknown.';
+    }
+    byId('record-note').textContent = caption;
   }
   function updateMath() {
     const p = people[state.selected];
@@ -246,6 +287,7 @@
   }
 
   const viewInputs = document.querySelectorAll('input[name="view"]');
+  const cousinLinks = document.querySelectorAll('a[data-patient-link]');
   const views = ['patients','effects','math'];
   const stateKeys = ['method','patient','view','target','slope'];
   const storageKey = 'causal-roadmap.estimator-worksheet.v1';
@@ -306,13 +348,14 @@
     const adjusted = ['s','t','x'].includes(state.stage);
     byId('method').value = state.stage;
     byId('patient').value = p.id;
+    for (const link of cousinLinks) link.href = 'cousins.html?patient=' + encodeURIComponent(p.id);
     byId('target').value = state.target;
     byId('target').disabled = !adjusted;
     byId('s-setting').hidden = state.stage !== 's';
     byId('interaction').value = state.allowInteraction ? 'separate' : 'shared';
     for (const input of viewInputs) input.checked = input.value === state.view;
     for (const view of views) byId('view-' + view).hidden = view !== state.view;
-    byId('method-note').textContent = instructions[state.stage];
+    updateRecordFigure(p);
     updateTable();
     updateTrace();
     updateEffects(adjusted);

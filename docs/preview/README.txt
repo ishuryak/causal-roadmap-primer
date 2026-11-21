@@ -10,15 +10,18 @@ spotlight-model.mjs and practice-ui.mjs directly. The main primer has no build
 step. The embedded Glasshouses game has editable src/ files and a reproducible
 bundle; see glasshouses/README.txt. app.mjs adapts the v2 controller with imports
 pointing to v2, descriptive lesson references, and a separate worksheet key. Calculations,
-rubric, star geometry and synthetic data reuse unchanged v2 files. The original
-artwork is retained in optional reading. Four separate sketches in
-assets/illustrations/ support the main route; see assets/README.txt.
+rubric, star geometry and synthetic data reuse v2 files. Four separate scientific
+sketches and three illustrations for the clinical examples are in
+assets/illustrations/. See assets/README.txt for their sources.
 Keep that dependency in mind if v2 assets are ever moved. Quiz links explicitly
 open the existing self-tests in v2. Artwork attribution remains in the footer.
 
 Step 6 opens estimators/index.html, the brief introduction and four-branch
 methods map. worksheet.html has the six patients, effects and optional math.
-The guide and the complete paper each have a page in the same directory.
+cousins.html works through TMLE and cross-fitted DML on the same cohort and
+shows how the FWL partial-regression slope weights the frailty groups. The guide
+and the complete paper each have a page in the same directory. The guide
+includes two original pen drawings from Andy Wilson's ECA slides 56 and 60.
 analysis.Rmd reproduces the training counts, learner fits and target averages.
 Bookmarked fragments from the original single-page tutorial resolve to the
 corresponding new pages. The journal article opens at the equations on PDF page 3.
@@ -38,7 +41,8 @@ Changes to review:
 - Four separate sketches in the main flow: the unseen causal comparison in
   the opening, context and missingness before step 2, the DAG within step 2,
   and the conditional Inference Engine in step 4. Full-size links allow zooming.
-  Earlier opening, cohort and hidden-thread artwork stays in optional reading.
+  Optional clinical examples show trial versus records, one cohort under both
+  schedules and what Susan can recover from the record.
 - Target-trial planning and the causal estimand within the first step.
 - A brief explanation of how target-trial planning and the broader roadmap
   connect, grounded in Dang and Balzer (reference 50).
@@ -73,6 +77,7 @@ consistent after module changes. CSS has its own version query.
 
 From the repository root:
   node tests/test_preview.mjs
+  node tests/test_estimator_cousins.mjs
   node tests/test_bleile_v2.mjs
   node tests/test_spotlight.mjs
   python tools/serve_preview.py

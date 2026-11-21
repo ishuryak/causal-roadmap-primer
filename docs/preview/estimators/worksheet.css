@@ -18,11 +18,38 @@
 .view-choice span{display:block;padding:10px 12px 8px;border-bottom:3px solid transparent;color:var(--muted);font-weight:600}
 .view-choice input:checked+span{color:var(--teal);border-color:var(--teal)}
 .view-choice input:focus-visible+span,.workbench :focus-visible{outline:3px solid var(--teal);outline-offset:-2px}
+.row-figure{padding:12px 0 9px;border-bottom:1px solid var(--line)}
+.record-strip{display:grid;grid-template-columns:minmax(100px,145px) minmax(146px,230px) minmax(100px,195px);gap:clamp(15px,4vw,54px);align-items:start}
+.record-strip>div{min-width:0}
+.record-strip .record-label{display:block;margin-bottom:3px;font-size:.89rem;line-height:1.15}
+.record-source .record-grid{max-width:134px}
+.record-arm,.record-risk-list{font-size:.79rem;line-height:1.3}
+.record-arm{color:var(--secondary)}
+.record-strip abbr{border:0;text-decoration:none}
+.record-source .record-cell{justify-self:center;min-width:1.25em;font:700 1.55rem/1.05 "Bradley Hand","Segoe Print",var(--serif)}
+.record-source .is-missing{font-style:italic}
+.record-model{display:flex;align-items:center;gap:5px}
+.record-model>.record-arrow{display:block;width:56px;height:42px;flex:none}
+.record-model .record-arrow g{display:none}
+.row-figure[data-method="observed"] .ink-observed,.row-figure[data-method="crude"] .ink-crude,
+.row-figure[data-method="s"] .ink-s,.row-figure[data-method="t"] .ink-t,.row-figure[data-method="x"] .ink-x{display:inline}
+.ink-observed{color:#8e97ac}
+.record-dots{stroke:var(--record-observed);stroke-width:2.5}
+.record-fit-box{fill:#f1f4fc}
+.row-figure[data-arm="short"] .cross-standard,.row-figure[data-arm="standard"] .cross-short{opacity:.22}
+.record-risk-list{display:grid;gap:4px;min-width:0}
+.record-risk-list>span{display:grid;grid-template-columns:2.7em auto;align-items:baseline;gap:4px;line-height:1.1}
+.record-risk-list .record-cell{justify-self:start;font-size:.93rem}
+.record-output .record-label{margin-bottom:2px}
+.record-result{display:block;font:650 1.27rem/1.17 var(--serif);white-space:nowrap}
+.record-equation{color:var(--record-ink);white-space:nowrap}
+.row-figure[data-method="observed"] .record-result{color:var(--record-missing);font-style:italic}
+.row-figure[data-method="x"] .is-source{outline:1.5px solid var(--record-ink);outline-offset:1px;border-radius:45% 51% 41% 47%}
+.row-figure figcaption{margin:5px 0 0;color:var(--secondary);font-size:.86rem;line-height:1.35}
 .work-view{min-width:0;min-height:clamp(280px,46vh,410px);padding:18px 0 6px}
 .work-view h2{font-size:clamp(1.45rem,3vw,1.9rem);line-height:1.2;margin:0 0 7px}
 .work-view p{margin:0 0 .55rem}
 .view-note{color:var(--muted);font-size:.95rem;max-width:76ch}
-.method-note{min-height:1.5em}
 .work-links{display:flex;gap:8px 22px;flex-wrap:wrap;border-top:1px solid #dce5e2;margin:16px 0 34px;padding-top:14px;font-size:.94rem}
 .workbench .overline{font:600 .76rem/1.35 var(--mono);text-transform:uppercase;letter-spacing:.045em;color:var(--teal);margin-bottom:.4rem}
 .worksheet{display:grid;grid-template-columns:minmax(0,1fr) minmax(215px,.34fr);gap:24px;align-items:start}
@@ -94,7 +121,16 @@ th,td{text-align:left}
  .worksheet-controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;padding-bottom:8px}
  .worksheet-controls select{font-size:.93rem}.worksheet-controls label{font-size:.82rem}
  .view-choice{gap:2px}.view-choice span{padding:8px 9px;font-size:.91rem}
- .work-view{padding-top:12px}.method-note{min-height:3em}
+ .work-view{padding-top:12px}
+ .row-figure{padding:8px 0 6px}
+ .record-strip{grid-template-columns:minmax(0,.86fr) minmax(0,1.23fr) minmax(0,.91fr);gap:7px;min-height:60px}
+ .record-strip .record-label{font-size:.77rem}
+ .record-model{gap:2px}.record-model>.record-arrow{width:clamp(25px,6.7vw,42px);height:36px}
+ .record-source .record-cell{font-size:1.34rem}
+ .record-arm,.record-risk-list{font-size:.71rem}
+ .record-risk-list .record-cell{font-size:.76rem}
+ .record-result{font-size:1.02rem}
+ .row-figure figcaption{font-size:.78rem;line-height:1.3;min-height:2.6em;margin-top:3px}
  .patients .record-long{display:none}.patients .record-short{display:table-cell}
  .patients .idbtn{padding-block:3px}.patients .mobile-profile{display:block;color:var(--muted);font:500 .75rem/1.2 var(--sans);text-align:left;padding:0 0 2px 7px}
  .mobile-profile span+span::before{content:" · "}

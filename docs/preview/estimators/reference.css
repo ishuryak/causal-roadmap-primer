@@ -14,6 +14,21 @@
 .reference-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; }
 .reference-links a { padding-block: 3px; text-underline-offset: .16em; }
 .reference-end { margin: 24px 0 0; }
+.sketch-pair { border: 0; min-width: 0; margin: 0; padding: 0; }
+.sketch-controls { display: flex; flex-wrap: wrap; gap: 5px 16px; }
+.sketch-controls label { display: inline-flex; gap: 5px; align-items: center; min-height: 44px; font-weight: 550; cursor: pointer; }
+.sketch-controls input { accent-color: var(--teal); }
+.sketch-stage { display: grid; width: min(100%, 36rem); }
+.sketch-stage figure { grid-area: 1/1; min-width: 0; margin: 4px 0 0; }
+.sketch-stage svg { display: block; width: 100%; height: auto; }
+.sketch-stage figcaption { color: var(--secondary); font-size: .94rem; margin-top: 4px; }
+.sketch-pair:has([value="observed"]:checked) .original-fitted,
+.sketch-pair:has([value="fitted"]:checked) .original-observed { visibility: hidden; }
+.clinic-ink { width: min(100%, 32rem); border-collapse: collapse; }
+.clinic-ink caption { padding: 8px 0; color: var(--secondary); text-align: left; }
+.clinic-ink th, .clinic-ink td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--rule); }
+.clinic-ink td small { display: block; font-size: .88rem; color: var(--secondary); }
+.clinic-ink .is-missing { font: 700 1.45rem/1 "Bradley Hand", "Segoe Print", cursive; }
 
 .method-reference { margin: 0 0 18px; }
 .method-reference > div {

@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="only light"><meta name="robots" content="noindex,nofollow">
   <title>Patient worksheet · Causal Roadmap</title>
-  <link rel="stylesheet" href="tutorial.css"><link rel="stylesheet" href="worksheet.css">
+  <link rel="stylesheet" href="tutorial.css"><link rel="stylesheet" href="record-figure.css"><link rel="stylesheet" href="worksheet.css">
   <script src="worksheet.mjs" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to worksheet</a>
-<header class="site-head"><div class="frame head-inner"><a class="site-brand" href="../index.html#estimators">Causal Roadmap</a><nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html" aria-current="page">Worksheet</a><a href="guide.html">Field guide</a><a href="paper.html">Paper</a></nav></div></header>
+<header class="site-head"><div class="frame head-inner"><a class="site-brand" href="../index.html#estimators">Causal Roadmap</a><nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html" aria-current="page">Worksheet</a><a href="cousins.html" data-patient-link>Cousins</a><a href="guide.html">Field guide</a><a href="paper.html">Paper</a></nav></div></header>
 <main class="frame" id="main">
   <header class="worksheet-heading"><h1>Patient worksheet</h1><p>Follow six synthetic patients through estimates of five-year mortality under short and standard radiotherapy schedules.</p></header>
   <noscript><p>Enable JavaScript to change the worksheet. The <a href="analysis.Rmd">R workbook</a> contains the same patients and calculations.</p></noscript>
@@ -24,8 +24,51 @@
       <label><input type="radio" class="sr" name="view" value="effects" aria-controls="view-effects"><span>Effects</span></label>
       <label><input type="radio" class="sr" name="view" value="math" aria-controls="view-math"><span>Show the math</span></label>
     </fieldset>
+    <figure class="record-figure row-figure" id="row-figure" data-method="observed" aria-label="One patient’s outcome record and estimation">
+      <div class="record-strip">
+        <div class="record-source">
+          <div class="record-label"><span id="record-id">P04</span> outcomes</div>
+          <div class="record-grid">
+            <span class="record-arm"><abbr title="Standard schedule">Std.</abbr></span><span class="record-arm">Short</span>
+            <span id="record-y0" class="record-cell is-missing" role="img" aria-label="Standard outcome unknown">?</span><span id="record-y1" class="record-cell is-observed" role="img" aria-label="Short outcome 1, observed">1</span>
+          </div>
+        </div>
+        <div class="record-operation">
+          <div class="record-label" id="record-fit-label">No risk fit</div>
+          <div class="record-model">
+            <svg class="record-arrow" viewBox="0 0 56 42" aria-hidden="true" focusable="false" stroke-width="1.7">
+              <g class="ink-observed" stroke-dasharray="2 5"><path d="M7 10q16 1 40 0m-40 22q18-1 40 0"/></g>
+              <g class="ink-crude">
+                <path class="record-dots" d="M4 6h2m4 2h2M4 13h2m4 2h2M4 27h2m4 2h2M4 34h2m4 2h2"/>
+                <path d="M17 3q3 1 3 4t4 3q-4 0-4 4t-3 3m0 7q3 0 3 4t4 3q-4 1-4 4t-3 3M29 10q9 1 19 0l-4-2m4 2-4 3M29 31q10-1 19 0l-4-3m4 3-4 2"/>
+              </g>
+              <g class="ink-s">
+                <path class="record-fit-box" d="M3 13q7-1 15 0l1 15q-7 1-16 0z"/>
+                <path d="M8 19h7m-7 4h5M19 20q8 1 12-5t17-5l-4-3m4 3-4 2M19 21q8 0 12 6t17 5l-4-3m4 3-4 2"/>
+              </g>
+              <g class="ink-t">
+                <path class="record-fit-box" d="M4 3q8-1 14 0l1 14q-7 1-15 0zM4 25q8-1 14 0l1 14q-8 1-15 0z"/>
+                <path d="M8 8h7m-7 4h5m-5 18h7m-7 4h5M20 10q12-1 28 0l-4-3m4 3-4 2M20 32q13 1 28 0l-4-3m4 3-4 2"/>
+              </g>
+              <g class="ink-x">
+                <path class="cross-short" d="M5 31c17 1 24-23 43-21l-4-3m4 3-4 3"/>
+                <path class="cross-standard" d="M5 10c17-1 25 24 43 22l-4-3m4 3-4 2"/>
+              </g>
+            </svg>
+            <div class="record-risk-list">
+              <span><abbr title="Fitted risk under the standard schedule">Std.</abbr> <b class="record-cell" id="record-q0" role="img" aria-label="Standard risk not fitted">—</b></span>
+              <span><span>Short</span> <b class="record-cell" id="record-q1" role="img" aria-label="Short risk not fitted">—</b></span>
+            </div>
+          </div>
+        </div>
+        <div class="record-output">
+          <span class="record-label" id="record-result-label">Individual effect</span>
+          <strong class="record-result" id="record-result" role="img" aria-label="Unknown individual effect">?</strong>
+        </div>
+      </div>
+      <figcaption id="method-note"><span id="record-note">The green digit is recorded. The other outcome stays unknown.</span><span id="record-pseudo" hidden>The circled values give the pseudo-outcome <span class="record-equation"><span id="record-subtraction"></span> = <strong id="record-pseudo-value"></strong></span>.</span></figcaption>
+    </figure>
     <section id="view-patients" class="work-view" aria-label="Patient calculations">
-      <p class="view-note method-note" id="method-note">One outcome is observed. Choose Arm means to fill both risks.</p>
     <div class="worksheet">
       <div class="table-box">
         <p id="scroll-hint" class="scroll-note" hidden>Scroll the table sideways to see every column. You can also focus the table area and use the arrow keys.</p>
@@ -118,6 +161,6 @@
     </section>
     <p id="live-note" class="sr" aria-live="polite" aria-atomic="true"></p>
   </div>
-  <footer class="work-links"><a href="guide.html">Fitting data and assumptions</a><a href="paper.html">Original paper</a><a href="analysis.Rmd" download>R workbook</a></footer>
+  <footer class="work-links"><a href="cousins.html" data-patient-link>Compare TMLE and DML</a><a href="guide.html">Fitting data and assumptions</a><a href="analysis.Rmd" download>R workbook</a></footer>
 </main>
 </body></html>

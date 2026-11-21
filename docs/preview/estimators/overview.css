@@ -22,9 +22,13 @@
 .map h2 { margin: 0 0 16px; font-size: clamp(1.65rem, 2.85vw, 2.4rem); }
 .branches {
   margin: 0; padding: 0; border: 0; min-width: 0; position: relative;
-  display: grid; grid-template-columns: minmax(80px,29%) minmax(0,1fr); gap: 10px;
+  display: grid; grid-template-columns: minmax(0,36%) minmax(0,1fr); gap: 8px;
 }
-.pencil-map { width: 100%; height: 100%; min-height: 0; position: absolute; inset: 0 auto 0 0; max-width: 29%; }
+.map-drawing { position: absolute; inset: 0 auto 0 0; width: 36%; display: grid; grid-template-columns: 59% 41%; align-items: center; }
+.map-records, .branch-lines { display: block; width: 100%; }
+.map-records { height: auto; overflow: visible; }
+.map-column-names { font: 650 12px var(--sans); }
+.branch-lines { height: 100%; }
 .branch-options { grid-column: 2; display: grid; grid-template-rows: repeat(4, 1fr); }
 .branch { display: flex; position: relative; cursor: pointer; }
 .branch input { position: absolute; width: 1px; height: 1px; opacity: 0; margin: 0; }
@@ -37,14 +41,11 @@
 .branch input:focus-visible + span { outline: 2px solid var(--teal); outline-offset: -2px; }
 .branch input:checked + span { border-inline-start-color: var(--teal); background: var(--teal-light); }
 .branch input:checked + span strong, .branch:hover strong { color: var(--teal); }
-.branch-ink { stroke: #798882; stroke-width: 1.55; }
-.branch-ink .pencil-echo { opacity: .3; stroke-width: .8; }
-.record-ink { stroke: #445750; stroke-width: 1.6; }
-.record-faint { stroke: #aebcb3; stroke-width: .9; }
+.branch-ink { stroke: #a28cab; stroke-width: 1.7; }
 .map:has([value="risk"]:checked) .ink-risk,
 .map:has([value="effect"]:checked) .ink-effect,
 .map:has([value="weight"]:checked) .ink-weight,
-.map:has([value="both"]:checked) .ink-both { stroke: var(--teal); stroke-width: 2.3; }
+.map:has([value="both"]:checked) .ink-both { stroke: #65367e; stroke-width: 2.7; }
 .map-explanation {
   margin-top: 20px; padding-top: 13px; border-top: 1px solid var(--rule);
   display: flex; flex-direction: column; align-items: flex-start;
@@ -62,8 +63,7 @@
 }
 @media (max-width: 850px) {
   .overview { gap: 30px; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
-  .branches { gap: 4px; grid-template-columns: minmax(70px,25%) minmax(0,1fr); }
-  .pencil-map { max-width: 25%; }
+  .branches { gap: 4px; }
   .branch-label { padding-left: 8px; }
 }
 @media (max-width: 700px) {
@@ -76,7 +76,7 @@
   .intro .design-note { max-width: 58ch; margin-top: 17px; }
   .map { border-top: 1px solid var(--rule); padding-top: 24px; }
   .map h2 { margin-bottom: 12px; }
-  .branches { grid-template-columns: minmax(60px,25%) minmax(0,1fr); }
+  .map-drawing { grid-template-columns: 65% 35%; }
   .branch-label { min-height: 59px; }
   .map-explanation { margin-top: 12px; }
 }
@@ -86,5 +86,5 @@
 }
 @media (forced-colors: active) {
   .branch input:checked + span { border: 2px solid Highlight; }
-  .branch-ink, .record-ink { stroke: CanvasText; }
+  .branch-ink { stroke: CanvasText; }
 }

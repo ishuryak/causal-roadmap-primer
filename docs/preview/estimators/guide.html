@@ -7,13 +7,14 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Estimator field guide · Causal Roadmap</title>
   <link rel="stylesheet" href="tutorial.css">
+  <link rel="stylesheet" href="record-figure.css">
   <link rel="stylesheet" href="reference.css">
 </head>
 <body>
   <a class="ref-skip" href="#main">Skip to content</a>
   <header class="site-head"><div class="frame head-inner">
     <a class="site-brand" href="../index.html#estimators">Causal Roadmap</a>
-    <nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html">Worksheet</a><a href="guide.html" aria-current="page">Field guide</a><a href="paper.html">Paper</a></nav>
+    <nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html">Worksheet</a><a href="cousins.html">Cousins</a><a href="guide.html" aria-current="page">Field guide</a><a href="paper.html">Paper</a></nav>
   </div></header>
 
   <main class="frame" id="main" tabindex="-1">
@@ -37,12 +38,35 @@
           <dd>For the average treatment effect, inverse probability weighting (IPW) weights each observed outcome by the inverse probability of the schedule received. The <strong>propensity score</strong> is the probability of short given baseline characteristics.</dd>
         </div>
         <div>
-          <dt>Combined methods<span>AIPW and TMLE</span></dt>
-          <dd>Augmented IPW (AIPW) corrects predicted risks using inverse-probability-weighted residuals. Targeted maximum likelihood estimation (TMLE) uses treatment probabilities to update the predicted risks, then averages the updated risks under each schedule.</dd>
+          <dt>Combined methods<span>AIPW, TMLE and DML for the ATE</span></dt>
+          <dd>Targeted maximum likelihood estimation (TMLE) updates the predicted risks before averaging. Double machine learning (DML) can target the same average treatment effect with an augmented inverse probability weighting (AIPW) score. For each held-out patient it adds a weighted prediction error to the fitted risk difference. <a href="cousins.html">Work through the two calculations</a>.</dd>
         </div>
       </dl>
 
       <div class="guide-folds">
+        <details class="guide-fold" id="original-sketch">
+          <summary>Andy’s original six-row sketch</summary>
+          <div class="fold-body">
+            <p>These two drawings come from Andy Wilson’s g-computation lesson. The original uses a numerical outcome. Susan’s worksheet uses five-year mortality, coded 0 or 1.</p>
+            <fieldset class="sketch-pair">
+              <legend class="visually-hidden">Choose an original drawing</legend>
+              <div class="sketch-controls">
+                <label><input type="radio" name="original" value="observed" checked><span>Observed outcomes</span></label>
+                <label><input type="radio" name="original" value="fitted"><span>Add predictions</span></label>
+              </div>
+              <div class="sketch-stage">
+                <figure class="original-observed">
+                  <svg role="img" aria-label="Original six handwritten rows. Each green outcome matches the treatment received and the red question mark marks the other treatment." width="1060" height="830" viewBox="390 175 1060 830"><image href="ink/observed.png" width="1492" height="1017"/></svg>
+                  <figcaption>Slide 56. Each patient has one observed outcome. The question marks show what we would like to know.</figcaption>
+                </figure>
+                <figure class="original-fitted">
+                  <svg role="img" aria-label="The same six handwritten rows, now with blue fitted values in the previously empty cells. Arrows connect treatment and baseline covariates to the predictions." width="1060" height="830" viewBox="390 175 1060 830"><image href="ink/fitted.png" width="1492" height="1017"/></svg>
+                  <figcaption>Slide 60. The blue values estimate conditional means from treatment and baseline covariates. The individual’s outcome under the other treatment stays unknown.</figcaption>
+                </figure>
+              </div>
+            </fieldset>
+          </div>
+        </details>
         <details class="guide-fold">
           <summary>Which patients? CATE, ATE and ATT</summary>
           <div class="fold-body">
@@ -58,7 +82,8 @@
           <summary>Base learners, Super Learner and cross-fitting</summary>
           <div class="fold-body">
             <p>A <strong>base learner</strong> is a prediction algorithm, such as logistic regression or a forest. A <strong>meta-learner</strong> arranges prediction fits to estimate treatment effects. <strong>Super Learner</strong> uses cross-validation to combine candidate algorithms for a prediction task, such as fitting mortality risk inside a T-learner.</p>
-            <p>Outcome risks and treatment probabilities are <strong>nuisance functions</strong> used to estimate the causal contrast. <strong>Cross-fitting</strong> trains such functions on other folds before predicting for a held-out fold. <strong>Double machine learning (DML)</strong> commonly pairs cross-fitting with an orthogonal score that reduces first-order sensitivity to small errors in those fits.</p>
+            <p>Outcome risks and treatment probabilities are <strong>nuisance functions</strong> used to estimate the causal contrast. <strong>Cross-fitting</strong> trains on other folds before predicting for the held-out fold. DML pairs cross-fitting with an <strong>orthogonal score</strong> that reduces first-order sensitivity to small errors in these fits. The <strong>interactive regression model (IRM)</strong> allows the two schedules to have different effects across frailty profiles.</p>
+            <p><strong>Partially linear regression (PLR)</strong> relates residual mortality to residual treatment. In this cohort it gives more weight to profiles where clinicians commonly chose either schedule. <a href="cousins.html?method=plr#fwl">See the Frisch–Waugh–Lovell example</a>.</p>
           </div>
         </details>
         <details class="guide-fold" id="fitting-records">
@@ -76,7 +101,15 @@
         <details class="guide-fold" id="support">
           <summary>Try a clinic missing one schedule</summary>
           <div class="fold-body">
-            <p>A second synthetic clinic offers only standard to its 2,000 higher-frailty patients. Among lower-frailty patients, deaths were 180 of 900 on standard and 462 of 2,100 on short.</p>
+            <p>A second clinic offers only standard to its 2,000 higher-frailty patients. Here the question mark applies to an entire group.</p>
+            <table class="clinic-ink record-figure">
+              <caption>What Susan can observe in the second clinic</caption>
+              <thead><tr><th scope="col">Frailty</th><th scope="col">Standard</th><th scope="col">Short</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Lower</th><td><span class="record-cell is-observed">20%</span><small>180 of 900</small></td><td><span class="record-cell is-observed">22%</span><small>462 of 2,100</small></td></tr>
+                <tr><th scope="row">Higher</th><td>2,000 treated</td><td><span class="record-cell is-missing" aria-label="Risk unknown">?</span><small>0 treated</small></td></tr>
+              </tbody>
+            </table>
             <fieldset class="support-picker">
               <legend>Whose risk difference could Susan report?</legend>
               <div class="support-options">

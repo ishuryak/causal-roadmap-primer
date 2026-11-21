@@ -9,6 +9,8 @@ The [test roadmap](../docs/preview/index.html#estimators) offers an optional [es
 | Start with the six observed patients. Select a patient, then reveal the arm means. | One binary outcome is known for each person. A predicted risk can be estimated even though that person’s other potential outcome remains unknown. |
 | Switch between S and T, then remove the interaction in S. | One logistic regression with a schedule-by-frailty interaction reproduces the fitted risks from two separate regressions in this example. Sharing the frailty slope changes the model and can change the sign of a subgroup contrast. |
 | Open X and trace a death in each schedule group. | The subtraction changes order across arms to keep short minus conventional as the direction. The second-stage fits smooth these noisy pseudo-outcomes. |
+| Follow the same row into [TMLE and DML](../docs/preview/estimators/cousins.html). | TMLE updates the predicted risks, then averages their difference. DML for the population average adds a weighted held-out prediction error. Both estimate −4.80 percentage points in these data. |
+| Partial out frailty from treatment and outcome. | The FWL residual slope is −4.34 points. It gives more weight to frailty groups where both schedules were commonly used. |
 | Keep the fitted contrasts and change who counts in the average. | With these synthetic records, the mortality difference moves from −4.80 percentage points in all eligible patients to −1.27 points among short-schedule recipients. |
 | Try the clinic missing an entire treatment arm for one frailty group. | The original population contrast lacks support. Naming a group for which both schedules were available changes the question. |
 
@@ -17,6 +19,8 @@ The [test roadmap](../docs/preview/index.html#estimators) offers an optional [es
 Susan first checks what randomized evidence already answers for her patients. The roadmap’s outcome is average months alive through five years. The tutorial uses a simpler outcome, death by five years with complete ascertainment. Its estimates illustrate arithmetic and carry no clinical recommendation. A resident can return directly to Step 6 or to Susan’s Step 8 decision.
 
 The worksheet and its [R Markdown notebook](../docs/preview/estimators/analysis.Rmd) are paired. When changing the example, update both and knit the notebook to run its numerical checks. The 5,000 fitting records determine the models and target populations. The six independent display rows are for the reader to follow through each operation.
+
+The [original six-row drawings](../docs/preview/estimators/guide.html#original-sketch) are embedded illustrations from slides 56 and 60 of Andy Wilson’s ECA deck. Indigo labels, green observed values, red question marks and blue estimates follow those drawings. The live clinical example uses binary outcomes. Its missing potential outcome stays marked even after estimating the risk.
 
 The worksheet’s optional math panel connects each patient trace to the paper. Printed page 4158, the third PDF page, contains equations 3–9. The [complete article](../docs/preview/estimators/kunzel-2019.pdf) is the ten-page published PDF from [PubMed Central](https://pmc.ncbi.nlm.nih.gov/articles/PMC6410831/). The authors license it under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/). Keep it intact. The public test edition lives at [the repository’s GitHub Pages tutorial route](https://ishuryak.github.io/causal-roadmap-primer/preview/estimators/).
 

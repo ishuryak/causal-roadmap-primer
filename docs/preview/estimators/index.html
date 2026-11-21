@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="only light">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="description" content="Trace six patients through three causal estimators. Explore a map of the methods, open the patient worksheet or read the original paper.">
+  <meta name="description" content="Follow six patients through g-computation and the S-, T- and X-learners, then compare TMLE and double machine learning.">
   <title>Six patients, three learners · Causal Roadmap</title>
   <script>
     // Resolve bookmarks from the earlier single-page tutorial before it paints.
@@ -24,6 +24,7 @@
     if (destination) location.replace(new URL(destination, location.href));
   </script>
   <link rel="stylesheet" href="tutorial.css">
+  <link rel="stylesheet" href="record-figure.css">
   <link rel="stylesheet" href="overview.css">
   <script src="overview.js" defer></script>
 </head>
@@ -32,15 +33,15 @@
 <header class="site-head"><div class="frame head-inner">
   <a class="site-brand" href="../index.html#estimators">Causal Roadmap</a>
   <nav class="section-nav" aria-label="Estimator tutorial">
-    <a href="index.html" aria-current="page">Overview</a><a href="worksheet.html">Worksheet</a><a href="guide.html">Field guide</a><a href="paper.html">Paper</a>
+    <a href="index.html" aria-current="page">Overview</a><a href="worksheet.html">Worksheet</a><a href="cousins.html">Cousins</a><a href="guide.html">Field guide</a><a href="paper.html">Paper</a>
   </nav>
 </div></header>
 
 <main class="frame overview" id="main">
   <header class="intro">
     <h1>Six patients,<br> <em>three learners</em></h1>
-    <p>Would a shorter course of radiotherapy change five-year mortality for the same patients?</p>
-    <p>Follow six synthetic patients through Susan’s comparison. The S-, T- and X-learners use the same records in different ways.</p>
+    <p>How would five-year mortality change if everyone eligible for both radiotherapy schedules received the short course instead of the standard course?</p>
+    <p>Susan has one observed outcome for each of six synthetic patients. Follow the same rows through S, T and X, then meet their cousins, TMLE and DML.</p>
     <a class="start" href="worksheet.html">Open the patient worksheet</a>
     <p class="design-note">Each approach assumes we measured the relevant confounders and that both schedules were possible for patients with the same frailty.</p>
   </header>
@@ -49,52 +50,45 @@
     <h2 id="map-heading">A map of the methods</h2>
     <fieldset class="branches">
       <legend class="visually-hidden">Choose a way to estimate the treatment effect</legend>
-      <svg class="pencil-map" viewBox="0 0 180 280" preserveAspectRatio="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-        <!-- Four pencil branches connect the same records to the methods. The labels are HTML. -->
-        <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M83 140.5 Q88 139.6 94 140" stroke="#71847a" stroke-width="1.7"/>
-          <g class="branch-ink ink-risk">
-            <path d="M93 140 C109 137 111 97 126 72 S149 37 174 35"/>
-            <path class="pencil-echo" d="M100 137 C112 122 113 92 129 69 M146 45 Q158 36 173 36"/>
-            <path d="m169 32 6 3-5 4"/>
+      <div class="map-drawing" role="img" aria-label="Six patient rows show standard and short outcomes side by side. Each row has one observed zero or one and one question mark. The same six rows feed all four branches.">
+        <svg class="map-records" viewBox="0 0 100 144" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- These labels, row numbers and question marks are Andy Wilson’s pen strokes from ECA slide 56. -->
+            <image id="original-pen" href="ink/observed.png" width="1492" height="1017"/>
+            <symbol id="pen-index" viewBox="434 331 51 389" preserveAspectRatio="none"><use href="#original-pen"/></symbol>
+            <symbol id="pen-unknown" viewBox="835 339 32 49"><use href="#original-pen"/></symbol>
+            <symbol id="pen-one" viewBox="838 533 20 34"><use href="#original-pen"/></symbol>
+            <symbol id="pen-zero" viewBox="0 0 14 17"><path d="M8.6 1.8C4.3 1.5 2.2 6.6 2 11c-.2 3.6 1.6 4.3 4.2 3.8 3.7-.7 6.1-6.9 5.8-10.3-.2-2.4-2.2-3.2-4.1-2.1" fill="none" stroke="#238326" stroke-width="2.5" stroke-linecap="round"/></symbol>
+            <symbol id="pen-y0" viewBox="826 203 65 65"><use href="#original-pen"/></symbol>
+            <symbol id="pen-y1" viewBox="698 204 50 64"><use href="#original-pen"/></symbol>
+          </defs>
+          <g class="map-column-names" text-anchor="middle" fill="#27235e">
+            <text x="40" y="11">Std.</text><text x="76" y="11">Short</text>
           </g>
-          <g class="branch-ink ink-effect">
-            <path d="M94 140 C118 139 133 106 174 105"/>
-            <path class="pencil-echo" d="M106 137 C123 130 137 108 169 106"/>
-            <path d="m169 102 6 3-5 4"/>
+          <use href="#pen-y0" x="30" y="16" width="21" height="17"/>
+          <use href="#pen-y1" x="66" y="16" width="21" height="17"/>
+          <use href="#pen-index" x="5" y="38" width="12" height="105"/>
+          <!-- Standard / short, in the same P01–P06 order as the live worksheet. -->
+          <use href="#pen-zero" x="33" y="39" width="13" height="14"/><use href="#pen-unknown" x="70" y="38" width="11" height="16"/>
+          <use href="#pen-unknown" x="34" y="56" width="11" height="16"/><use href="#pen-zero" x="69" y="57" width="13" height="14"/>
+          <use href="#pen-unknown" x="34" y="74" width="11" height="16"/><use href="#pen-one" x="70" y="75" width="11" height="14"/>
+          <use href="#pen-unknown" x="34" y="92" width="11" height="16"/><use href="#pen-one" x="70" y="93" width="11" height="14"/>
+          <use href="#pen-one" x="34" y="111" width="11" height="14"/><use href="#pen-unknown" x="70" y="110" width="11" height="16"/>
+          <use href="#pen-zero" x="33" y="129" width="13" height="14"/><use href="#pen-unknown" x="70" y="128" width="11" height="16"/>
+        </svg>
+        <svg class="branch-lines" viewBox="0 0 80 280" preserveAspectRatio="none" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 140 Q8 140.7 12 140" stroke="#694382" stroke-width="2.1"/>
+            <g class="branch-ink ink-risk"><path d="M11 140C27 134 24 94 37 69S56 37 75 35m-5-3 6 3-5 4"/></g>
+            <g class="branch-ink ink-effect"><path d="M11 140C32 140 44 105 75 105m-5-4 6 4-5 3"/></g>
+            <g class="branch-ink ink-weight"><path d="M11 140C33 143 45 173 75 175m-5-4 6 4-6 3"/></g>
+            <g class="branch-ink ink-both"><path d="M11 140C25 148 28 187 39 209S58 242 75 245m-5-4 6 4-5 3"/></g>
           </g>
-          <g class="branch-ink ink-weight">
-            <path d="M94 140 C120 144 133 173 174 175"/>
-            <path class="pencil-echo" d="M108 146 Q137 174 168 174"/>
-            <path d="m169 171 6 4-6 3"/>
-          </g>
-          <g class="branch-ink ink-both">
-            <path d="M93 140 C112 148 111 183 130 211 S155 242 174 245"/>
-            <path class="pencil-echo" d="M104 151 C114 165 116 195 134 216 M151 236 Q163 243 172 244"/>
-            <path d="m169 241 6 4-6 3"/>
-          </g>
-          <!-- The individual sheets are deliberately slightly out of register. -->
-          <g class="record-ink">
-            <path fill="#f0f3ef" d="m12 107 54-9 13 78-56 10z"/>
-            <path fill="#fcfdfb" d="m20 100 55-4 6 81-56 3z"/>
-            <path fill="#fff" d="m28 96 48 3 10 12-5 69-58-4z"/>
-            <path d="m76 100-1 10 10 2"/>
-            <path class="record-faint" d="m26 174 3-76m-5 69-2-59m54 70-47-2"/>
-            <path stroke="#599081" stroke-width="2" d="m34 107 24 1m-24 4 15 1"/>
-            <g stroke="#798982" stroke-width="1.45">
-              <path d="m33 124 5 .2-.3 5-5-.3z m11 2 24 1"/>
-              <path d="m32 136 5 .2-.3 5-5-.4z m11 2 27 1"/>
-              <path d="m31 148 5 .2-.3 5-5-.3z m11 2 20 1"/>
-            </g>
-            <path stroke="#216256" stroke-width="1.85" d="m32 125 2 2 5-6m-7 16 2 2 5-6"/>
-            <path class="record-faint" d="m31 163 21 1m-21 3 16 1"/>
-            <path stroke="#84918b" stroke-width="1.25" d="m12 114 7 42m-3-42 4 20m3 49 12-1"/>
-          </g>
-        </g>
-      </svg>
+        </svg>
+      </div>
       <div class="branch-options">
         <label class="branch"><input type="radio" name="family" value="risk" aria-describedby="note-risk" checked>
-          <span class="branch-label"><strong>Predict both outcomes</strong><span>S-learner · T-learner</span></span>
+          <span class="branch-label"><strong>Predict both outcomes</strong><span>S-learner · T-learner · g-computation</span></span>
         </label>
         <label class="branch"><input type="radio" name="family" value="effect" aria-describedby="note-effect">
           <span class="branch-label"><strong>Model the effect directly</strong><span>X-learner · R-learner</span></span>
@@ -103,16 +97,16 @@
           <span class="branch-label"><strong>Weight the observed outcomes</strong><span>IPW</span></span>
         </label>
         <label class="branch"><input type="radio" name="family" value="both" aria-describedby="note-both">
-          <span class="branch-label"><strong>Combine predictions and weights</strong><span>AIPW · TMLE</span></span>
+          <span class="branch-label"><strong>Combine predictions and weights</strong><span>AIPW · TMLE · DML for the ATE</span></span>
         </label>
       </div>
     </fieldset>
     <div class="map-explanation">
       <div class="branch-notes">
-        <p id="note-risk">S asks one model about each schedule. T asks a separate model for each. Both predict two risks for the same patient profile.</p>
-        <p id="note-effect">X starts with T’s two risk fits, then combines observed outcomes and opposite-schedule predictions to learn how effects vary. R learns from residuals.</p>
-        <p id="note-weight">Inverse probability weighting gives more weight to patients whose observed schedule was less likely, adjusting which patients each arm represents.</p>
-        <p id="note-both">AIPW corrects an initial estimate with weighted residuals. TMLE updates the outcome predictions before averaging. Both use a treatment model as well.</p>
+        <p id="note-risk">S uses one risk model, T uses two. For P04, T predicts <span class="record-cell is-fitted">40%</span> under standard and <span class="record-cell is-fitted">25%</span> under short. Comparing average predicted risks gives the g-computation estimate.</p>
+        <p id="note-effect">X reuses T’s fits. P04 died on short, so the signed contrast for this row is <span class="record-cell is-observed">1</span> − <span class="record-cell is-fitted">0.40</span> = +0.60. R learns how the effect varies from treatment and outcome residuals.</p>
+        <p id="note-weight">One in four higher-frailty patients received short. Inverse probability weighting gives P04’s observed outcome a weight of <span class="record-label">1 / 0.25 = 4</span> when estimating short-schedule risk for everyone.</p>
+        <p id="note-both">TMLE updates risk predictions before averaging. DML can estimate the same average treatment effect (ATE) by adding weighted prediction errors on held-out records. <a href="cousins.html?patient=P04">Compare them for P04</a>.</p>
       </div>
       <button type="button" class="walk" id="next-branch" hidden>Next branch</button>
       <span id="map-status" class="visually-hidden" role="status"></span>
