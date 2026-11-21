@@ -514,25 +514,37 @@ th,td{text-align:left}
     if (risks) summary += 'Profile contrast ' + points(contrastFor(person.group)) + ' percentage points. ';
     byId('live-note').textContent = summary + byId('target-value').textContent + '.';
   }
-  document.querySelectorAll('input[name="stage"]').forEach(input => input.addEventListener('change', () => {
-    state.stage = input.value;
-    render();
-  }));
-  byId('interaction').addEventListener('change', event => {
-    state.allowInteraction = event.target.checked;
-    render();
-  });
-  document.querySelectorAll('input[name="target"]').forEach(input => input.addEventListener('change', () => {
-    state.target = input.value;
-    render();
-  }));
-  document.querySelectorAll('input[name="support-target"]').forEach(input => input.addEventListener('change', () => {
-    byId('support-answer').textContent = input.value === 'all'
+  const checked = name => document.querySelector('input[name="' + name + '"]:checked');
+  function readControls() {
+    state.stage = checked('stage').value;
+    state.target = checked('target').value;
+    state.allowInteraction = byId('interaction').checked;
+    byId('support-answer').textContent = checked('support-target').value === 'all'
       ? 'The all-patient effect is unidentified from this clinic’s data under the stated assumptions. There are no short-schedule outcomes in the higher-frailty stratum.'
       : 'For the 3,000 lower-frailty patients who could receive either schedule, the estimated risk difference is +2.00 points. Naming this group changes the target population.';
-  }));
+    render();
+  }
+  document.querySelectorAll('input').forEach(input => input.addEventListener('change', readControls));
+  window.addEventListener('pagehide', () => {
+    const radios = Array.from(document.querySelectorAll('input[type="radio"]:checked'), input => input.value);
+    history.replaceState({patient: state.selected, radios, interaction: state.allowInteraction}, '');
+  });
+  window.addEventListener('pageshow', () => {
+    // Browsers may restore checked inputs after pageshow, without a change event.
+    setTimeout(() => {
+      const saved = history.state;
+      if (saved && people[saved.patient] && Array.isArray(saved.radios)) {
+        state.selected = saved.patient;
+        for (const radio of document.querySelectorAll('input[type="radio"]')) {
+          radio.checked = saved.radios.includes(radio.value);
+        }
+        byId('interaction').checked = saved.interaction;
+      }
+      readControls();
+    }, 0);
+  });
   buildRows();
-  render();
+  readControls();
   if (typeof ResizeObserver === 'function') {
     const tableObserver = new ResizeObserver(updateTableViewport);
     tableObserver.observe(byId('table-scroll'));
