@@ -287,7 +287,6 @@
   }
 
   const viewInputs = document.querySelectorAll('input[name="view"]');
-  const cousinLinks = document.querySelectorAll('a[data-patient-link]');
   const views = ['patients','effects','math'];
   const stateKeys = ['method','patient','view','target','slope'];
   const storageKey = 'causal-roadmap.estimator-worksheet.v1';
@@ -348,7 +347,6 @@
     const adjusted = ['s','t','x'].includes(state.stage);
     byId('method').value = state.stage;
     byId('patient').value = p.id;
-    for (const link of cousinLinks) link.href = 'cousins.html?patient=' + encodeURIComponent(p.id);
     byId('target').value = state.target;
     byId('target').disabled = !adjusted;
     byId('s-setting').hidden = state.stage !== 's';

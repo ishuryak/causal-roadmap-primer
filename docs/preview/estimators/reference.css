@@ -54,6 +54,8 @@
 .reference-terms > div { display: grid; grid-template-columns: 4rem 1fr; gap: 5px; margin: 5px 0; }
 .reference-terms dt { font-weight: 700; }
 .reference-terms dd { margin: 0; }
+.vocabulary-terms { margin: 2px 0 12px; }
+.vocabulary-terms > div { grid-template-columns: 7rem minmax(0, 1fr); gap: 12px; margin: 0 0 8px; }
 .reference-counts { width: min(100%, 32rem); margin: 14px 0; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .reference-counts caption { margin-bottom: 5px; color: var(--secondary); text-align: left; }
 .reference-counts th, .reference-counts td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--rule); }
@@ -90,6 +92,7 @@
 @media (max-width: 500px) {
   .method-reference > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .method-reference dt span { display: inline; margin-left: 8px; }
+  .vocabulary-terms > div { display: block; margin-bottom: 11px; }
 }
 @media (max-width: 410px) {
   .paper-tools { padding: 7px; }

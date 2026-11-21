@@ -1,5 +1,5 @@
 ---
-title: "Six patients, three learners"
+title: "Different learners, the same estimate?"
 subtitle: "An R companion to Susan’s Causal Roadmap tutorial"
 output:
   html_document:
@@ -16,6 +16,16 @@ Open this file in RStudio and select **Knit**, or run `rmarkdown::render("analys
 knitr::opts_chunk$set(echo = TRUE, collapse = FALSE, error = FALSE, comment = "#>")
 options(knitr.kable.NA = "")
 ```
+
+## Terms used in the calculations
+
+| Term | Meaning in this example |
+| --- | --- |
+| Estimand, estimator, estimate | The estimand specifies whose five-year risks to compare. The estimator is the rule for combining the records. The estimate is the resulting number. |
+| Base learner and meta-learner | A base learner fits a prediction, such as a regression for mortality. A meta-learner arranges prediction fits to estimate how a treatment effect varies. |
+| Outcome model and propensity | The outcome model predicts mortality for a given schedule and frailty. The propensity is the chance of receiving the short schedule at that frailty. Both help estimate the causal contrast. |
+| Standardization | Average predicted risks for both schedules using the same patients and the same frailty mix. |
+| Cross-fitting | Train the prediction models on some records and use them to score other records. Rotate the held-out group so every record is scored once. |
 
 ## The records Susan has
 
@@ -143,18 +153,20 @@ risk_columns <- cbind(standard = t0, short = t1, S = s1 - s0,
 estimates <- weights %*% risk_columns
 knitr::kable(100*estimates, digits = 2,
   caption = "Two arm risks in percent, followed by four risk differences in percentage points.")
-stopifnot(abs(estimates["ATE", "T"] + 0.048) < 1e-6,
-          abs(estimates["ATT", "T"] + 33/2600) < 1e-6,
+stopifnot(max(abs(estimates["ATE", c("S", "T", "X")] + 0.048)) < 1e-6,
+          max(abs(estimates["ATT", c("S", "T", "X")] + 33/2600)) < 1e-6,
           abs(unname(arm_risk["1"] - arm_risk["0"]) + 0.0992307692) < 1e-6)
 ```
 
-## TMLE and double machine learning on the same records
+The fully interacted S-learner, T-learner and X-learner all estimate **+2 points** in lower-frailty patients and **−15 points** in higher-frailty patients. For the full cohort, 60% have lower frailty and 40% higher. The shared estimate is **−4.80 percentage points**. Among short recipients, 2,100 of 2,600 have lower frailty, giving **−1.27 points**. The S-learner with a shared log-odds treatment effect gives different estimates in the last column.
 
-Susan keeps the five-year risk difference, short minus standard, in all 5,000 eligible patients. In this example both targeted maximum likelihood estimation (TMLE) and cross-fitted augmented inverse probability weighting (AIPW) estimate **−4.80 percentage points**. The six display patients illustrate individual calculations and contribute no observations to any fit or average below.
+## TMLE and double machine learning across the cohort
+
+Susan keeps the all-eligible target fixed. Targeted maximum likelihood estimation (TMLE) updates predictions across both frailty groups. Double machine learning (DML) rotates training and scoring through groups of records. Each method below uses the 5,000 fitting records. The separate six-row illustration belongs to the S-, T- and X-learner worksheet.
 
 ### Target the difference with TMLE
 
-Start with a deliberately simple outcome fit. Pool the schedules and use the observed mortality rate within each frailty group for both predictions, giving an initial difference of zero. Estimate the probability of short, `e`, separately by frailty. For a short recipient the clever covariate `H` equals `1/e`. For a standard recipient it equals `-1/(1-e)`. Fit one logistic coefficient `epsilon`, using the initial log odds as an offset with no intercept. This coefficient updates the predictions for the **population risk difference**.
+The lower-frailty group contributes 3,000 records and the higher-frailty group contributes 2,000. Pool the schedules within each group to get a starting risk under either schedule. The starting cohort difference is zero. Estimate the probability of short, `e`, within each group. Use it to weight signed prediction errors through a **clever covariate** `H`, equal to `1/e` on short and `-1/(1-e)` on standard. Fit one coefficient, `epsilon`, across all 5,000 records by logistic regression with the initial log odds as an offset and no intercept. Apply that update under both schedules in each group.
 
 ```{r targeting}
 group <- train[["L"]] + 1L
@@ -175,14 +187,33 @@ qstar_obs <- ifelse(arm == 1L, qstar1[group], qstar0[group])
 tmle_ate <- mean(qstar1[group] - qstar0[group])
 score_before <- mean(H * (observed - q_initial[group]))
 score_after <- mean(H * (observed - qstar_obs))
-knitr::kable(data.frame(frailty = profile_names, initial = q_initial, e = g_full,
-                       H_standard = h0, H_short = h1,
-                       updated_standard = qstar0, updated_short = qstar1), digits = 5)
+cohort_n <- as.numeric(table(group))
+knitr::kable(data.frame(profile_names, cohort_n, 100*g_full, 100*q_initial,
+                       100*qstar0, 100*qstar1), digits = 3,
+             col.names = c("Frailty", "Patients", "Received short (%)", "Starting risk (%)",
+                           "Updated standard (%)", "Updated short (%)"))
 stopifnot(abs(epsilon + 0.049149193627) < 1e-9, abs(score_before + 0.048) < 1e-9,
           abs(score_after) < 1e-9, abs(tmle_ate + 0.048) < 1e-9)
 ```
 
-The fitted coefficient is −0.049149. Averaging the updated risks across the target patients gives 24.88169% on short and 29.68169% on standard, a difference of −4.80 points. The mean of `H * (observed - updated risk)` is zero at the fit. An individual residual can increase, and targeting this single difference does not separately calibrate either arm mean or either frailty contrast. [Schuler and Rose on TMLE for observational data](https://doi.org/10.1093/aje/kww165) · [Balzer, Petersen and van der Laan on targeting a difference](https://doi.org/10.1002/sim.6965)
+The fitted coefficient is −0.049149. Check its effect in two ways. First, take the cohort mean of `H * (observed - fitted risk)` under the schedule actually received. It moves from **−0.048 to zero**. Second, average the updated risks under each schedule using the same 60% lower-frailty and 40% higher-frailty mix.
+
+```{r targeting-summary}
+starting_risk <- weighted.mean(q_initial, cohort_n)
+tmle_standard <- weighted.mean(qstar0, cohort_n)
+tmle_short <- weighted.mean(qstar1, cohort_n)
+knitr::kable(data.frame(step = c("Before update", "After update"),
+                       standard = 100*c(starting_risk, tmle_standard),
+                       short = 100*c(starting_risk, tmle_short),
+                       difference = 100*c(0, tmle_short - tmle_standard),
+                       score = c(score_before, score_after)), digits = c(0, 5, 5, 2, 3),
+             col.names = c("Cohort fit", "Standard mortality (%)", "Short mortality (%)",
+                           "Difference (points)", "Mean H × residual"))
+stopifnot(abs(starting_risk - 0.2734) < 1e-9,
+          abs(tmle_short - tmle_standard - tmle_ate) < 1e-9)
+```
+
+The two standardized risks are **24.88169% on short and 29.68169% on standard**, a difference of **−4.80 points**. This single coefficient targets the population difference. Individual arm means and frailty contrasts can differ from the S/T fit. [Schuler and Rose on TMLE for observational data](https://doi.org/10.1093/aje/kww165) · [Balzer, Petersen and van der Laan on targeting a difference](https://doi.org/10.1002/sim.6965)
 
 ### Train on four folds, score on the fifth
 
@@ -217,47 +248,64 @@ for (k in seq_along(fits)) {
 stopifnot(!anyNA(out_of_fold), abs(fits[[1]]$q0[2] - 479/1200) < 1e-12)
 ```
 
-For the interactive regression model (IRM), `q0` and `q1` predict the outcome under each schedule. Each held-out record contributes the predicted difference plus a signed, inverse-probability-weighted residual. Averaging those contributions estimates the ATE. No propensity clipping or weight normalization is used here. Positive and negative individual contributions can extend beyond the range of a risk difference.
+In each rotation, use the four training folds to fit two mortality risks and the probability of short by frailty. Predict both risks across the 1,000 held-out records. Their mean short-minus-standard difference is the **starting contrast**. Compare observed mortality to predicted mortality under the received schedule in that same fold. The mean signed, inverse-probability-weighted discrepancy is the **correction**. Adding it to the starting contrast gives the fold’s augmented inverse probability weighting (AIPW) estimate in the interactive regression model (IRM).
 
 ```{r dml-ate}
-irm_contribution <- function(y, a, fit) {
-  q_received <- ifelse(a == 1L, fit[["q1"]], fit[["q0"]])
-  h <- ifelse(a == 1L, 1 / fit[["e"]], -1 / (1 - fit[["e"]]))
-  fit[["q1"]] - fit[["q0"]] + h * (y - q_received)
-}
-contribution <- irm_contribution(observed, arm, out_of_fold)
+q_received <- ifelse(arm == 1L, out_of_fold[["q1"]], out_of_fold[["q0"]])
+h_held <- ifelse(arm == 1L, 1 / out_of_fold[["e"]], -1 / (1 - out_of_fold[["e"]]))
+initial_difference <- out_of_fold[["q1"]] - out_of_fold[["q0"]]
+correction <- h_held * (observed - q_received)
+contribution <- initial_difference + correction
 irm_ate <- mean(contribution)
-knitr::kable(data.frame(held_out_fold = 1:5, held_out_n = as.integer(table(fold)),
-                        mean_contribution_pp = 100 * as.numeric(tapply(contribution, fold, mean))),
-             digits = 3)
-stopifnot(abs(irm_ate + 0.048) < 1e-9)
+fold_n <- as.integer(table(fold))
+mean_by_fold <- function(x) as.numeric(tapply(x, fold, mean))
+fold_results <- data.frame(held = as.character(seq_along(fold_n)),
+                           trained = nrow(train) - fold_n, scored = fold_n,
+                           start = mean_by_fold(initial_difference),
+                           correction = mean_by_fold(correction), result = mean_by_fold(contribution))
+pooled <- data.frame(held = "All folds", trained = NA_integer_, scored = sum(fold_n),
+                     start = weighted.mean(fold_results$start, fold_n),
+                     correction = weighted.mean(fold_results$correction, fold_n),
+                     result = weighted.mean(fold_results$result, fold_n))
+report <- rbind(fold_results, pooled)
+knitr::kable(transform(report, start = 100*start, correction = 100*correction,
+                      result = 100*result), digits = c(0, 0, 0, 3, 3, 3),
+             col.names = c("Scored fold", "Trained on", "Scored", "Starting contrast (pp)",
+                           "Mean correction (pp)", "Fold or cohort estimate (pp)"))
+stopifnot(sum(fold_n) == nrow(train),
+          max(abs(report$start + report$correction - report$result)) < 1e-12,
+          abs(pooled$start + 0.048) < 1e-9, abs(pooled$correction) < 1e-9,
+          abs(pooled$result - irm_ate) < 1e-9, abs(irm_ate + 0.048) < 1e-9)
 ```
 
-Take display patient P04, a higher-frailty short recipient who died. The model trained without fold 1 gives `q1 = 0.25`, `q0 = 479/1200` and `e = 0.25`. Her illustrative AIPW contribution is about **2.85083**. This number shows how a recorded death enters the average. Her unobserved outcome under standard stays unknown. The agreement of IRM and TMLE here follows from the empirical within-frailty treatment probabilities and balanced folds. They can give different finite-sample estimates in other data. [Chernozhukov et al., sections 3–5](https://doi.org/10.1111/ectj.12097) · [DoubleML score equations](https://docs.doubleml.org/stable/guide/scores.html)
+In fold 1 the initial difference is −4.633 points, the correction is −0.833 points and the resulting estimate is −5.467 points (rounded). The final row weights each fold by its number of scored records. Every record is scored once. The nonzero fold corrections cancel in this balanced synthetic design, giving **−4.80 points** for all 5,000 patients. Other datasets and nuisance fits can yield a nonzero overall correction and different finite-sample estimates from TMLE. [Chernozhukov et al., sections 3–5](https://doi.org/10.1111/ectj.12097) · [DoubleML score equations](https://docs.doubleml.org/stable/guide/scores.html)
 
 ### A separate partially linear comparison
 
-For partially linear regression (PLR), `m` predicts mortality from frailty alone and `e` predicts schedule from frailty. On each held-out record, subtract each prediction from its observed value. Regress the outcome residual on the treatment residual through zero. Here the propensity is the same within every fold, so this cross-fitted slope exactly matches the ordinary Frisch–Waugh–Lovell (FWL) result from regressing `Y` on `A` and frailty.
+Partially linear regression (PLR) uses two residuals from held-out predictions. Subtract the predicted chance of short from the schedule received and subtract the mortality predicted from frailty alone from the outcome. Pool the outcome-by-treatment residual cross-products across all five folds, and divide once by the pooled squared treatment residuals. In this design each fold has the same fraction treated within each frailty group, so the pooled slope exactly matches the ordinary Frisch–Waugh–Lovell (FWL) result from regressing `Y` on `A` and frailty.
 
 ```{r dml-plr}
 treatment_residual <- arm - out_of_fold[["e"]]
 outcome_residual <- observed - out_of_fold[["m"]]
-num <- sum(treatment_residual * outcome_residual)
-den <- sum(treatment_residual^2)
+cross_products <- tapply(treatment_residual * outcome_residual, fold, sum)
+squared_treatment <- tapply(treatment_residual^2, fold, sum)
+num <- sum(cross_products)
+den <- sum(squared_treatment)
 plr <- num / den
 fwl <- unname(coef(lm(Y ~ A + factor(L), data = train))["A"])
-cohort_n <- as.numeric(table(group))
 overlap_mass <- cohort_n * g_full * (1 - g_full)
 overlap_weight <- overlap_mass / sum(overlap_mass)
 overlap_target <- sum(overlap_weight * (t1 - t0))
-knitr::kable(data.frame(frailty = profile_names, cohort_share = cohort_n / sum(cohort_n),
-                       overlap_mass, overlap_weight, stratum_difference = t1 - t0), digits = 5)
+knitr::kable(data.frame(scored = nrow(train), cross_product = num, squared_treatment = den,
+                       plr = 100*plr, fwl = 100*fwl), digits = c(0, 2, 0, 5, 5),
+             col.names = c("Scored records", "Sum of residual cross-products",
+                           "Sum of squared treatment residuals", "PLR slope (pp)", "OLS / FWL (pp)"))
 stopifnot(abs(num + 43.65) < 1e-9, abs(den - 1005) < 1e-9,
           max(abs(plr - fwl), abs(plr - overlap_target)) < 1e-9,
           abs(plr - irm_ate) > 0.004)
 ```
 
-The residualized slope is −43.65 / 1,005 = −0.0434328, or **−4.34328 percentage points**. With a binary schedule and heterogeneous effects, the partially linear projection weights each frailty group in proportion to its frequency times `e * (1-e)`. The lower-frailty group therefore gets 62.69% of the weight in this projection and 60% in Susan’s all-eligible ATE. TMLE uses its clever covariate to target an outcome regression. Treatment residualization belongs to the PLR calculation. [Why a partially linear model weights overlap](https://docs.doubleml.org/stable/examples/py_double_ml_plm_irm_hetfx.html)
+The residualized slope is −43.65 / 1,005 = −0.0434328, or **−4.34328 percentage points**. With a binary schedule and heterogeneous effects, the partially linear projection weights each frailty group in proportion to its frequency times `e * (1-e)`. The two overlap masses are 630 and 375. The lower-frailty group therefore gets 62.69% of the weight in this projection and 60% in Susan’s all-eligible ATE. TMLE uses its clever covariate to target an outcome regression. Treatment residualization belongs to the PLR calculation. [Why a partially linear model weights overlap](https://docs.doubleml.org/stable/examples/py_double_ml_plm_irm_hetfx.html)
 
 ## What if one schedule is unavailable?
 

@@ -24,11 +24,15 @@ for (let g = 0; g < 2; g++) {
 }
 close(tmle.standardRisk, .296816901995990, 'targeted standard risk');
 close(tmle.shortRisk, .248816901995990, 'targeted short risk');
+close(tmle.standardRisk, tmle.profiles.reduce((sum, p) => sum + p.n * p.q0, 0) / n, 'standardized over both frailty groups');
+close(tmle.shortRisk, tmle.profiles.reduce((sum, p) => sum + p.n * p.q1, 0) / n, 'same group weights under short');
 close(tmle.ate, target, 'TMLE target');
 close(tmle.scoreAfter, 0, 'final mean clever residual');
 
 // The held-out deaths are from deterministic, outcome-blind permutations of the four cell ID ranges.
 const foldDeaths = [[40, 98, 121, 25], [38, 91, 121, 25], [35, 91, 122, 25], [32, 90, 121, 23], [35, 92, 115, 27]];
+const expectedStarts = [-.046333333333333, -.0455, -.047666666666667, -.048142857142857, -.052357142857143];
+const expectedCorrections = [-.008333333333333, -.0125, -.001666666666667, .000714285714286, .021785714285714];
 const expectedFoldMeans = [-.054666666666667, -.058, -.049333333333333, -.047428571428571, -.030571428571429];
 assert.equal(dml.folds.length, 5);
 let scored = 0;
@@ -47,10 +51,22 @@ for (const [k, fold] of dml.folds.entries()) {
     close(p.m, (d0 + d1) / (n0 + n1), 'out-of-fold marginal mortality');
     close(p.e, n1 / (n0 + n1), 'out-of-fold propensity');
   }
+  close(fold.initialDifference, expectedStarts[k], 'held-out mean starting contrast');
+  close(fold.meanCorrection, expectedCorrections[k], 'held-out mean residual correction');
+  close(fold.initialDifference + fold.meanCorrection, fold.ate, 'fold start plus correction');
   close(fold.ate, expectedFoldMeans[k], 'mean held-out uncentered AIPW score');
   scored += fold.holdoutN;
 }
 assert.equal(scored, n);
+for (const [cellIndex, [size, deaths]] of cells.entries()) {
+  assert.equal(dml.folds.reduce((sum, f) => sum + f.holdoutCells[cellIndex].n, 0), size);
+  assert.equal(dml.folds.reduce((sum, f) => sum + f.holdoutCells[cellIndex].deaths, 0), deaths);
+}
+const cohortStart = dml.folds.reduce((sum, f) => sum + f.holdoutN * f.initialDifference, 0) / n;
+const cohortCorrection = dml.folds.reduce((sum, f) => sum + f.holdoutN * f.meanCorrection, 0) / n;
+close(cohortStart, -.048, 'starting contrasts standardized over all scored patients');
+close(cohortCorrection, 0, 'fold corrections cancel in this balanced synthetic example');
+close(dml.ate, cohortStart + cohortCorrection, 'full cohort start plus correction');
 close(dml.ate, target, 'mean cross-fitted AIPW contribution');
 close(dml.plrNumerator, -43.65, 'residual cross-product');
 close(dml.plrDenominator, 1005, 'residual treatment sum of squares');

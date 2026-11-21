@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="only light">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="description" content="Follow six patients through g-computation and the S-, T- and X-learners, then compare TMLE and double machine learning.">
-  <title>Six patients, three learners · Causal Roadmap</title>
+  <meta name="description" content="Compare how S-, T- and X-learners estimate a difference in five-year mortality. Follow six example patients, then see how TMLE and double machine learning use the whole cohort.">
+  <title>Different learners, the same estimate? · Causal Roadmap</title>
   <script>
     // Resolve bookmarks from the earlier single-page tutorial before it paints.
     const oldSection = location.hash.slice(1);
@@ -39,18 +39,18 @@
 
 <main class="frame overview" id="main">
   <header class="intro">
-    <h1>Six patients,<br> <em>three learners</em></h1>
+    <h1>Different learners, <em>the same estimate?</em></h1>
     <p>How would five-year mortality change if everyone eligible for both radiotherapy schedules received the short course instead of the standard course?</p>
-    <p>Susan has one observed outcome for each of six synthetic patients. Follow the same rows through S, T and X, then meet their cousins, TMLE and DML.</p>
-    <a class="start" href="worksheet.html">Open the patient worksheet</a>
-    <p class="design-note">Each approach assumes we measured the relevant confounders and that both schedules were possible for patients with the same frailty.</p>
+    <p>A <strong>learner</strong> fits a pattern in data, such as how mortality risk varies with frailty. An <strong>estimator</strong> is the rule Susan uses to turn her records into a risk difference.</p>
+    <div class="intro-actions"><a class="start" href="worksheet.html">Open the six-patient worksheet</a><a href="guide.html#vocabulary">See the vocabulary</a></div>
+    <p class="design-note">In this synthetic clinic, Susan assumes frailty captures the shared causes of schedule choice and mortality, and either course is possible at each frailty level.</p>
   </header>
 
   <section class="map" id="methods-map" aria-labelledby="map-heading">
     <h2 id="map-heading">A map of the methods</h2>
     <fieldset class="branches">
       <legend class="visually-hidden">Choose a way to estimate the treatment effect</legend>
-      <div class="map-drawing" role="img" aria-label="Six patient rows show standard and short outcomes side by side. Each row has one observed zero or one and one question mark. The same six rows feed all four branches.">
+      <div class="map-drawing" role="img" aria-label="Six illustrative records show one observed outcome under standard or short and one question mark for the other schedule. The four branches show ways to estimate treatment effects in the cohort.">
         <svg class="map-records" viewBox="0 0 100 144" focusable="false" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <!-- These labels, row numbers and question marks are Andy Wilson’s pen strokes from ECA slide 56. -->
@@ -88,7 +88,7 @@
       </div>
       <div class="branch-options">
         <label class="branch"><input type="radio" name="family" value="risk" aria-describedby="note-risk" checked>
-          <span class="branch-label"><strong>Predict both outcomes</strong><span>S-learner · T-learner · g-computation</span></span>
+          <span class="branch-label"><strong>Predict risk under each schedule</strong><span>S-learner · T-learner · g-computation</span></span>
         </label>
         <label class="branch"><input type="radio" name="family" value="effect" aria-describedby="note-effect">
           <span class="branch-label"><strong>Model the effect directly</strong><span>X-learner · R-learner</span></span>
@@ -106,7 +106,7 @@
         <p id="note-risk">S uses one risk model, T uses two. For P04, T predicts <span class="record-cell is-fitted">40%</span> under standard and <span class="record-cell is-fitted">25%</span> under short. Comparing average predicted risks gives the g-computation estimate.</p>
         <p id="note-effect">X reuses T’s fits. P04 died on short, so the signed contrast for this row is <span class="record-cell is-observed">1</span> − <span class="record-cell is-fitted">0.40</span> = +0.60. R learns how the effect varies from treatment and outcome residuals.</p>
         <p id="note-weight">One in four higher-frailty patients received short. Inverse probability weighting gives P04’s observed outcome a weight of <span class="record-label">1 / 0.25 = 4</span> when estimating short-schedule risk for everyone.</p>
-        <p id="note-both">TMLE updates risk predictions before averaging. DML can estimate the same average treatment effect (ATE) by adding weighted prediction errors on held-out records. <a href="cousins.html?patient=P04">Compare them for P04</a>.</p>
+        <p id="note-both">TMLE updates the predicted risks before averaging. DML adds a weighted prediction error to each held-out record’s fitted risk difference, then averages. <a href="cousins.html">Follow both calculations across the 5,000-patient cohort</a>.</p>
       </div>
       <button type="button" class="walk" id="next-branch" hidden>Next branch</button>
       <span id="map-status" class="visually-hidden" role="status"></span>
