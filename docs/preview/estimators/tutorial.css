@@ -49,7 +49,7 @@ p { text-wrap: pretty; }
   .section-nav { gap: 0 7px; width: 100%; justify-content: space-between; }
   .section-nav a { font-size: .94rem; }
 }
-@media (max-width: 365px) {
-  .section-nav { display: grid; grid-template-columns: repeat(3, max-content); justify-content: start; column-gap: 17px; }
+@media (max-width: 450px) {
+  .section-nav { display: grid; grid-template-columns: repeat(3, max-content); justify-content: start; column-gap: 23px; }
 }
 @media print { .site-head, .skip, .ref-skip { display: none; } .frame { width: 100%; } }

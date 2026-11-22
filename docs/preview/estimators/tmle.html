@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="only light">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="What would five-year mortality be if all 5,000 patients in Susan’s synthetic cohort received short-course radiotherapy? What if all received standard? Targeted maximum likelihood estimation starts with a risk prediction under each schedule.">
+  <title>TMLE updates the risks · Causal Roadmap</title>
+  <link rel="stylesheet" href="tutorial.css">
+  <link rel="stylesheet" href="record-figure.css">
+  <link rel="stylesheet" href="cousins.css">
+  <script type="module" src="cousins.mjs"></script>
+</head>
+<body data-method="tmle">
+<a class="skip" href="#main">Skip to the example</a>
+<header class="site-head"><div class="frame head-inner">
+  <a class="site-brand" href="../index.html#estimators">Causal Roadmap</a>
+  <nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html">Worksheet</a><a href="tmle.html" aria-current="page">TMLE</a><a href="dml.html">DML</a><a href="guide.html">Field guide</a><a href="paper.html">Paper</a></nav>
+</div></header>
+<main class="frame cousin-page" id="main">
+  <header class="cousin-heading">
+    <h1>TMLE updates the risks</h1>
+    <p>What would five-year mortality be if all 5,000 patients in Susan’s synthetic cohort received short-course radiotherapy? What if all received standard? Targeted maximum likelihood estimation starts with a risk prediction under each schedule.</p>
+  </header>
+  <noscript><p>Start with the schedule each patient received, then predict again with everyone on short and everyone on standard. A one-coefficient update adjusts the working risks. Averaging them over the same cohort gives a five-year mortality difference of −4.80 percentage points (short minus standard).</p></noscript>
+  <div class="process-book" id="process-book" hidden>
+    <fieldset class="process-stages">
+      <legend class="visually-hidden">Calculation step</legend>
+      <label><input type="radio" name="step" value="1" checked><span><small aria-hidden="true">1</small><b>Predict</b></span></label>
+      <label><input type="radio" name="step" value="2"><span><small aria-hidden="true">2</small><b>Target</b></span></label>
+      <label><input type="radio" name="step" value="3"><span><small aria-hidden="true">3</small><b>Average</b></span></label>
+    </fieldset>
+    <figure class="process-sheet">
+      <figcaption>
+        <h2 id="stage-title">Predict under each schedule</h2>
+        <p id="stage-copy"></p>
+        <a id="profile-comparison" href="worksheet.html?method=t&amp;view=effects&amp;target=ate" hidden>Compare the frailty groups in the worksheet</a>
+      </figcaption>
+      <svg id="cohort-drawing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 278" role="img" focusable="false"></svg>
+    </figure>
+    <details class="process-fold" id="math-disclosure">
+      <summary>Show the math for this step</summary>
+      <div class="fold-copy">
+        <p id="notation"></p>
+        <div id="formula" class="equations"></div>
+        <p id="worked-math"></p>
+        <p id="math-extra"></p>
+      </div>
+    </details>
+    <p class="visually-hidden" role="status" id="process-status"></p>
+  </div>
+
+  <details class="process-fold" id="how-fit">
+    <summary>Teaching notes and sources</summary>
+    <div class="fold-copy">
+      <p>Andy Wilson’s Instats/SSC Module 4 pauses at the g-computation estimate before targeting. It uses the observed schedule to fit the update, then applies that update to both schedule predictions. Here the starting model uses frailty alone so you can see what the update changes.</p>
+      <p><a href="https://doi.org/10.1093/aje/kww165">Schuler and Rose’s worked introduction to TMLE</a></p>
+      <p>A causal interpretation requires comparable groups given frailty, a chance of either schedule in each group, well-defined schedules and complete follow-up. <a href="guide.html#fitting-records">See the counts and assumptions</a>.</p>
+    </div>
+  </details>
+  <footer class="case-links"><a href="analysis.Rmd" download>Download the R workbook</a></footer>
+</main>
+<template id="tmle-math-1">
+  <math aria-label="Starting risk within each frailty group equals its observed death proportion">
+    <msup><mi>Q</mi><mn>0</mn></msup><mo>(</mo><mi>a</mi><mo>,</mo><mi>L</mi><mo>)</mo><mo>=</mo><mover><mi>Pr</mi><mo>^</mo></mover><mo>(</mo><mi>Y</mi><mo>=</mo><mn>1</mn><mo>∣</mo><mi>L</mi><mo>)</mo>
+  </math>
+  <math aria-label="e is the estimated probability of short given frailty">
+    <mi>e</mi><mo>(</mo><mi>L</mi><mo>)</mo><mo>=</mo><mover><mi>Pr</mi><mo>^</mo></mover><mo>(</mo><mi>A</mi><mo>=</mo><mn>1</mn><mo>∣</mo><mi>L</mi><mo>)</mo>
+  </math>
+</template>
+<template id="tmle-math-2">
+  <math aria-label="H equals A over e minus one minus A over one minus e">
+    <mi>H</mi><mo>=</mo><mfrac><mi>A</mi><mi>e</mi></mfrac><mo>−</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>A</mi></mrow><mrow><mn>1</mn><mo>−</mo><mi>e</mi></mrow></mfrac>
+  </math>
+  <math aria-label="Targeted log odds equal starting log odds plus epsilon times H">
+    <mi>logit</mi><mo>(</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo>)</mo><mo>=</mo><mi>logit</mi><mo>(</mo><msup><mi>Q</mi><mn>0</mn></msup><mo>)</mo><mo>+</mo><mi>ε</mi><mi>H</mi>
+  </math>
+</template>
+<template id="tmle-math-3">
+  <math aria-label="Estimated ATE is the cohort mean of targeted short risk minus targeted standard risk">
+    <mover><mi>θ</mi><mo>^</mo></mover><mo>=</mo><mi>mean</mi><mo>[</mo><msubsup><mi>Q</mi><mn>1</mn><mo>∗</mo></msubsup><mo>−</mo><msubsup><mi>Q</mi><mn>0</mn><mo>∗</mo></msubsup><mo>]</mo>
+  </math>
+</template>
+</body>
+</html>

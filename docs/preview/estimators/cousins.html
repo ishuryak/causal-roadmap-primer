@@ -5,135 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="only light">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="description" content="Follow one cohort through the targeted risk updates of TMLE and the training and scoring folds of double machine learning.">
-  <title>TMLE and DML · Causal Roadmap</title>
+  <title>TMLE and DML tutorials · Causal Roadmap</title>
+  <script>
+    // Keep shared links from the former two-method page pointing to the same example.
+    const old = new URL(location.href);
+    let saved = old.searchParams;
+    if (!['method', 'step', 'fold', 'math', 'fwl', 'patient'].some(key => saved.has(key)) && !old.hash) {
+      try {
+        saved = new URLSearchParams(history.state?.estimatorCousins ?? sessionStorage.getItem('causal-roadmap.estimator-cousins.v1') ?? '');
+      } catch { /* The unqualified bookmark defaults to the first lesson. */ }
+    }
+    const method = saved.get('method');
+    const wantsResiduals = method === 'plr' || saved.get('fwl') === '1' || old.hash === '#fwl';
+    const dml = method === 'dml' || (method !== 'tmle' && wantsResiduals);
+    const next = new URL(dml ? 'dml.html' : 'tmle.html', old);
+    for (const key of ['step', 'math', ...(dml ? ['fold'] : [])]) {
+      if (saved.has(key)) next.searchParams.set(key, saved.get(key));
+    }
+    if (old.hash && old.hash !== '#fwl') next.hash = old.hash;
+    else if (dml && wantsResiduals) next.hash = 'fwl';
+    if (dml && wantsResiduals && next.hash !== '#fwl') next.searchParams.set('fwl', '1');
+    location.replace(next.href);
+  </script>
   <link rel="stylesheet" href="tutorial.css">
-  <link rel="stylesheet" href="record-figure.css">
-  <link rel="stylesheet" href="cousins.css">
-  <script type="module" src="cousins.mjs"></script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to the example</a>
-<header class="site-head"><div class="frame head-inner">
-  <a class="site-brand" href="../index.html#estimators">Causal Roadmap</a>
-  <nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html">Worksheet</a><a href="cousins.html" aria-current="page">Cousins</a><a href="guide.html">Field guide</a><a href="paper.html">Paper</a></nav>
-</div></header>
-<main class="frame cousin-page" id="main">
-  <header class="cousin-heading">
-    <h1>TMLE and DML</h1>
-    <p>How would five-year mortality change if all 5,000 patients in Susan’s synthetic cohort received short-course radiotherapy instead of standard? Both methods combine risk predictions with treatment probabilities. TMLE updates the risks. This version of DML corrects the predicted differences.</p>
-  </header>
-  <noscript>
-    <p>Targeted maximum likelihood estimation (TMLE) updates the working risks to estimate the cohort’s five-year risk difference. Short minus standard is −4.80 percentage points. <a href="worksheet.html?method=t&amp;view=effects">Compare mortality within each frailty group</a>.</p>
-    <p>The average treatment effect (ATE) version of double machine learning (DML) fits on four folds. In the fifth, it corrects the predicted difference using observed outcomes. Averaging all 5,000 held-out contributions gives −4.80 percentage points here, the same estimate as TMLE. <a href="analysis.Rmd">Read the calculations in R</a>.</p>
-  </noscript>
-
-  <div class="process-book" id="process-book" hidden>
-    <div class="method-line">
-      <fieldset class="method-choices">
-        <legend class="visually-hidden">Estimation method</legend>
-        <label><input type="radio" name="method" value="tmle" checked><span>TMLE</span></label>
-        <label><input type="radio" name="method" value="dml"><span>DML</span></label>
-      </fieldset>
-      <p id="method-name">Targeted maximum likelihood estimation</p>
-    </div>
-    <fieldset class="process-stages">
-      <legend class="visually-hidden">Calculation step</legend>
-      <label><input type="radio" name="step" value="1" checked><span><small aria-hidden="true">1</small><b id="stage-name-1">Fit</b></span></label>
-      <label><input type="radio" name="step" value="2"><span><small aria-hidden="true">2</small><b id="stage-name-2">Target</b></span></label>
-      <label><input type="radio" name="step" value="3"><span><small aria-hidden="true">3</small><b id="stage-name-3">Average</b></span></label>
-    </fieldset>
-    <figure class="process-sheet">
-      <figcaption>
-        <h2 id="stage-title">Fit the starting risks</h2>
-        <p id="stage-copy"></p>
-        <a id="profile-comparison" href="worksheet.html?method=t&amp;view=effects&amp;target=ate" hidden>Compare the frailty groups in the worksheet</a>
-        <label class="fold-picker" id="fold-control" hidden>Held-out fold
-          <select id="fold-number"><option value="1">Fold 1</option><option value="2">Fold 2</option><option value="3">Fold 3</option><option value="4">Fold 4</option><option value="5">Fold 5</option></select>
-        </label>
-      </figcaption>
-      <svg id="cohort-drawing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 278" role="img" focusable="false"></svg>
-    </figure>
-    <details class="process-fold" id="math-disclosure">
-      <summary>Show the math for this step</summary>
-      <div class="fold-copy">
-        <p id="notation"></p>
-        <div id="formula" class="equations"></div>
-        <p id="worked-math"></p>
-        <p id="math-extra"></p>
-        <p id="sampling-note" hidden>For an illustration of sampling uncertainty, suppose these patients were sampled independently. The standard error of the mean AIPW contribution is 1.34 percentage points, giving a 95% interval from −7.43 to −2.17 points. <a href="analysis.Rmd">Calculation in R</a>.</p>
-      </div>
-    </details>
-    <p class="visually-hidden" role="status" id="process-status"></p>
-  </div>
-
-  <details class="process-fold" id="fwl">
-    <summary>Another DML target · partialling out frailty</summary>
-    <div class="fold-copy">
-      <p><strong>Partially linear regression (PLR).</strong> Predict schedule and mortality separately from frailty, training on the other folds. Subtract each prediction from what happened. Fit one slope relating the two sets of held-out residuals.</p>
-      <p><var>V</var> = observed schedule − predicted chance of short. <var>U</var> = observed death indicator − predicted mortality given frailty alone. The ATE calculation above uses a different outcome residual, from the risk under the schedule actually received.</p>
-      <div class="residual-result">
-        <span>Slope = sum of <var>V</var> × <var>U</var> divided by sum of <var>V</var>²</span>
-        <p class="equation"><span id="residual-ratio">−43.65 ÷ 1,005</span> <span aria-hidden="true">≈</span><span class="visually-hidden"> is approximately </span> <strong id="residual-slope">−0.04343</strong></p>
-      </div>
-      <p>That gives <strong id="residual-points">−4.34 percentage points</strong>. Lower frailty has a +2-point schedule difference and higher frailty a −15-point difference. The ATE counts patients, giving those groups 60% and 40% of the weight. The partial slope weights each group by its size times <var>e</var>(1 − <var>e</var>), where <var>e</var> is its chance of short. Its weights here are <span id="overlap-low">62.69%</span> and <span id="overlap-high">37.31%</span>. In a trial with the same randomization probability in both groups, the two population weightings would coincide.</p>
-      <p><strong>The Frisch–Waugh–Lovell (FWL) connection.</strong> In ordinary least squares, removing the same adjustment variables from schedule and outcome on the same records gives exactly the schedule coefficient from the full regression. Cross-fitting uses different training records. The two slopes happen to agree here because every fold has the same treatment shares within frailty groups. <a href="https://doi.org/10.1016/j.spl.2020.108945">Read the FWL result</a>.</p>
-    </div>
-  </details>
-  <details class="process-fold" id="how-fit">
-    <summary>The fitting records and sources</summary>
-    <div class="fold-copy">
-      <p>Both methods use the same 5,000 synthetic records. There are 3,000 lower-frailty and 2,000 higher-frailty patients. In the DML example, folds are balanced by frailty and schedule. Treatment probabilities and risks are re-estimated within each training set.</p>
-      <p>A causal interpretation requires comparable groups given frailty, a chance of either schedule in each group, well-defined schedules and complete follow-up here. <a href="guide.html#fitting-records">See the counts and assumptions</a>.</p>
-      <p class="source-links"><a href="https://doi.org/10.1093/aje/kww165">Schuler and Rose on TMLE</a><a href="https://doi.org/10.1111/ectj.12097">Chernozhukov et al. on DML, §§4–5</a><a href="https://docs.doubleml.org/stable/guide/scores.html">The DML score equations</a><a href="https://docs.doubleml.org/stable/examples/py_double_ml_plm_irm_hetfx.html">Partial regression with varying effects</a></p>
-    </div>
-  </details>
-  <footer class="case-links"><a href="worksheet.html">Back to the patient worksheet</a><a href="analysis.Rmd" download>Download the R workbook</a></footer>
+<main class="frame">
+  <h1>TMLE and DML</h1>
+  <p><a href="tmle.html">Follow the TMLE risk update</a></p>
+  <p><a href="dml.html">Follow the DML folds</a></p>
 </main>
-<template id="tmle-math-1">
-  <math aria-label="Starting risk within each frailty group equals its observed death proportion">
-    <msup><mi>Q</mi><mn>0</mn></msup><mo>(</mo><mi>a</mi><mo>,</mo><mi>L</mi><mo>)</mo><mo>=</mo><mover><mi>Pr</mi><mo>^</mo></mover><mo>(</mo><mi>Y</mi><mo>=</mo><mn>1</mn><mo>∣</mo><mi>L</mi><mo>)</mo>
-  </math>
-  <math aria-label="e is the estimated probability of short given frailty">
-    <mi>e</mi><mo>(</mo><mi>L</mi><mo>)</mo><mo>=</mo><mover><mi>Pr</mi><mo>^</mo></mover><mo>(</mo><mi>A</mi><mo>=</mo><mn>1</mn><mo>∣</mo><mi>L</mi><mo>)</mo>
-  </math>
-</template>
-<template id="tmle-math-2">
-  <math aria-label="H equals A over e minus one minus A over one minus e">
-    <mi>H</mi><mo>=</mo><mfrac><mi>A</mi><mi>e</mi></mfrac><mo>−</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>A</mi></mrow><mrow><mn>1</mn><mo>−</mo><mi>e</mi></mrow></mfrac>
-  </math>
-  <math aria-label="Targeted log odds equal starting log odds plus epsilon times H">
-    <mi>logit</mi><mo>(</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo>)</mo><mo>=</mo><mi>logit</mi><mo>(</mo><msup><mi>Q</mi><mn>0</mn></msup><mo>)</mo><mo>+</mo><mi>ε</mi><mi>H</mi>
-  </math>
-</template>
-<template id="tmle-math-3">
-  <math aria-label="Estimated ATE is the cohort mean of targeted short risk minus targeted standard risk">
-    <mover><mi>θ</mi><mo>^</mo></mover><mo>=</mo><mi>mean</mi><mo>[</mo><msubsup><mi>Q</mi><mn>1</mn><mo>∗</mo></msubsup><mo>−</mo><msubsup><mi>Q</mi><mn>0</mn><mo>∗</mo></msubsup><mo>]</mo>
-  </math>
-</template>
-<template id="dml-math-1">
-  <math aria-label="q sub a is the fitted risk under schedule a for this record, trained outside fold k">
-    <msub><mi>q</mi><mi>a</mi></msub><mo>=</mo><msubsup><mover><mi>Q</mi><mo>^</mo></mover><mi>a</mi><mrow><mo>(</mo><mo>−</mo><mi>k</mi><mo>)</mo></mrow></msubsup><mo>(</mo><msub><mi>L</mi><mi>i</mi></msub><mo>)</mo>
-  </math>
-  <math aria-label="e is this record’s fitted chance of short, trained outside fold k">
-    <mi>e</mi><mo>=</mo><msup><mover><mi>e</mi><mo>^</mo></mover><mrow><mo>(</mo><mo>−</mo><mi>k</mi><mo>)</mo></mrow></msup><mo>(</mo><msub><mi>L</mi><mi>i</mi></msub><mo>)</mo>
-  </math>
-</template>
-<template id="dml-math-2">
-  <math aria-label="Gamma for one held-out record equals the predicted difference plus H times its observed outcome minus its predicted risk under the received schedule">
-    <msub><mi>Γ</mi><mi>i</mi></msub><mo>=</mo><mo>(</mo><msub><mi>q</mi><mn>1</mn></msub><mo>−</mo><msub><mi>q</mi><mn>0</mn></msub><mo>)</mo><mo>+</mo><mi>H</mi><mo>(</mo><mi>Y</mi><mo>−</mo><msub><mi>q</mi><mi>A</mi></msub><mo>)</mo>
-  </math>
-  <math aria-label="H equals A over e minus one minus A over one minus e">
-    <mi>H</mi><mo>=</mo><mfrac><mi>A</mi><mi>e</mi></mfrac><mo>−</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>A</mi></mrow><mrow><mn>1</mn><mo>−</mo><mi>e</mi></mrow></mfrac>
-  </math>
-</template>
-<template id="dml-math-3">
-  <math aria-label="Estimated ATE equals the mean of the held-out contributions">
-    <mover><mi>θ</mi><mo>^</mo></mover><mo>=</mo><mi>mean</mi><mo>(</mo><msub><mi>Γ</mi><mi>i</mi></msub><mo>)</mo>
-  </math>
-  <math aria-label="The centered score at theta equals the contribution minus theta">
-    <msub><mi>ψ</mi><mi>i</mi></msub><mo>(</mo><mi>θ</mi><mo>)</mo><mo>=</mo><msub><mi>Γ</mi><mi>i</mi></msub><mo>−</mo><mi>θ</mi>
-  </math>
-</template>
 </body>
 </html>

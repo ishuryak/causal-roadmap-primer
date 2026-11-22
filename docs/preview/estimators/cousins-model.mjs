@@ -116,7 +116,19 @@ function fitDml() {
   return {folds, ate, plr: plrNumerator / plrDenominator, plrNumerator, plrDenominator, overlapWeights, overlapTarget};
 }
 
-export const cousins = {n: total, tmle: fitTmle(), dml: fitDml()};
+// Within a frailty group the schedule residual is constant for each arm.
+// The four cell means, weighted by their counts, therefore reproduce the full OLS slope.
+function fitFwl() {
+  const profiles = fitProfiles(cells);
+  const groups = cells.map(({group, a, n, deaths}) => ({
+    group, a, n, v: a - profiles[group].e, u: deaths / n - profiles[group].m
+  }));
+  const crossProduct = groups.reduce((sum, cell) => sum + cell.n * cell.v * cell.u, 0);
+  const sumSquares = groups.reduce((sum, cell) => sum + cell.n * cell.v ** 2, 0);
+  return {groups, slope: crossProduct / sumSquares};
+}
+
+export const cousins = {n: total, tmle: fitTmle(), dml: fitDml(), fwl: fitFwl()};
 
 export function tracePatient({group, a, y}, fold = 1) {
   const selected = cousins.dml.folds[fold - 1];

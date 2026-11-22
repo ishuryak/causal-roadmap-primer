@@ -1,5 +1,5 @@
 import {cousins} from './cousins-model.mjs';
-import {renderDrawing} from './cohort-drawings.mjs';
+import {renderDrawing, renderResidualPlot} from './cohort-drawings.mjs';
 
 const byId = id => document.getElementById(id);
 const format = (value, digits) => value.toFixed(digits).replace('-', '−');
@@ -11,23 +11,19 @@ const tmle = cousins.tmle;
 const dml = cousins.dml;
 const [lower, higher] = tmle.profiles;
 
-const methods = {
-  tmle: {name: 'Targeted maximum likelihood estimation', stages: ['Fit', 'Target', 'Average']},
-  dml: {name: 'Double machine learning for the average treatment effect', stages: ['Split & fit', 'Correct', 'Pool']}
-};
 const stepsTmle = [
   {
-    title: 'Fit the starting risks',
-    copy: 'To make the update visible, Susan deliberately starts with a simple risk model. It uses frailty alone, so both schedules start with the same risk. A second fit gives the chance of short, ' + percent(lower.e, 0) + ' at lower frailty and ' + percent(higher.e, 0) + ' at higher frailty.',
+    title: 'Predict under each schedule',
+    copy: 'Keep each patient’s frailty fixed. Read the risk model under the schedule received, then under short and standard for everyone. Pause at g-computation. With this deliberately simple frailty-only model, the two schedule columns match and the starting difference is zero.',
     notation: 'L is baseline frailty, A is schedule (1 short, 0 standard), and Y is 1 for death by five years. Here the starting risk Q⁰ uses frailty alone.',
     worked: 'For lower frailty, 642 deaths among ' + count(lower.n) + ' records give a starting risk of ' + percent(lower.initial) + '. For higher frailty, 725 deaths among ' + count(higher.n) + ' give ' + percent(higher.initial) + '.',
-    extra: 'Within each group the starting risk is identical for both schedules, so the initial risk difference is zero.'
+    extra: 'The received-schedule prediction is the one we can check against an observed outcome. A separate fit gives the chance of receiving short, ' + percent(lower.e, 0) + ' at lower frailty and ' + percent(higher.e, 0) + ' at higher frailty.'
   },
   {
-    title: 'Update the risks together',
-    copy: 'Compare each outcome with its predicted risk under the schedule received. Weight the error by the inverse chance of that schedule, positive for short and negative for standard. One fitted update makes the signed errors balance across the cohort.',
-    notation: 'A is 1 for short and 0 for standard. If e is the fitted chance of short given frailty, H is positive for short and negative for standard.',
-    worked: 'Fit a logistic regression with the starting log odds as an offset and H as its sole covariate, with no intercept. The fitted coefficient ε is ' + format(tmle.epsilon, 5) + '. The mean of H × (Y − fitted risk) moves from ' + points(tmle.scoreBefore) + ' to 0.00 percentage points. The fitted risk difference moves from 0.00 to ' + points(tmle.ate) + ' points.',
+    title: 'Fit the update on the schedule received',
+    copy: 'Compare observed deaths with the risks predicted for the schedules patients received. Keep those starting predictions fixed and fit one adjustment using the treatment probabilities. Apply it twice, once assuming everyone received standard and once assuming everyone received short.',
+    notation: 'The clever covariate H weights errors by the inverse chance of the schedule received. It is positive for short (A = 1) and negative for standard (A = 0). The offset holds each starting log odds fixed while the data determine one coefficient, ε.',
+    worked: 'A logistic fit with H, the offset and no intercept gives ε = ' + format(tmle.epsilon, 5) + '. The mean of H × (Y − fitted risk) moves from ' + points(tmle.scoreBefore) + ' to 0.00 percentage points. The fitted risk difference moves from 0.00 to ' + points(tmle.ate) + ' points.',
     extra: 'Use that same update under each schedule. At lower frailty the risks become ' + percent(lower.q1) + ' under short and ' + percent(lower.q0) + ' under standard. At higher frailty they become ' + percent(higher.q1) + ' and ' + percent(higher.q0) + '.'
   },
   {
@@ -44,7 +40,7 @@ function dmlStep(step, foldIndex) {
   const foldName = 'Fold ' + fold.id;
   if (step === 1) return {
     title: 'Train on four folds',
-    copy: 'Set aside one of five groups of records. Use the other four to predict mortality under each schedule and the chance of receiving short, given frailty. Apply those fits to the group set aside.',
+    copy: 'Set aside the circled fold. Fit the risk and schedule models on the four checked folds. For the patients in the circled fold, predict mortality under each schedule and the chance of receiving short. Every patient takes one turn outside the training data.',
     notation: 'For a patient i with frailty Lᵢ in fold k, (−k) means fitted outside that fold. The schedule a is 1 for short and 0 for standard.',
     worked: foldName + ' contributes ' + count(fold.holdoutN) + ' held-out records. The other ' + count(fold.trainN) + ' supply both risk predictions and the treatment probability for each of them.',
     extra: 'This is cross-fitting. Every record takes one turn in a held-out fold. This version of DML uses the interactive regression model (IRM), which lets each schedule have its own risk curve.'
@@ -65,42 +61,38 @@ function dmlStep(step, foldIndex) {
     copy: 'Average the 5,000 held-out contributions. Each fold contains 1,000 patients, so its mean gets one-fifth of the weight. The result is about five fewer deaths per 100 patients by five years under short.',
     notation: 'Γᵢ is a patient’s AIPW contribution, and θ is a candidate average treatment effect. Subtract θ from each contribution to get the orthogonal estimating score.',
     worked: 'The fold means are ' + foldMeans + ' percentage points. The mean contribution is ' + points(dml.ate) + ' points (−0.048 on the risk scale). At that estimate the centered scores average to zero.',
-    extra: 'Here DML starts with separate risk fits for the two schedules. Its corrections cancel across the balanced folds. TMLE starts with identical risks, so its update accounts for the whole difference. Either method can use a richer starting fit.'
+    extra: 'This is an orthogonal score. At the true risk and treatment models, a small change to either model has zero first-order effect on the expected score. In these balanced folds the five corrections cancel in the pooled estimate.'
   };
 }
 
-const methodInputs = [...document.querySelectorAll('input[name="method"]')];
+const method = document.body.dataset.method;
 const stepInputs = [...document.querySelectorAll('input[name="step"]')];
 const mathDisclosure = byId('math-disclosure');
 const fwlDisclosure = byId('fwl');
 const foldPicker = byId('fold-number');
-const storageKey = 'causal-roadmap.estimator-cousins.v1';
-const state = {method: 'tmle', step: 1, fold: 1, math: false, fwl: false};
+let step = 1;
+let fold = 1;
 
 function render() {
-  const method = methods[state.method];
-  const showFoldChoice = state.method === 'dml' && state.step < 3;
-  const content = state.method === 'tmle' ? stepsTmle[state.step - 1] : dmlStep(state.step, state.fold - 1);
-  for (const input of methodInputs) input.checked = input.value === state.method;
-  for (const input of stepInputs) input.checked = Number(input.value) === state.step;
-  method.stages.forEach((label, i) => { byId('stage-name-' + (i + 1)).textContent = label; });
-  byId('method-name').textContent = method.name;
+  const hasFoldChoice = method === 'dml' && step < 3;
+  const content = method === 'tmle' ? stepsTmle[step - 1] : dmlStep(step, fold - 1);
+  for (const input of stepInputs) input.checked = Number(input.value) === step;
   byId('stage-title').textContent = content.title;
   byId('stage-copy').textContent = content.copy;
-  byId('profile-comparison').hidden = state.method !== 'tmle' || state.step !== 3;
-  byId('sampling-note').hidden = state.method !== 'dml' || state.step !== 3;
+  if (method === 'tmle') byId('profile-comparison').hidden = step !== 3;
+  if (foldPicker) {
+    byId('fold-control').hidden = !hasFoldChoice;
+    byId('sampling-note').hidden = step !== 3;
+    foldPicker.value = String(fold);
+  }
   byId('notation').textContent = content.notation;
-  const equations = byId(state.method + '-math-' + state.step);
+  const equations = byId(method + '-math-' + step);
   byId('formula').replaceChildren(equations.content.cloneNode(true));
   byId('worked-math').textContent = content.worked;
   byId('math-extra').textContent = content.extra;
-  byId('fold-control').hidden = !showFoldChoice;
-  foldPicker.value = String(state.fold);
-  renderDrawing(byId('cohort-drawing'), state.method, state.step, state.fold - 1);
-  mathDisclosure.open = state.math;
-  fwlDisclosure.open = state.fwl;
-  byId('process-status').textContent = state.method.toUpperCase() + ', step ' + state.step + ' of 3. ' + content.title +
-    (showFoldChoice ? ', fold ' + state.fold : '') + '.';
+  renderDrawing(byId('cohort-drawing'), method, step, fold - 1);
+  byId('process-status').textContent = method.toUpperCase() + ', step ' + step + ' of 3. ' + content.title +
+    (hasFoldChoice ? ', fold ' + fold : '') + '.';
   byId('process-book').hidden = false;
 }
 
@@ -109,65 +101,53 @@ function validChoice(text, count) {
   return Number.isInteger(value) && value >= 1 && value <= count ? value : 1;
 }
 
-function paramsForState() {
-  const params = new URLSearchParams({method: state.method, step: String(state.step)});
-  if (state.method === 'dml') params.set('fold', String(state.fold));
-  if (state.math) params.set('math', '1');
-  if (state.fwl) params.set('fwl', '1');
-  return params;
-}
-
-function remember(writeUrl = true) {
-  const settings = paramsForState();
-  try { sessionStorage.setItem(storageKey, settings.toString()); } catch { /* Optional storage. */ }
+function remember() {
   const url = new URL(location.href);
-  if (writeUrl) {
-    for (const key of ['method', 'step', 'fold', 'patient', 'math', 'fwl']) url.searchParams.delete(key);
-    settings.forEach((value, key) => url.searchParams.set(key, value));
-    if (['#fwl', '#math-disclosure'].includes(url.hash)) url.hash = '';
+  for (const key of ['method', 'step', 'fold', 'math', 'fwl']) url.searchParams.delete(key);
+  if (step !== 1) url.searchParams.set('step', String(step));
+  if (foldPicker && fold !== 1) url.searchParams.set('fold', String(fold));
+  if (url.hash === '#math-disclosure' && !mathDisclosure.open) url.hash = '';
+  if (url.hash === '#fwl' && !fwlDisclosure?.open) url.hash = '';
+  if (mathDisclosure.open && url.hash !== '#math-disclosure') url.searchParams.set('math', '1');
+  if (fwlDisclosure?.open && url.hash !== '#fwl') url.searchParams.set('fwl', '1');
+  if (url.href !== location.href) {
+    try { history.replaceState(history.state, '', url); } catch { /* Interaction also works without history. */ }
   }
-  try { history.replaceState({...history.state, estimatorCousins: settings.toString()}, '', url); } catch { /* Optional history. */ }
 }
 
 function readLocation() {
   const url = new URL(location.href);
-  const explicit = ['method', 'patient', 'step', 'fold', 'math', 'fwl'].some(key => url.searchParams.has(key)) ||
-    ['#fwl', '#math-disclosure'].includes(url.hash);
-  let params = url.searchParams;
-  if (!explicit) {
-    try { params = new URLSearchParams(history.state?.estimatorCousins ?? sessionStorage.getItem(storageKey) ?? ''); }
-    catch { /* Defaults work without storage. */ }
-  }
-  const requestedMethod = params.get('method');
-  state.method = ['dml', 'plr'].includes(requestedMethod) || (url.hash === '#fwl' && requestedMethod !== 'tmle') ? 'dml' : 'tmle';
-  state.step = validChoice(params.get('step'), 3);
-  state.fold = validChoice(params.get('fold'), dml.folds.length);
-  state.math = params.get('math') === '1' || url.hash === '#math-disclosure';
-  state.fwl = requestedMethod === 'plr' || params.get('fwl') === '1' || url.hash === '#fwl';
-  render();
+  step = validChoice(url.searchParams.get('step'), stepInputs.length);
+  fold = foldPicker ? validChoice(url.searchParams.get('fold'), dml.folds.length) : 1;
+  mathDisclosure.open = url.searchParams.get('math') === '1' || url.hash === '#math-disclosure';
+  if (fwlDisclosure) fwlDisclosure.open = url.searchParams.get('fwl') === '1' || url.hash === '#fwl';
   if (url.hash === '#how-fit') byId('how-fit').open = true;
-  remember(false);
+  render();
 }
 
-function change() { render(); remember(); }
-for (const input of methodInputs) input.addEventListener('change', () => {
-  state.method = input.value;
-  state.step = 1;
-  change();
+for (const input of stepInputs) input.addEventListener('change', () => {
+  step = Number(input.value);
+  render();
+  remember();
 });
-for (const input of stepInputs) input.addEventListener('change', () => { state.step = Number(input.value); change(); });
-foldPicker.addEventListener('change', () => { state.fold = Number(foldPicker.value); change(); });
-for (const [element, key] of [[mathDisclosure, 'math'], [fwlDisclosure, 'fwl']]) {
-  element.addEventListener('toggle', () => {
-    if (state[key] !== element.open) { state[key] = element.open; remember(); }
-  });
-}
+foldPicker?.addEventListener('change', () => {
+  fold = Number(foldPicker.value);
+  render();
+  remember();
+});
+mathDisclosure.addEventListener('toggle', remember);
+fwlDisclosure?.addEventListener('toggle', remember);
 window.addEventListener('popstate', readLocation);
 window.addEventListener('hashchange', readLocation);
 window.addEventListener('pageshow', event => { if (event.persisted) readLocation(); });
-byId('residual-ratio').textContent = format(dml.plrNumerator, 2) + ' ÷ ' + count(dml.plrDenominator);
-byId('residual-slope').textContent = format(dml.plr, 5);
-byId('residual-points').textContent = points(dml.plr) + ' percentage points';
-byId('overlap-low').textContent = percent(dml.overlapWeights[0]);
-byId('overlap-high').textContent = percent(dml.overlapWeights[1]);
+if (fwlDisclosure) {
+  byId('residual-ratio').textContent = format(dml.plrNumerator, 2) + ' ÷ ' + count(dml.plrDenominator);
+  byId('residual-slope').textContent = format(dml.plr, 5);
+  byId('residual-points').textContent = points(dml.plr) + ' percentage points';
+  byId('overlap-low').textContent = percent(dml.overlapWeights[0]);
+  byId('overlap-high').textContent = percent(dml.overlapWeights[1]);
+  const plot = byId('residual-plot');
+  renderResidualPlot(plot);
+  plot.closest('figure').hidden = false;
+}
 readLocation();

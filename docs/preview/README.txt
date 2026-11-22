@@ -18,9 +18,12 @@ open the existing self-tests in v2. Artwork attribution remains in the footer.
 
 Step 6 opens “Different learners, the same estimate?” at estimators/index.html.
 In worksheet.html, readers follow six illustrative patients through S-, T- and
-X-learner fits. In cousins.html, readers compare how TMLE and cross-fitted DML
-estimate the average effect for all 5,000 eligible patients. The FWL example
-shows how its partial-regression slope weights the frailty groups.
+X-learner fits. tmle.html follows the received, all-standard and all-short risk
+predictions from Andy Wilson's Instats/SSC Module 4. dml.html uses held-out
+predictions to estimate the same cohort contrast. Its optional residual plot
+adapts PBHLT 7115 Session 7a, “From Partialling Out to Orthogonal Learning”,
+and shows how the partial slope weights the frailty groups. Old cousins.html
+links resolve to the corresponding method, step and fold.
 guide.html#vocabulary defines the estimator terms. The guide includes two
 original pen drawings from Andy Wilson's ECA slides 56 and 60. The complete
 paper has its own page in the same directory.

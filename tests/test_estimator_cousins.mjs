@@ -90,6 +90,14 @@ close(dml.plr, (630 * .02 - 375 * .15) / 1005, 'heterogeneous-effect FWL coeffic
 close(dml.plr, dml.overlapTarget, 'PLR and overlap-weighted risk difference');
 assert.ok(Math.abs(dml.plr - dml.ate) > .004);
 
+const residualPoints = [[-.70, -.014], [.30, .006], [-.25, .0375], [.75, -.1125]];
+for (const [i, cell] of cousins.fwl.groups.entries()) {
+  assert.equal(cell.n, cells[i][0], 'Mark size uses the full cell count');
+  close(cell.v, residualPoints[i][0], 'Schedule residual on the FWL plot');
+  close(cell.u, residualPoints[i][1], 'Mean mortality residual on the FWL plot');
+}
+close(cousins.fwl.slope, -43.65 / 1005, 'Full-data line through the residuals');
+
 const p04 = tracePatient({group: 1, a: 1, y: 1}, 1);
 close(p04.tmle.updated, .318401724085853, 'targeted higher-frailty short risk');
 close(p04.tmle.scoreAfter, 4 * (1 - p04.tmle.updated), 'patient clever residual');

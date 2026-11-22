@@ -60,22 +60,21 @@ function startingRisks() {
   const {profiles} = cousins.tmle;
   const rows = profiles.map((p, i) => {
     const y = 79 + i * 85;
-    return text(8, y, groupNames[i])
-      + people(8, y + 8, 3 - i, .64)
-      + text(54, y + 31, num.format(p.n), {color: green})
-      + text(180, y + 18, percent(p.initial), {size: 24, color: blue, anchor: 'middle', hand: true})
-      + text(243, y + 17, '=', {size: 23, color: purple, anchor: 'middle'})
-      + text(307, y + 18, percent(p.initial), {size: 24, color: blue, anchor: 'middle', hand: true});
+    return text(8, y, groupNames[i]) + people(11, y + 9, 3 - i, .63)
+      + [121, 216, 310].map(x =>
+        text(x, y + 21, percent(p.initial), {size: 22, color: blue, anchor: 'middle', hand: true})
+      ).join('');
   }).join('');
   return {
     title: 'TMLE starts with one risk per frailty group',
-    description: profiles.map((p, i) => `${groupNames[i]} frailty, ${num.format(p.n)} patients. Both schedule predictions start at ${percent(p.initial)}.`).join(' '),
+    description: profiles.map((p, i) => `${groupNames[i]} frailty, ${num.format(p.n)} patients. The received-schedule, all-standard and all-short predictions start at ${percent(p.initial)}.`).join(' '),
     drawing: text(8, 32, 'Frailty')
-      + text(180, 32, 'Standard', {anchor: 'middle'})
-      + text(307, 32, 'Short', {anchor: 'middle'})
+      + text(121, 32, 'Received', {anchor: 'middle'})
+      + text(216, 32, 'Standard', {anchor: 'middle'})
+      + text(310, 32, 'Short', {anchor: 'middle'})
       + stroke('M8 46q76-2 171 0t171-1', lightInk, 1.5)
-      + rows + stroke('M143 210q54 3 116 1t89-2', blue, 1.7)
-      + text(180, 253, 'Same risk under either schedule', {color: purple, anchor: 'middle'})
+      + rows + stroke('M173 207q91 3 173 0', blue, 1.7)
+      + text(180, 249, 'G-computation gives ' + points(cousins.tmle.initialAte) + ' points', {color: purple, anchor: 'middle'})
   };
 }
 
@@ -208,6 +207,38 @@ const drawings = {
   tmle: [startingRisks, targetedRisks, standardizedRisks],
   dml: [crossFitting, correctFold, pooledEstimates]
 };
+
+export function renderResidualPlot(svg) {
+  const {groups, slope} = cousins.fwl;
+  const x = v => 187 + 170 * v;
+  const y = u => 105 - 530 * u;
+  const description = groups.map(cell =>
+    `${groupNames[cell.group]} frailty, ${cell.a ? 'short' : 'standard'}, ${num.format(cell.n)} patients. Schedule residual ${cell.v.toFixed(2)}, mean mortality residual ${points(cell.u)} percentage points.`
+  ).join(' ') + ` Fitted slope ${points(slope)} percentage points per unit schedule residual.`;
+  const yTicks = [-.10, 0, .10].map(u =>
+    stroke(`M44 ${y(u)}H331`, lightInk, 1) + text(37, y(u) + 5, String(Math.round(100 * u)).replace('-', '−'), {size: 17, anchor: 'end'})
+  ).join('');
+  const xTicks = [-.5, 0, .5].map(v =>
+    stroke(`M${x(v)} 176v4`, ink, 1) + text(x(v), 198, String(v).replace('-', '−'), {size: 17, anchor: 'middle'})
+  ).join('');
+  const marks = groups.map(cell => {
+    const area = .23 * cell.n;
+    const color = cell.group ? purple : green;
+    // Circle and square areas share one count scale.
+    if (cell.group) {
+      const side = Math.sqrt(area);
+      return `<rect x="${x(cell.v) - side / 2}" y="${y(cell.u) - side / 2}" width="${side}" height="${side}" fill="#eadfec" stroke="${color}" stroke-width="2"/>`;
+    }
+    return `<circle cx="${x(cell.v)}" cy="${y(cell.u)}" r="${Math.sqrt(area / Math.PI)}" fill="#e1efe3" stroke="${color}" stroke-width="2"/>`;
+  }).join('');
+  const line = stroke(`M${x(-.8)} ${y(slope * -.8)}L${x(.8)} ${y(slope * .8)}`, blue, 2.4);
+  svg.setAttribute('aria-description', description);
+  svg.innerHTML = `<title>Full-cohort partial regression</title><desc>${description}</desc>
+    <g font-family="${labels}" stroke-linecap="round" stroke-linejoin="round">` +
+    text(10, 24, 'Mean mortality residual (points)', {size: 20}) + yTicks +
+    stroke(`M${x(0)} 35V176M44 176H331`, ink, 1.1) + line + marks + xTicks +
+    text(187, 228, 'Schedule residual', {anchor: 'middle'}) + '</g>';
+}
 
 export function renderDrawing(svg, method, step, foldIndex = 0) {
   const draw = drawings[method]?.[step - 1];

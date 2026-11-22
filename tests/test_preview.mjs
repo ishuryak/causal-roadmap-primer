@@ -42,7 +42,7 @@ for(const oldId of [...readFileSync(new URL('../docs/v2/index.html',import.meta.
 const stepSix = html.slice(html.indexOf('id="estimators"'), html.indexOf('id="checks"'));
 assert(stepSix.split('<details')[0].includes('href="estimators/index.html"'), 'The tutorial is visible on the main Step 6 path');
 const overviewFile = new URL('estimators/index.html', file);
-const tutorialPages = ['index.html', 'worksheet.html', 'cousins.html', 'guide.html', 'paper.html'];
+const tutorialPages = ['index.html', 'worksheet.html', 'tmle.html', 'dml.html', 'guide.html', 'paper.html'];
 const pageHtml = name => readFileSync(new URL(name, overviewFile), 'utf8');
 for (const page of tutorialPages) {
   const source = pageHtml(page);
@@ -90,9 +90,37 @@ for (const asset of ['equations-page.webp', 'vendor/pdf.mjs', 'vendor/pdf.worker
 }
 assert(pageHtml('worksheet.html').includes('href="analysis.Rmd"'), 'The worked R notebook is available at the worksheet');
 assert(overview.includes('ink/observed.png') && pageHtml('guide.html').includes('ink/fitted.png'), 'The overview and field guide use the original ECA pen drawings');
-assert(pageHtml('cousins.html').includes('href="analysis.Rmd"'), 'The new estimators link to their reproducible fits');
 assert(overview.includes('guide.html#vocabulary'), 'The introduction connects learners with the estimator vocabulary');
-assert(!pageHtml('cousins.html').includes('id="case-patient"'), 'The process walk-through uses the cohort');
+for (const method of ['tmle', 'dml']) {
+  const lesson = pageHtml(method + '.html');
+  assert(lesson.includes('href="analysis.Rmd"'), 'Both lessons link to the workbook');
+  assert(!lesson.includes('id="case-patient"'), 'The walkthrough uses the cohort');
+  assert.deepEqual([...lesson.matchAll(/<template id="([^"]+)"/g)].map(m => m[1]),
+    [1, 2, 3].map(step => method + '-math-' + step), 'Only the current method owns equations');
+  for (const id of ['fold-control', 'fwl', 'residual-plot', 'sampling-note']) {
+    assert.equal(lesson.includes('id="' + id + '"'), method === 'dml', id + ' belongs exclusively to DML');
+  }
+  assert.equal(lesson.includes('id="profile-comparison"'), method === 'tmle');
+}
+const oldMethodLink = pageHtml('cousins.html').match(/<script>([\s\S]*?)<\/script>/)[1];
+for (const [suffix, stored, expected] of [
+  ['', '', 'tmle.html'],
+  ['', 'method=dml&step=2&fold=3', 'dml.html?step=2&fold=3'],
+  ['?method=dml&step=2&fold=5&math=1', '', 'dml.html?step=2&math=1&fold=5'],
+  ['?method=tmle&step=2&fold=5&fwl=1#fwl', 'method=dml', 'tmle.html?step=2'],
+  ['?method=plr#fwl', '', 'dml.html#fwl'],
+  ['#fwl', '', 'dml.html#fwl'],
+  ['?fwl=1', '', 'dml.html#fwl'],
+  ['?method=dml#how-fit', '', 'dml.html#how-fit'],
+  ['?method=tmle#math-disclosure', '', 'tmle.html#math-disclosure'],
+  ['?method=plr#math-disclosure', '', 'dml.html?fwl=1#math-disclosure']
+]) {
+  const href = new URL('cousins.html' + suffix, 'https://example.org/preview/estimators/');
+  let destination;
+  runInNewContext(oldMethodLink, {URL, URLSearchParams, history: {}, sessionStorage: {getItem: () => stored},
+    location: {href: href.href, replace(value) { destination = value; }}});
+  assert.equal(destination, new URL(expected, href).href, 'Old method link ' + suffix);
+}
 // Exercise the same SVG renderer as the interactive board, including every held-out fold.
 let pooledDrawing;
 for (const method of ['tmle', 'dml']) {
