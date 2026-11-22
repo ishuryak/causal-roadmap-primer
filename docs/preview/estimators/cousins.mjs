@@ -5,6 +5,7 @@ const byId = id => document.getElementById(id);
 const format = (value, digits) => value.toFixed(digits).replace('-', '−');
 const percent = (value, digits = 2) => format(100 * value, digits) + '%';
 const points = (value, digits = 2) => format(100 * value, digits);
+const signedPoints = (value, digits) => (value > 0 ? '+' : '') + points(value, digits);
 const count = value => value.toLocaleString('en-US');
 const tmle = cousins.tmle;
 const dml = cousins.dml;
@@ -17,24 +18,24 @@ const methods = {
 const stepsTmle = [
   {
     title: 'Fit the starting risks',
-    copy: 'Pool both schedules within each frailty group to get its starting mortality risk. A second fit gives the chance of receiving short, ' + percent(lower.e, 0) + ' at lower frailty and ' + percent(higher.e, 0) + ' at higher frailty. The next step uses both fits.',
+    copy: 'To make the update visible, Susan deliberately starts with a simple risk model. It uses frailty alone, so both schedules start with the same risk. A second fit gives the chance of short, ' + percent(lower.e, 0) + ' at lower frailty and ' + percent(higher.e, 0) + ' at higher frailty.',
     notation: 'L is baseline frailty, A is schedule (1 short, 0 standard), and Y is 1 for death by five years. Here the starting risk Q⁰ uses frailty alone.',
     worked: 'For lower frailty, 642 deaths among ' + count(lower.n) + ' records give a starting risk of ' + percent(lower.initial) + '. For higher frailty, 725 deaths among ' + count(higher.n) + ' give ' + percent(higher.initial) + '.',
     extra: 'Within each group the starting risk is identical for both schedules, so the initial risk difference is zero.'
   },
   {
     title: 'Update the risks together',
-    copy: 'Compare deaths with the predicted risk under the schedule received. Use one fitted adjustment to move the two schedules’ risks in opposite directions until the signed prediction errors balance.',
+    copy: 'Compare each outcome with its predicted risk under the schedule received. Weight the error by the inverse chance of that schedule, positive for short and negative for standard. One fitted update makes the signed errors balance across the cohort.',
     notation: 'A is 1 for short and 0 for standard. If e is the fitted chance of short given frailty, H is positive for short and negative for standard.',
-    worked: 'Fit a logistic regression with the starting log odds as an offset and H as its sole covariate, with no intercept. The fitted coefficient ε is ' + format(tmle.epsilon, 5) + '. The mean of H × (Y − fitted risk) moves from ' + format(tmle.scoreBefore, 3) + ' to zero on the risk scale.',
+    worked: 'Fit a logistic regression with the starting log odds as an offset and H as its sole covariate, with no intercept. The fitted coefficient ε is ' + format(tmle.epsilon, 5) + '. The mean of H × (Y − fitted risk) moves from ' + points(tmle.scoreBefore) + ' to 0.00 percentage points. The fitted risk difference moves from 0.00 to ' + points(tmle.ate) + ' points.',
     extra: 'Use that same update under each schedule. At lower frailty the risks become ' + percent(lower.q1) + ' under short and ' + percent(lower.q0) + ' under standard. At higher frailty they become ' + percent(higher.q1) + ' and ' + percent(higher.q0) + '.'
   },
   {
     title: 'Average over the same cohort',
-    copy: 'Predict both schedules using the same mix of frailty. In this cohort, the difference between the two averages translates to about five fewer deaths per 100 people by five years under the short course.',
+    copy: 'Average the working risks for each schedule, then subtract. This update targets just the cohort difference, about five fewer deaths per 100 patients by five years under short. At lower frailty, the working risks even point in the opposite direction from the observed group contrast.',
     notation: 'Q₁* is the targeted short-course risk and Q₀* the targeted standard-course risk for the same frailty profile.',
     worked: 'For short, 0.60 × ' + percent(lower.q1) + ' + 0.40 × ' + percent(higher.q1) + ' ≈ ' + percent(tmle.shortRisk) + '. For standard, 0.60 × ' + percent(lower.q0) + ' + 0.40 × ' + percent(higher.q0) + ' ≈ ' + percent(tmle.standardRisk) + '. Their difference is ' + points(tmle.ate) + ' percentage points.',
-    extra: 'This update targets the risk difference. The T-learner reaches the same difference from a different pair of risks, 23.20% under short and 28.00% under standard.'
+    extra: 'The update targets the cohort risk difference. At lower frailty its contrast is ' + points(lower.q1 - lower.q0) + ' points, while the T-learner gives +2.00 there. Both give −4.80 points when averaged over the full cohort.'
   }
 ];
 
@@ -52,19 +53,19 @@ function dmlStep(step, foldIndex) {
     const lowerStandard = fold.holdoutCells.find(cell => cell.group === 0 && cell.a === 0);
     return {
       title: 'Correct the held-out predictions',
-      copy: 'Start with the predicted risk difference. Compare each held-out outcome with its prediction under the schedule received. A less likely schedule gives that error more weight. Add the correction for short and subtract it for standard.',
+      copy: 'Start with short risk minus standard risk. Take each held-out outcome minus its predicted risk under the schedule received, and divide that error by the chance of receiving that schedule. Add this term for short and subtract it for standard.',
       notation: 'Y is 1 for death by five years. A is 1 for short and 0 for standard. The other folds supply q₁ and q₀, this patient’s two predicted risks, and e, the fitted chance of short. The residual uses the risk for the schedule received.',
-      worked: 'Γᵢ is one record’s augmented inverse probability weighted (AIPW) contribution. In ' + foldName.toLowerCase() + ', the predicted difference averages ' + points(fold.initialDifference, 3) + ' points and the correction averages ' + points(fold.meanCorrection, 3) + ' points. Using unrounded values gives ' + points(fold.ate, 3) + ' points.',
+      worked: 'Γᵢ is one record’s augmented inverse probability weighted (AIPW) contribution to the average. It can exceed the range of an individual risk difference. In ' + foldName.toLowerCase() + ', the predicted difference averages ' + points(fold.initialDifference, 3) + ' points and the correction averages ' + signedPoints(fold.meanCorrection, 3) + ' points. Using unrounded values gives ' + points(fold.ate, 3) + ' points.',
       extra: 'For example, ' + lowerStandard.deaths + ' of ' + lowerStandard.n + ' lower-frailty patients on standard died in this fold (' + percent(lowerStandard.deaths / lowerStandard.n) + '). The other folds predicted ' + percent(fold.profiles[0].q0) + '. Standard-course errors enter the contrast with a minus sign.'
     };
   }
   const foldMeans = dml.folds.map(item => points(item.ate, 3)).join(', ');
   return {
     title: 'Pool the five held-out folds',
-    copy: 'Every patient now has one held-out contribution. Average all 5,000 to estimate the cohort’s risk difference. The five folds each contain 1,000 patients, so their means get equal weight here.',
+    copy: 'Average the 5,000 held-out contributions. Each fold contains 1,000 patients, so its mean gets one-fifth of the weight. The result is about five fewer deaths per 100 patients by five years under short.',
     notation: 'Γᵢ is a patient’s AIPW contribution, and θ is a candidate average treatment effect. Subtract θ from each contribution to get the orthogonal estimating score.',
     worked: 'The fold means are ' + foldMeans + ' percentage points. The mean contribution is ' + points(dml.ate) + ' points (−0.048 on the risk scale). At that estimate the centered scores average to zero.',
-    extra: 'The corrections cancel across these balanced folds. That cancellation and the exact agreement with TMLE are features of this example.'
+    extra: 'Here DML starts with separate risk fits for the two schedules. Its corrections cancel across the balanced folds. TMLE starts with identical risks, so its update accounts for the whole difference. Either method can use a richer starting fit.'
   };
 }
 
@@ -86,6 +87,8 @@ function render() {
   byId('method-name').textContent = method.name;
   byId('stage-title').textContent = content.title;
   byId('stage-copy').textContent = content.copy;
+  byId('profile-comparison').hidden = state.method !== 'tmle' || state.step !== 3;
+  byId('sampling-note').hidden = state.method !== 'dml' || state.step !== 3;
   byId('notation').textContent = content.notation;
   const equations = byId(state.method + '-math-' + state.step);
   byId('formula').replaceChildren(equations.content.cloneNode(true));

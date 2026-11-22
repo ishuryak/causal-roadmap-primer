@@ -10,9 +10,13 @@ const labels = "system-ui, 'Segoe UI', Arial, sans-serif";
 const num = new Intl.NumberFormat('en-US');
 
 const percent = value => (100 * value).toFixed(2) + '%';
-const points = value => (value < 0 ? '−' : value > 0 ? '+' : '') + (100 * Math.abs(value)).toFixed(2);
 const proportion = value => (100 * value).toFixed(0) + '%';
 const groupNames = ['Lower', 'Higher'];
+
+function points(value) {
+  const magnitude = (100 * Math.abs(value)).toFixed(2);
+  return magnitude === '0.00' ? magnitude : (value < 0 ? '−' : '+') + magnitude;
+}
 
 function text(x, y, words, {size = 20, color = ink, anchor = 'start', hand = false} = {}) {
   const font = hand ? ` font-family="${pen}"` : '';
@@ -76,9 +80,9 @@ function startingRisks() {
 }
 
 function targetedRisks() {
-  const {profiles, scoreBefore, scoreAfter} = cousins.tmle;
+  const {profiles, scoreBefore, scoreAfter, initialAte, ate} = cousins.tmle;
   const rows = profiles.map((p, i) => {
-    const y = 80 + i * 80;
+    const y = 77 + i * 72;
     const fork = stroke(`M127 ${y + 4}q15 0 30-14m-6 0 7-1-2 6M127 ${y + 4}q12 1 30 23m-6-2 7 3-1-7`);
     return text(8, y - 6, groupNames[i] + ' frailty')
       + text(12, y + 24, percent(p.initial), {size: 25, color: blue, hand: true})
@@ -88,18 +92,20 @@ function targetedRisks() {
       + text(166, y + 32, percent(p.q1), {size: 23, color: blue, hand: true})
       + text(269, y + 32, 'short');
   }).join('');
-  const scoreValue = score => (score < 0 ? '−' : '') + Math.abs(score).toFixed(3);
+  const change = (y, label, before, after, color) => text(6, y, label)
+    + text(235, y, points(before), {size: 23, color: purple, anchor: 'end', hand: true})
+    + straightArrow(246, y - 7, 22)
+    + text(350, y, points(after), {size: 23, color, anchor: 'end', hand: true});
   return {
-    title: 'A signed update changes both schedule risks',
-    description: profiles.map((p, i) => `${groupNames[i]} frailty starts at ${percent(p.initial)}. The targeted standard risk is ${percent(p.q0)} and the short risk is ${percent(p.q1)}.`).join(' ')
-      + ` The cohort mean weighted error moves from ${scoreValue(scoreBefore)} to ${scoreValue(scoreAfter)}.`,
-    drawing: text(8, 30, 'Starting risk') + text(166, 30, 'Updated risk')
+    title: 'Update the working risks for the cohort risk difference',
+    description: profiles.map((p, i) => `${groupNames[i]} frailty starts at ${percent(p.initial)}. After targeting, the working risks are ${percent(p.q0)} for standard and ${percent(p.q1)} for short.`).join(' ')
+      + ` In percentage points, the cohort mean weighted error moves from ${points(scoreBefore)} to ${points(scoreAfter)}. The cohort risk difference, short minus standard, moves from ${points(initialAte)} to ${points(ate)}.`,
+    drawing: text(8, 30, 'Starting risk') + text(166, 30, 'Working risks')
       + stroke('M8 41q72-2 160 0t182 0', lightInk, 1.5)
-      + rows + stroke('M8 208q95 2 168 0t174 0', lightInk, 1.5)
-      + text(180, 235, 'Mean weighted error', {anchor: 'middle'})
-      + text(137, 264, scoreValue(scoreBefore), {size: 24, color: purple, anchor: 'end', hand: true})
-      + straightArrow(155, 255, 48)
-      + text(222, 264, scoreValue(scoreAfter), {size: 24, color: green, hand: true})
+      + rows + stroke('M8 194q95 2 168 0t174 0', lightInk, 1.5)
+      + text(180, 217, 'Cohort · percentage points', {anchor: 'middle'})
+      + change(243, 'Weighted error', scoreBefore, scoreAfter, green)
+      + change(269, 'Risk difference', initialAte, ate, purple)
   };
 }
 
@@ -114,11 +120,12 @@ function standardizedRisks() {
       + text(305, y + 14, percent(p.q1), {size: 24, color: blue, anchor: 'middle', hand: true});
   }).join('');
   return {
-    title: 'TMLE averages the targeted risks over the same clinic population',
-    description: `Both schedules use ${weights[0]} lower-frailty and ${weights[1]} higher-frailty patients. The standard risk is ${percent(standardRisk)} and the short risk is ${percent(shortRisk)}. Short minus standard is ${points(ate)} percentage points.`,
-    drawing: text(8, 30, 'Frailty mix') + text(180, 30, 'Standard', {anchor: 'middle'})
-      + text(305, 30, 'Short', {anchor: 'middle'})
-      + stroke('M8 43q84-2 171 0t171-1', lightInk, 1.5) + rows
+    title: 'TMLE averages the working risks over the same clinic population',
+    description: `For each schedule, average the working risks using ${weights[0]} lower-frailty and ${weights[1]} higher-frailty patients. The cohort-average working risks are ${percent(standardRisk)} for standard and ${percent(shortRisk)} for short. Short minus standard is ${points(ate)} percentage points.`,
+    drawing: text(241, 21, 'Working risks', {anchor: 'middle'})
+      + text(8, 45, 'Frailty mix') + text(180, 45, 'Standard', {anchor: 'middle'})
+      + text(305, 45, 'Short', {anchor: 'middle'})
+      + stroke('M8 54q84-2 171 0t171-1', lightInk, 1.5) + rows
       + stroke('M8 171q86 2 177 0t165 0', lightInk, 1.5)
       + text(8, 199, 'Average')
       + text(180, 200, percent(standardRisk), {size: 26, color: blue, anchor: 'middle', hand: true})

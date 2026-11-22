@@ -188,15 +188,18 @@ tmle_ate <- mean(qstar1[group] - qstar0[group])
 score_before <- mean(H * (observed - q_initial[group]))
 score_after <- mean(H * (observed - qstar_obs))
 cohort_n <- as.numeric(table(group))
+working_difference <- qstar1 - qstar0
+group_error <- as.numeric(tapply(H * (observed - qstar_obs), group, mean))
 knitr::kable(data.frame(profile_names, cohort_n, 100*g_full, 100*q_initial,
-                       100*qstar0, 100*qstar1), digits = 3,
+                       100*qstar0, 100*qstar1, 100*working_difference), digits = 2,
              col.names = c("Frailty", "Patients", "Received short (%)", "Starting risk (%)",
-                           "Updated standard (%)", "Updated short (%)"))
+                           "Updated standard (%)", "Updated short (%)", "Difference (pp)"))
 stopifnot(abs(epsilon + 0.049149193627) < 1e-9, abs(score_before + 0.048) < 1e-9,
-          abs(score_after) < 1e-9, abs(tmle_ate + 0.048) < 1e-9)
+          abs(score_after) < 1e-9, abs(tmle_ate + 0.048) < 1e-9,
+          max(abs((t1 - t0) - working_difference - group_error)) < 1e-8)
 ```
 
-The fitted coefficient is −0.049149. Check its effect in two ways. First, take the cohort mean of `H * (observed - fitted risk)` under the schedule actually received. It moves from **−0.048 to zero**. Second, average the updated risks under each schedule using the same 60% lower-frailty and 40% higher-frailty mix.
+The fitted coefficient is −0.049149. Across the cohort, the mean weighted prediction error `H × (Y − fitted risk)` under the received schedule moves from **−4.80 to 0.00 percentage points**. Within the two frailty groups the remaining errors are +6.04 and −9.06 points. They cancel with the cohort’s 60% and 40% weights.
 
 ```{r targeting-summary}
 starting_risk <- weighted.mean(q_initial, cohort_n)
@@ -206,14 +209,14 @@ knitr::kable(data.frame(step = c("Before update", "After update"),
                        standard = 100*c(starting_risk, tmle_standard),
                        short = 100*c(starting_risk, tmle_short),
                        difference = 100*c(0, tmle_short - tmle_standard),
-                       score = c(score_before, score_after)), digits = c(0, 5, 5, 2, 3),
+                       score = 100*c(score_before, score_after)), digits = c(0, 5, 5, 2, 2),
              col.names = c("Cohort fit", "Standard mortality (%)", "Short mortality (%)",
-                           "Difference (points)", "Mean H × residual"))
+                           "Difference (pp)", "Mean H × residual (pp)"))
 stopifnot(abs(starting_risk - 0.2734) < 1e-9,
           abs(tmle_short - tmle_standard - tmle_ate) < 1e-9)
 ```
 
-The two standardized risks are **24.88169% on short and 29.68169% on standard**, a difference of **−4.80 points**. This update targets the difference. S and T give the same difference here with different standardized risks, 23.20% on short and 28.00% on standard. [Schuler and Rose on TMLE for observational data](https://doi.org/10.1093/aje/kww165) · [Balzer, Petersen and van der Laan on targeting a difference](https://doi.org/10.1002/sim.6965)
+Averaging the updated risks gives **24.88169% on short and 29.68169% on standard**, a difference of **−4.80 points**. S and T reach the same difference from 23.20% on short and 28.00% on standard. This TMLE targets the cohort ATE alone. Its working risk differences are −4.04 points at lower frailty and −5.94 at higher frailty. The observed cell risks give +2 and −15 points, respectively. At lower frailty, even the sign differs. [Schuler and Rose on TMLE for observational data](https://doi.org/10.1093/aje/kww165) · [Balzer, Petersen and van der Laan on targeting a difference](https://doi.org/10.1002/sim.6965)
 
 ### Cross-fitted AIPW for the all-eligible ATE
 
@@ -282,6 +285,36 @@ stopifnot(sum(fold_n) == nrow(train), abs(mean(irm_score)) < 1e-12,
 ```
 
 In fold 1 the initial difference is −4.633 points, the correction is −0.833 points and the resulting estimate is −5.467 points (rounded). The final row weights each fold by its number of scored records. Every record is scored once. The nonzero fold corrections cancel in this balanced synthetic design, giving **−4.80 points** for all 5,000 patients. Other datasets and nuisance fits can yield a nonzero overall correction and different finite-sample estimates from TMLE. [Chernozhukov et al., sections 3–5](https://doi.org/10.1111/ectj.12097) · [DoubleML score equations](https://docs.doubleml.org/stable/guide/scores.html)
+
+#### How much would the AIPW estimate vary across samples?
+
+Imagine repeatedly sampling 5,000 independent patients from the same eligible population, with the frailty mix free to vary. For this sampling question, estimate the AIPW standard error from the spread of the 5,000 held-out contributions. A normal approximation gives a 95% confidence interval for the population ATE. The synthetic counts in the worksheet itself are fixed.
+
+```{r aipw-uncertainty}
+n_patients <- length(contribution)
+iid_se <- sd(contribution) / sqrt(n_patients)
+iid_interval <- irm_ate + c(-1, 1) * qnorm(0.975) * iid_se
+
+# Independent check using the four observed death risks.
+cell_counts <- xtabs(patients ~ L + A, data = cells)
+cell_risks <- xtabs(deaths ~ L + A, data = cells) / cell_counts
+q0 <- cell_risks[, "0"]
+q1 <- cell_risks[, "1"]
+profile_n <- rowSums(cell_counts)
+prop_short <- cell_counts[, "1"] / profile_n
+cell_ate <- weighted.mean(q1 - q0, profile_n)
+within_group <- q1*(1 - q1)/prop_short + q0*(1 - q0)/(1 - prop_short)
+between_groups <- (q1 - q0 - cell_ate)^2
+# Use the same sample-variance convention as sd() above.
+cell_se <- sqrt(weighted.mean(within_group + between_groups, profile_n) / (sum(profile_n) - 1))
+
+round(100 * c(AIPW_SE = iid_se, lower_95 = iid_interval[1],
+              upper_95 = iid_interval[2], four_cell_SE = cell_se), 4)
+stopifnot(abs(cell_ate - irm_ate) < 1e-12,
+          abs(iid_se - 0.0134352252592) < 1e-10, abs(cell_se - 0.0134328117289) < 1e-10)
+```
+
+For AIPW the SE is **1.34 percentage points**, giving **−4.80 points (95% CI −7.43 to −2.17)**. The four-cell check combines variation in outcomes within frailty groups and variation in the effect across groups. Using the same sample-variance convention, it gives 1.34328 points, close to 1.34352 from the held-out fits. [DoubleML on score-based confidence intervals](https://docs.doubleml.org/stable/guide/se_confint.html)
 
 ### Partially linear DML for a residual slope
 

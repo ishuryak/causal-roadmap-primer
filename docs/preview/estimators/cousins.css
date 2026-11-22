@@ -29,6 +29,7 @@
 .process-sheet figcaption { grid-area: caption; }
 .process-sheet h2 { font-size: clamp(1.45rem, 2.5vw, 2rem); margin: 0 0 7px; }
 .process-sheet figcaption > p { margin: 0; max-width: 43ch; }
+#profile-comparison { display: inline-block; margin-top: .45rem; font-size: .94rem; }
 .fold-picker { display: flex; align-items: center; gap: 9px; width: fit-content; margin-top: 14px; color: var(--secondary); font-size: .93rem; }
 .fold-picker select { min-height: 42px; padding: 4px 8px; border: 1px solid #9eaca7; border-radius: 3px; background: white; color: var(--ink); }
 .process-fold { border-block-start: 1px solid var(--rule); scroll-margin-top: 12px; }

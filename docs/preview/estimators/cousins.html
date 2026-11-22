@@ -21,10 +21,10 @@
 <main class="frame cousin-page" id="main">
   <header class="cousin-heading">
     <h1>TMLE and DML</h1>
-    <p>Susan asks how five-year mortality would change if all 5,000 patients in her synthetic cohort received the short course of radiotherapy instead of the standard course. Both calculations estimate that average difference, short minus standard.</p>
+    <p>How would five-year mortality change if all 5,000 patients in Susan’s synthetic cohort received short-course radiotherapy instead of standard? Both methods combine risk predictions with treatment probabilities. TMLE updates the risks. This version of DML corrects the predicted differences.</p>
   </header>
   <noscript>
-    <p>Targeted maximum likelihood estimation (TMLE) fits initial risks and treatment probabilities, updates the risks, then averages over the cohort. The predicted mortality is 24.88% under short and 29.68% under standard.</p>
+    <p>Targeted maximum likelihood estimation (TMLE) updates the working risks to estimate the cohort’s five-year risk difference. Short minus standard is −4.80 percentage points. <a href="worksheet.html?method=t&amp;view=effects">Compare mortality within each frailty group</a>.</p>
     <p>The average treatment effect (ATE) version of double machine learning (DML) fits on four folds. In the fifth, it corrects the predicted difference using observed outcomes. Averaging all 5,000 held-out contributions gives −4.80 percentage points here, the same estimate as TMLE. <a href="analysis.Rmd">Read the calculations in R</a>.</p>
   </noscript>
 
@@ -47,6 +47,7 @@
       <figcaption>
         <h2 id="stage-title">Fit the starting risks</h2>
         <p id="stage-copy"></p>
+        <a id="profile-comparison" href="worksheet.html?method=t&amp;view=effects&amp;target=ate" hidden>Compare the frailty groups in the worksheet</a>
         <label class="fold-picker" id="fold-control" hidden>Held-out fold
           <select id="fold-number"><option value="1">Fold 1</option><option value="2">Fold 2</option><option value="3">Fold 3</option><option value="4">Fold 4</option><option value="5">Fold 5</option></select>
         </label>
@@ -60,6 +61,7 @@
         <div id="formula" class="equations"></div>
         <p id="worked-math"></p>
         <p id="math-extra"></p>
+        <p id="sampling-note" hidden>For an illustration of sampling uncertainty, suppose these patients were sampled independently. The standard error of the mean AIPW contribution is 1.34 percentage points, giving a 95% interval from −7.43 to −2.17 points. <a href="analysis.Rmd">Calculation in R</a>.</p>
       </div>
     </details>
     <p class="visually-hidden" role="status" id="process-status"></p>
@@ -74,7 +76,7 @@
         <span>Slope = sum of <var>V</var> × <var>U</var> divided by sum of <var>V</var>²</span>
         <p class="equation"><span id="residual-ratio">−43.65 ÷ 1,005</span> <span aria-hidden="true">≈</span><span class="visually-hidden"> is approximately </span> <strong id="residual-slope">−0.04343</strong></p>
       </div>
-      <p>That gives <strong id="residual-points">−4.34 percentage points</strong>. Lower frailty has a +2-point schedule difference and higher frailty a −15-point difference. The ATE counts patients, giving those groups 60% and 40% of the weight. The partial slope weights each group by its size times <var>e</var>(1 − <var>e</var>), where <var>e</var> is its chance of short. Its weights here are <span id="overlap-low">62.69%</span> and <span id="overlap-high">37.31%</span>.</p>
+      <p>That gives <strong id="residual-points">−4.34 percentage points</strong>. Lower frailty has a +2-point schedule difference and higher frailty a −15-point difference. The ATE counts patients, giving those groups 60% and 40% of the weight. The partial slope weights each group by its size times <var>e</var>(1 − <var>e</var>), where <var>e</var> is its chance of short. Its weights here are <span id="overlap-low">62.69%</span> and <span id="overlap-high">37.31%</span>. In a trial with the same randomization probability in both groups, the two population weightings would coincide.</p>
       <p><strong>The Frisch–Waugh–Lovell (FWL) connection.</strong> In ordinary least squares, removing the same adjustment variables from schedule and outcome on the same records gives exactly the schedule coefficient from the full regression. Cross-fitting uses different training records. The two slopes happen to agree here because every fold has the same treatment shares within frailty groups. <a href="https://doi.org/10.1016/j.spl.2020.108945">Read the FWL result</a>.</p>
     </div>
   </details>

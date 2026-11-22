@@ -52,9 +52,9 @@
               <div><dt>Base learner</dt><dd>An algorithm that fits a pattern to data. For example, logistic regression can estimate mortality risk from frailty.</dd></div>
               <div><dt>Meta-learner</dt><dd>A rule for putting those fits together. The T-learner fits one risk model per schedule. By subtracting the two risks at a given frailty, T is itself an estimator of that group’s risk difference.</dd></div>
               <div><dt>Estimator</dt><dd>The rule for calculating a particular quantity from data. To estimate the clinic-wide difference, Susan predicts both risks for every eligible patient using T, subtracts standard from short, then averages.</dd></div>
-              <div><dt>Estimate</dt><dd>The number the rule gives for these records. Average mortality risk is 23.2% under short and 28.0% under standard, a difference of <strong>−4.80 percentage points</strong>.</dd></div>
+              <div><dt>Estimate</dt><dd>The number the rule gives for these records. With the T-learner, average mortality risk is 23.2% under short and 28.0% under standard, a difference of <strong>−4.80 percentage points</strong>.</dd></div>
             </dl>
-            <p><strong>When do the estimates agree?</strong> Here S with a schedule-by-frailty interaction, T and X all give +2 points at lower frailty and −15 at higher frailty. Averaging over the same patients gives the same −4.80 points. If S shares a frailty slope across schedules, its estimate for the same clinic changes to −4.38 points.</p>
+            <p><strong>Why do the estimates agree here?</strong> Frailty has just two levels and the fits can recover a separate risk in every schedule-by-frailty group. The fully interacted S, T and X estimates are +2 points at lower frailty and −15 at higher frailty. Averaging over the same patients gives −4.80 points. If S shares a frailty slope across schedules, the estimate changes to −4.38 points.</p>
             <p class="reference-links"><a href="worksheet.html?method=s&amp;view=effects&amp;target=ate&amp;slope=shared">Try the shared slope in the worksheet</a></p>
           </div>
         </details>
