@@ -21,11 +21,11 @@
 <main class="frame cousin-page" id="main">
   <header class="cousin-heading">
     <h1>TMLE and DML</h1>
-    <p>Susan has 5,000 synthetic records. How would five-year mortality change if everyone received the short course of radiotherapy instead of the standard course? Follow the cohort through each calculation.</p>
+    <p>Susan asks how five-year mortality would change if all 5,000 patients in her synthetic cohort received the short course of radiotherapy instead of the standard course. Both calculations estimate that average difference, short minus standard.</p>
   </header>
   <noscript>
     <p>Targeted maximum likelihood estimation (TMLE) fits initial risks and treatment probabilities, updates the risks, then averages over the cohort. The predicted mortality is 24.88% under short and 29.68% under standard.</p>
-    <p>Double machine learning (DML) trains on four folds, scores the fifth and repeats until all five folds contribute. Both procedures estimate a difference of −4.80 percentage points in this example. <a href="analysis.Rmd">Read the calculations in R</a>.</p>
+    <p>The average treatment effect (ATE) version of double machine learning (DML) fits on four folds. In the fifth, it corrects the predicted difference using observed outcomes. Averaging all 5,000 held-out contributions gives −4.80 percentage points here, the same estimate as TMLE. <a href="analysis.Rmd">Read the calculations in R</a>.</p>
   </noscript>
 
   <div class="process-book" id="process-book" hidden>
@@ -44,7 +44,6 @@
       <label><input type="radio" name="step" value="3"><span><small aria-hidden="true">3</small><b id="stage-name-3">Average</b></span></label>
     </fieldset>
     <figure class="process-sheet">
-      <svg id="cohort-drawing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 284" role="img" focusable="false"></svg>
       <figcaption>
         <h2 id="stage-title">Fit the starting risks</h2>
         <p id="stage-copy"></p>
@@ -52,11 +51,13 @@
           <select id="fold-number"><option value="1">Fold 1</option><option value="2">Fold 2</option><option value="3">Fold 3</option><option value="4">Fold 4</option><option value="5">Fold 5</option></select>
         </label>
       </figcaption>
+      <svg id="cohort-drawing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 278" role="img" focusable="false"></svg>
     </figure>
     <details class="process-fold" id="math-disclosure">
       <summary>Show the math for this step</summary>
       <div class="fold-copy">
-        <p id="formula" class="equation"></p>
+        <p id="notation"></p>
+        <div id="formula" class="equations"></div>
         <p id="worked-math"></p>
         <p id="math-extra"></p>
       </div>
@@ -65,15 +66,16 @@
   </div>
 
   <details class="process-fold" id="fwl">
-    <summary>Partialling out frailty · Frisch–Waugh–Lovell</summary>
+    <summary>Another DML target · partialling out frailty</summary>
     <div class="fold-copy">
-      <p>Regress schedule on frailty and keep the residuals. Do the same for mortality. Then regress the mortality residuals on the schedule residuals. Frisch–Waugh–Lovell tells us that this slope equals the schedule coefficient from the full least-squares regression, using the same rows and adjustment variables.</p>
-      <p>Partially linear DML uses predictions from the other folds to remove the part of schedule and mortality predicted by frailty. Collect the two residuals for every held-out record, then fit one slope across all 5,000 pairs.</p>
+      <p><strong>Partially linear regression (PLR).</strong> Predict schedule and mortality separately from frailty, training on the other folds. Subtract each prediction from what happened. Fit one slope relating the two sets of held-out residuals.</p>
+      <p><var>V</var> = observed schedule − predicted chance of short. <var>U</var> = observed death indicator − predicted mortality given frailty alone. The ATE calculation above uses a different outcome residual, from the risk under the schedule actually received.</p>
       <div class="residual-result">
-        <span>Sum of residual products ÷ sum of squared schedule residuals</span>
+        <span>Slope = sum of <var>V</var> × <var>U</var> divided by sum of <var>V</var>²</span>
         <p class="equation"><span id="residual-ratio">−43.65 ÷ 1,005</span> <span aria-hidden="true">≈</span><span class="visually-hidden"> is approximately </span> <strong id="residual-slope">−0.04343</strong></p>
       </div>
-      <p>That slope is <strong id="residual-points">−4.34 percentage points</strong>. It matches ordinary adjusted regression in this example. With a binary schedule, the partial slope weights each frailty group by its size times <var>e</var>(1 − <var>e</var>), where <var>e</var> is its probability of short. Lower-frailty patients make up 60% of Susan’s cohort and get <span id="overlap-weight">62.69%</span> of the weight in the slope. Their treatment effect differs from the higher-frailty group’s, so the change in weights changes the answer. <a href="https://doi.org/10.1016/j.spl.2020.108945">Read the FWL result</a>.</p>
+      <p>That gives <strong id="residual-points">−4.34 percentage points</strong>. Lower frailty has a +2-point schedule difference and higher frailty a −15-point difference. The ATE counts patients, giving those groups 60% and 40% of the weight. The partial slope weights each group by its size times <var>e</var>(1 − <var>e</var>), where <var>e</var> is its chance of short. Its weights here are <span id="overlap-low">62.69%</span> and <span id="overlap-high">37.31%</span>.</p>
+      <p><strong>The Frisch–Waugh–Lovell (FWL) connection.</strong> In ordinary least squares, removing the same adjustment variables from schedule and outcome on the same records gives exactly the schedule coefficient from the full regression. Cross-fitting uses different training records. The two slopes happen to agree here because every fold has the same treatment shares within frailty groups. <a href="https://doi.org/10.1016/j.spl.2020.108945">Read the FWL result</a>.</p>
     </div>
   </details>
   <details class="process-fold" id="how-fit">
@@ -81,10 +83,55 @@
     <div class="fold-copy">
       <p>Both methods use the same 5,000 synthetic records. There are 3,000 lower-frailty and 2,000 higher-frailty patients. In the DML example, folds are balanced by frailty and schedule. Treatment probabilities and risks are re-estimated within each training set.</p>
       <p>A causal interpretation requires comparable groups given frailty, a chance of either schedule in each group, well-defined schedules and complete follow-up here. <a href="guide.html#fitting-records">See the counts and assumptions</a>.</p>
-      <p class="source-links"><a href="https://doi.org/10.1093/aje/kww165">Schuler and Rose on TMLE</a><a href="https://doi.org/10.1111/ectj.12097">Chernozhukov et al. on DML, §§4–5</a><a href="https://docs.doubleml.org/stable/examples/py_double_ml_plm_irm_hetfx.html">Partial regression with varying effects</a></p>
+      <p class="source-links"><a href="https://doi.org/10.1093/aje/kww165">Schuler and Rose on TMLE</a><a href="https://doi.org/10.1111/ectj.12097">Chernozhukov et al. on DML, §§4–5</a><a href="https://docs.doubleml.org/stable/guide/scores.html">The DML score equations</a><a href="https://docs.doubleml.org/stable/examples/py_double_ml_plm_irm_hetfx.html">Partial regression with varying effects</a></p>
     </div>
   </details>
   <footer class="case-links"><a href="worksheet.html">Back to the patient worksheet</a><a href="analysis.Rmd" download>Download the R workbook</a></footer>
 </main>
+<template id="tmle-math-1">
+  <math aria-label="Starting risk within each frailty group equals its observed death proportion">
+    <msup><mi>Q</mi><mn>0</mn></msup><mo>(</mo><mi>a</mi><mo>,</mo><mi>L</mi><mo>)</mo><mo>=</mo><mover><mi>Pr</mi><mo>^</mo></mover><mo>(</mo><mi>Y</mi><mo>=</mo><mn>1</mn><mo>∣</mo><mi>L</mi><mo>)</mo>
+  </math>
+  <math aria-label="e is the estimated probability of short given frailty">
+    <mi>e</mi><mo>(</mo><mi>L</mi><mo>)</mo><mo>=</mo><mover><mi>Pr</mi><mo>^</mo></mover><mo>(</mo><mi>A</mi><mo>=</mo><mn>1</mn><mo>∣</mo><mi>L</mi><mo>)</mo>
+  </math>
+</template>
+<template id="tmle-math-2">
+  <math aria-label="H equals A over e minus one minus A over one minus e">
+    <mi>H</mi><mo>=</mo><mfrac><mi>A</mi><mi>e</mi></mfrac><mo>−</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>A</mi></mrow><mrow><mn>1</mn><mo>−</mo><mi>e</mi></mrow></mfrac>
+  </math>
+  <math aria-label="Targeted log odds equal starting log odds plus epsilon times H">
+    <mi>logit</mi><mo>(</mo><msup><mi>Q</mi><mo>∗</mo></msup><mo>)</mo><mo>=</mo><mi>logit</mi><mo>(</mo><msup><mi>Q</mi><mn>0</mn></msup><mo>)</mo><mo>+</mo><mi>ε</mi><mi>H</mi>
+  </math>
+</template>
+<template id="tmle-math-3">
+  <math aria-label="Estimated ATE is the cohort mean of targeted short risk minus targeted standard risk">
+    <mover><mi>θ</mi><mo>^</mo></mover><mo>=</mo><mi>mean</mi><mo>[</mo><msubsup><mi>Q</mi><mn>1</mn><mo>∗</mo></msubsup><mo>−</mo><msubsup><mi>Q</mi><mn>0</mn><mo>∗</mo></msubsup><mo>]</mo>
+  </math>
+</template>
+<template id="dml-math-1">
+  <math aria-label="q sub a is the fitted risk under schedule a for this record, trained outside fold k">
+    <msub><mi>q</mi><mi>a</mi></msub><mo>=</mo><msubsup><mover><mi>Q</mi><mo>^</mo></mover><mi>a</mi><mrow><mo>(</mo><mo>−</mo><mi>k</mi><mo>)</mo></mrow></msubsup><mo>(</mo><msub><mi>L</mi><mi>i</mi></msub><mo>)</mo>
+  </math>
+  <math aria-label="e is this record’s fitted chance of short, trained outside fold k">
+    <mi>e</mi><mo>=</mo><msup><mover><mi>e</mi><mo>^</mo></mover><mrow><mo>(</mo><mo>−</mo><mi>k</mi><mo>)</mo></mrow></msup><mo>(</mo><msub><mi>L</mi><mi>i</mi></msub><mo>)</mo>
+  </math>
+</template>
+<template id="dml-math-2">
+  <math aria-label="Gamma for one held-out record equals the predicted difference plus H times its observed outcome minus its predicted risk under the received schedule">
+    <msub><mi>Γ</mi><mi>i</mi></msub><mo>=</mo><mo>(</mo><msub><mi>q</mi><mn>1</mn></msub><mo>−</mo><msub><mi>q</mi><mn>0</mn></msub><mo>)</mo><mo>+</mo><mi>H</mi><mo>(</mo><mi>Y</mi><mo>−</mo><msub><mi>q</mi><mi>A</mi></msub><mo>)</mo>
+  </math>
+  <math aria-label="H equals A over e minus one minus A over one minus e">
+    <mi>H</mi><mo>=</mo><mfrac><mi>A</mi><mi>e</mi></mfrac><mo>−</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>A</mi></mrow><mrow><mn>1</mn><mo>−</mo><mi>e</mi></mrow></mfrac>
+  </math>
+</template>
+<template id="dml-math-3">
+  <math aria-label="Estimated ATE equals the mean of the held-out contributions">
+    <mover><mi>θ</mi><mo>^</mo></mover><mo>=</mo><mi>mean</mi><mo>(</mo><msub><mi>Γ</mi><mi>i</mi></msub><mo>)</mo>
+  </math>
+  <math aria-label="The centered score at theta equals the contribution minus theta">
+    <msub><mi>ψ</mi><mi>i</mi></msub><mo>(</mo><mi>θ</mi><mo>)</mo><mo>=</mo><msub><mi>Γ</mi><mi>i</mi></msub><mo>−</mo><mi>θ</mi>
+  </math>
+</template>
 </body>
 </html>

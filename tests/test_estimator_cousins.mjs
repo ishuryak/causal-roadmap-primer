@@ -54,7 +54,7 @@ for (const [k, fold] of dml.folds.entries()) {
   close(fold.initialDifference, expectedStarts[k], 'held-out mean starting contrast');
   close(fold.meanCorrection, expectedCorrections[k], 'held-out mean residual correction');
   close(fold.initialDifference + fold.meanCorrection, fold.ate, 'fold start plus correction');
-  close(fold.ate, expectedFoldMeans[k], 'mean held-out uncentered AIPW score');
+  close(fold.ate, expectedFoldMeans[k], 'mean held-out AIPW contribution');
   scored += fold.holdoutN;
 }
 assert.equal(scored, n);
@@ -68,6 +68,20 @@ close(cohortStart, -.048, 'starting contrasts standardized over all scored patie
 close(cohortCorrection, 0, 'fold corrections cancel in this balanced synthetic example');
 close(dml.ate, cohortStart + cohortCorrection, 'full cohort start plus correction');
 close(dml.ate, target, 'mean cross-fitted AIPW contribution');
+// Rebuild the centered moment from held-out outcomes using the two inverse-probability terms.
+function meanAteScore(theta) {
+  let sum = 0;
+  for (const fold of dml.folds) {
+    for (const {group, a, n: size, deaths} of fold.holdoutCells) {
+      const {q1, q0, e} = fold.profiles[group];
+      const errors = a ? (deaths - size * q1) / e : -(deaths - size * q0) / (1 - e);
+      sum += size * (q1 - q0 - theta) + errors;
+    }
+  }
+  return sum / n;
+}
+close(meanAteScore(0), target, 'at zero the mean score equals the mean contribution');
+close(meanAteScore(dml.ate), 0, 'centered ATE score vanishes at the fitted difference');
 close(dml.plrNumerator, -43.65, 'residual cross-product');
 close(dml.plrDenominator, 1005, 'residual treatment sum of squares');
 close(dml.overlapWeights[0], 630 / 1005, 'overlap weight for lower frailty');

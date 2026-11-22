@@ -38,8 +38,8 @@
           <dd>For the average treatment effect, inverse probability weighting (IPW) weights each observed outcome by the inverse probability of the schedule received. The <strong>propensity score</strong> is the probability of short given baseline characteristics.</dd>
         </div>
         <div>
-          <dt>Combined methods<span>AIPW, TMLE and DML for the ATE</span></dt>
-          <dd>Targeted maximum likelihood estimation (TMLE) updates the predicted risks before averaging. Double machine learning (DML) can target the same average treatment effect with an augmented inverse probability weighting (AIPW) score. For each held-out patient it adds a weighted prediction error to the fitted risk difference. <a href="cousins.html">Work through the two calculations</a>.</dd>
+          <dt>Combined methods<span>TMLE and cross-fitted AIPW</span></dt>
+          <dd>Targeted maximum likelihood estimation (TMLE) updates predicted risks before averaging. For the same all-eligible treatment effect, one form of double machine learning (DML) uses cross-fitted augmented inverse probability weighting (AIPW). Each held-out contribution is a fitted risk difference plus a signed, weighted outcome prediction error. <a href="cousins.html">Work through the two calculations</a>.</dd>
         </div>
       </dl>
 
@@ -88,7 +88,7 @@
             <dl class="reference-terms">
               <div><dt>CATE</dt><dd>The conditional average treatment effect compares the two risks at the same baseline profile, such as higher frailty.</dd></div>
               <div><dt>ATE</dt><dd>The average treatment effect gives each of the 5,000 eligible patients equal weight.</dd></div>
-              <div><dt>ATT</dt><dd>The average treatment effect among the treated uses the baseline mix of the 2,600 patients who received short.</dd></div>
+              <div><dt>ATT</dt><dd>The average treatment effect among the treated uses the 2,100 lower- and 500 higher-frailty patients who received short. Weighting +2 and −15 points by that mix gives −1.27 points.</dd></div>
             </dl>
           </div>
         </details>
@@ -96,8 +96,9 @@
           <summary>Super Learner, cross-fitting and partial regression</summary>
           <div class="fold-body">
             <p><strong>Super Learner</strong> uses cross-validation to combine predictions from several algorithms. It can supply the mortality risk fit within either arm of a T-learner.</p>
-            <p>Outcome risks and treatment probabilities are <strong>nuisance functions</strong> used to estimate the causal contrast. <strong>Cross-fitting</strong> trains on other folds before predicting for the held-out fold. DML pairs cross-fitting with an <strong>orthogonal score</strong> that reduces first-order sensitivity to small errors in these fits. The <strong>interactive regression model (IRM)</strong> allows the two schedules to have different effects across frailty profiles.</p>
-            <p><strong>Partially linear regression (PLR)</strong> relates residual mortality to residual treatment. In this cohort it gives more weight to profiles where clinicians commonly chose either schedule. <a href="cousins.html?method=plr#fwl">See the Frisch–Waugh–Lovell example</a>.</p>
+            <p>Outcome risks and treatment probabilities are <strong>nuisance functions</strong>. <strong>Cross-fitting</strong> predicts for each held-out fold using models fitted on the other folds. An <strong>orthogonal score</strong> makes the estimating equation insensitive, to first order, to small errors in these functions.</p>
+            <p>The <strong>interactive regression model (IRM)</strong> allows a separate mortality curve for each schedule. For the ATE, average the held-out AIPW contributions. Subtracting a proposed effect from each contribution gives its estimating score. The scores average to zero at the estimate.</p>
+            <p><strong>Partially linear regression (PLR)</strong> estimates a single slope from residual mortality and residual treatment. With varying effects, each patient in a frailty group receives more weight when both schedules are common in that group. <a href="cousins.html?method=plr#fwl">Compare the slope with ordinary adjusted regression</a>.</p>
           </div>
         </details>
         <details class="guide-fold" id="fitting-records">
