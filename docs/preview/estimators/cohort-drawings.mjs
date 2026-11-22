@@ -5,17 +5,22 @@ const purple = '#733e87';
 const blue = '#265898';
 const green = '#216b38';
 const lightInk = '#d5d4e0';
-const pen = "'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive";
+const pen = "'Bradley Hand', 'Segoe Print', 'Comic Sans MS', 'Trebuchet MS', Arial, sans-serif";
+const labels = "system-ui, 'Segoe UI', Arial, sans-serif";
 const num = new Intl.NumberFormat('en-US');
 
 const percent = value => (100 * value).toFixed(2) + '%';
-const points = value => (value < 0 ? '−' : value > 0 ? '+' : '') + (100 * Math.abs(value)).toFixed(2);
 const proportion = value => (100 * value).toFixed(0) + '%';
 const groupNames = ['Lower', 'Higher'];
 
-function text(x, y, words, {size = 23, color = ink, anchor = 'start'} = {}) {
-  const label = size <= 23 ? ' class="cohort-label"' : '';
-  return `<text${label} x="${x}" y="${y}" font-size="${size}" fill="${color}" text-anchor="${anchor}">${words}</text>`;
+function points(value) {
+  const magnitude = (100 * Math.abs(value)).toFixed(2);
+  return magnitude === '0.00' ? magnitude : (value < 0 ? '−' : '+') + magnitude;
+}
+
+function text(x, y, words, {size = 20, color = ink, anchor = 'start', hand = false} = {}) {
+  const font = hand ? ` font-family="${pen}"` : '';
+  return `<text x="${x}" y="${y}" font-size="${size}" fill="${color}" text-anchor="${anchor}"${font}>${words}</text>`;
 }
 
 function stroke(d, color = purple, width = 2.6) {
@@ -30,183 +35,178 @@ function ring(x, y, scale = 1) {
   return `<g transform="translate(${x} ${y}) scale(${scale})">${stroke('M-2-10c-6 0-10 5-9 11s6 10 12 9 10-6 9-12S3-12-2-10', purple, 2.4)}</g>`;
 }
 
-function people(x, y, count) {
+function people(x, y, count, scale) {
   const strokes = [
     'M11 3c-5-1-8 4-7 8s4 6 8 4 5-7 4-10q-1-3-5-2M9 16l1 12-6 11m6-11 7 10M2 22l8-3 9-2',
     'M11 4c-4-2-8 2-8 7s4 8 8 6 6-7 3-11l-3-2m3 1q4-6 5-2t-4 4M9 17l-1 12-5 9m5-9 7 10M1 22l7-2 10 4',
     'M11 2C6 1 3 6 4 11s5 7 9 4 4-9 1-12l-3-1M10 17l2 12-6 11m6-11 8 9M2 20l9 3 8-7'
   ];
-  return `<g transform="translate(${x} ${y})">${strokes.slice(0, count).map((d, i) =>
-    `<g transform="translate(${i * 21} ${i === 1 ? -2 : 0})">${stroke(d, green, 2.4)}</g>`
+  return `<g transform="translate(${x} ${y}) scale(${scale})">${strokes.slice(0, count).map((d, i) =>
+    `<g transform="translate(${i * 21} ${i === 1 ? -2 : 0})">${stroke(d, green, 2.9)}</g>`
   ).join('')}</g>`;
 }
 
 function rightBrace(x, top, height) {
-  // A continuous pen stroke collecting a column of entries.
   return `<g transform="translate(${x} ${top}) scale(1 ${height / 100})">
     <path d="M0 1c12-1 11 11 10 23s0 22 11 26c-13 4-13 13-12 25s2 22-10 24"
       fill="none" stroke="${purple}" stroke-width="2.6" vector-effect="non-scaling-stroke"/></g>`;
 }
 
 function straightArrow(x, y, length) {
-  return stroke(`M${x} ${y}q${length / 2} 2 ${length} -1m-8 -5 9 5-8 5`);
+  return stroke(`M${x} ${y}q${length / 2} 2 ${length} -1m-7 -4 8 4-7 5`);
 }
 
 function startingRisks() {
   const {profiles} = cousins.tmle;
   const rows = profiles.map((p, i) => {
-    const y = 104 + i * 90;
-    return people(10, y - 29, 3 - i)
-      + text(85, y - 2, groupNames[i])
-      + text(85, y + 24, num.format(p.n), {size: 22, color: green})
-      + straightArrow(166, y - 2, 43)
-      + text(281, y + 7, percent(p.initial), {size: 30, color: blue, anchor: 'middle'})
-      + text(369, y + 6, '=', {size: 26, color: purple, anchor: 'middle'})
-      + text(448, y + 7, percent(p.initial), {size: 30, color: blue, anchor: 'middle'});
+    const y = 79 + i * 85;
+    return text(8, y, groupNames[i])
+      + people(8, y + 8, 3 - i, .64)
+      + text(54, y + 31, num.format(p.n), {color: green})
+      + text(180, y + 18, percent(p.initial), {size: 24, color: blue, anchor: 'middle', hand: true})
+      + text(243, y + 17, '=', {size: 23, color: purple, anchor: 'middle'})
+      + text(307, y + 18, percent(p.initial), {size: 24, color: blue, anchor: 'middle', hand: true});
   }).join('');
   return {
     title: 'TMLE starts with one risk per frailty group',
     description: profiles.map((p, i) => `${groupNames[i]} frailty, ${num.format(p.n)} patients. Both schedule predictions start at ${percent(p.initial)}.`).join(' '),
-    drawing: text(16, 38, 'Baseline frailty')
-      + text(281, 38, 'Standard', {anchor: 'middle'})
-      + text(448, 38, 'Short', {anchor: 'middle'})
-      + stroke('M14 51Q145 48 251 51t270-1', lightInk, 1.5)
-      + rows + stroke('M251 226q48 3 93 2t114-1q15 0 27-2', blue, 1.8)
-      + text(367, 258, 'Same initial risk', {color: purple, anchor: 'middle'})
+    drawing: text(8, 32, 'Frailty')
+      + text(180, 32, 'Standard', {anchor: 'middle'})
+      + text(307, 32, 'Short', {anchor: 'middle'})
+      + stroke('M8 46q76-2 171 0t171-1', lightInk, 1.5)
+      + rows + stroke('M143 210q54 3 116 1t89-2', blue, 1.7)
+      + text(180, 253, 'Same risk under either schedule', {color: purple, anchor: 'middle'})
   };
 }
 
 function targetedRisks() {
-  const {profiles, scoreBefore, scoreAfter} = cousins.tmle;
+  const {profiles, scoreBefore, scoreAfter, initialAte, ate} = cousins.tmle;
   const rows = profiles.map((p, i) => {
-    const y = 86 + i * 90;
-    const fork = stroke(`M169 ${y}c33 0 43-21 87-22m-8-4 9 4-8 6M169 ${y}c35 0 43 21 87 22m-8-6 9 6-9 4`);
-    return text(16, y - 6, groupNames[i] + ' frailty', {size: 23})
-      + text(39, y + 24, percent(p.initial), {size: 29, color: blue})
-      + fork + text(268, y - 15, percent(p.q0), {size: 28, color: blue})
-      + text(397, y - 16, 'standard')
-      + text(268, y + 30, percent(p.q1), {size: 28, color: blue})
-      + text(397, y + 29, 'short');
+    const y = 77 + i * 72;
+    const fork = stroke(`M127 ${y + 4}q15 0 30-14m-6 0 7-1-2 6M127 ${y + 4}q12 1 30 23m-6-2 7 3-1-7`);
+    return text(8, y - 6, groupNames[i] + ' frailty')
+      + text(12, y + 24, percent(p.initial), {size: 25, color: blue, hand: true})
+      + fork
+      + text(166, y - 5, percent(p.q0), {size: 23, color: blue, hand: true})
+      + text(269, y - 5, 'standard')
+      + text(166, y + 32, percent(p.q1), {size: 23, color: blue, hand: true})
+      + text(269, y + 32, 'short');
   }).join('');
-  const scoreValue = score => (score < 0 ? '−' : '') + Math.abs(score).toFixed(3);
+  const change = (y, label, before, after, color) => text(6, y, label)
+    + text(235, y, points(before), {size: 23, color: purple, anchor: 'end', hand: true})
+    + straightArrow(246, y - 7, 22)
+    + text(350, y, points(after), {size: 23, color, anchor: 'end', hand: true});
   return {
-    title: 'A signed update changes both schedule risks',
-    description: profiles.map((p, i) => `${groupNames[i]} frailty starts at ${percent(p.initial)}. The targeted standard risk is ${percent(p.q0)} and the short risk is ${percent(p.q1)}.`).join(' ')
-      + ` The cohort mean weighted residual moves from ${scoreValue(scoreBefore)} to ${scoreValue(scoreAfter)}.`,
-    drawing: text(18, 32, 'Starting risk') + text(270, 32, 'After targeting')
-      + rows + stroke('M18 221q133 2 259 0t242 0', lightInk, 1.5)
-      + text(18, 258, 'Mean weighted error', {size: 22})
-      + text(317, 258, scoreValue(scoreBefore), {size: 25, color: purple, anchor: 'end'})
-      + straightArrow(327, 249, 52)
-      + text(398, 258, scoreValue(scoreAfter), {size: 25, color: green})
+    title: 'Update the working risks for the cohort risk difference',
+    description: profiles.map((p, i) => `${groupNames[i]} frailty starts at ${percent(p.initial)}. After targeting, the working risks are ${percent(p.q0)} for standard and ${percent(p.q1)} for short.`).join(' ')
+      + ` In percentage points, the cohort mean weighted error moves from ${points(scoreBefore)} to ${points(scoreAfter)}. The cohort risk difference, short minus standard, moves from ${points(initialAte)} to ${points(ate)}.`,
+    drawing: text(8, 30, 'Starting risk') + text(166, 30, 'Working risks')
+      + stroke('M8 41q72-2 160 0t182 0', lightInk, 1.5)
+      + rows + stroke('M8 194q95 2 168 0t174 0', lightInk, 1.5)
+      + text(180, 217, 'Cohort · percentage points', {anchor: 'middle'})
+      + change(243, 'Weighted error', scoreBefore, scoreAfter, green)
+      + change(269, 'Risk difference', initialAte, ate, purple)
   };
 }
 
 function standardizedRisks() {
   const {profiles, standardRisk, shortRisk, ate} = cousins.tmle;
-  const [lower, higher] = profiles;
-  const row = (y, name, key, risk) => text(12, y, name, {size: 23})
-    + text(188, y, percent(lower[key]), {size: 25, color: blue, anchor: 'middle'})
-    + text(316, y, percent(higher[key]), {size: 25, color: blue, anchor: 'middle'})
-    + straightArrow(366, y - 8, 29)
-    + text(462, y, percent(risk), {size: 28, color: blue, anchor: 'middle'});
   const weights = profiles.map(p => proportion(p.n / cousins.n));
+  const rows = profiles.map((p, i) => {
+    const y = 75 + i * 57;
+    return people(6, y - 11, 3 - i, .61)
+      + text(53, y, weights[i], {color: green}) + text(53, y + 23, groupNames[i].toLowerCase())
+      + text(180, y + 14, percent(p.q0), {size: 24, color: blue, anchor: 'middle', hand: true})
+      + text(305, y + 14, percent(p.q1), {size: 24, color: blue, anchor: 'middle', hand: true});
+  }).join('');
   return {
-    title: 'TMLE averages the targeted risks over the same clinic population',
-    description: `Both arms use ${weights[0]} lower-frailty and ${weights[1]} higher-frailty patients. The standard risk is ${percent(standardRisk)} and the short risk is ${percent(shortRisk)}. Short minus standard is ${points(ate)} percentage points.`,
-    drawing: text(190, 31, weights[0] + ' lower', {size: 22, anchor: 'middle'})
-      + text(318, 31, weights[1] + ' higher', {size: 22, anchor: 'middle'})
-      + people(157, 36, 3) + people(297, 36, 2)
-      + text(461, 62, 'Average', {anchor: 'middle'})
-      + stroke('M12 84q119-3 251-2t256 0', lightInk, 1.5)
-      + row(122, 'Standard', 'q0', standardRisk)
-      + row(173, 'Short', 'q1', shortRisk)
-      + stroke('M407 189q47 4 102-1', blue, 1.9)
-      + text(16, 241, 'Short − standard', {size: 25})
-      + straightArrow(218, 232, 38)
-      + text(275, 244, points(ate) + ' points', {size: 34, color: purple})
+    title: 'TMLE averages the working risks over the same clinic population',
+    description: `For each schedule, average the working risks using ${weights[0]} lower-frailty and ${weights[1]} higher-frailty patients. The cohort-average working risks are ${percent(standardRisk)} for standard and ${percent(shortRisk)} for short. Short minus standard is ${points(ate)} percentage points.`,
+    drawing: text(241, 21, 'Working risks', {anchor: 'middle'})
+      + text(8, 45, 'Frailty mix') + text(180, 45, 'Standard', {anchor: 'middle'})
+      + text(305, 45, 'Short', {anchor: 'middle'})
+      + stroke('M8 54q84-2 171 0t171-1', lightInk, 1.5) + rows
+      + stroke('M8 171q86 2 177 0t165 0', lightInk, 1.5)
+      + text(8, 199, 'Average')
+      + text(180, 200, percent(standardRisk), {size: 26, color: blue, anchor: 'middle', hand: true})
+      + text(305, 200, percent(shortRisk), {size: 26, color: blue, anchor: 'middle', hand: true})
+      + text(180, 235, 'Short − standard', {anchor: 'middle'})
+      + text(180, 265, points(ate) + ' points', {size: 27, color: purple, anchor: 'middle', hand: true})
   };
 }
 
 function crossFitting(fold) {
-  const size = 30, left = 103, top = 82, gap = 42;
-  const columns = cousins.dml.folds.map((f, col) =>
-    text(left + col * gap, 53, f.id, {size: 22, anchor: 'middle'})).join('');
-  const matrix = cousins.dml.folds.map((f, row) => {
-    const y = top + row * size;
-    const cells = cousins.dml.folds.map((part, col) =>
-      part.id === f.id ? ring(left + col * gap, y, 0.87) : tick(left + col * gap, y, 0.94)).join('');
-    return (fold.id === f.id ? straightArrow(12, y, 20) : '')
-      + text(56, y + 6, f.id, {size: 22, anchor: 'middle'}) + cells;
+  const {folds} = cousins.dml;
+  const columns = folds.map((f, col) => text(109 + 48 * col, 52, f.id, {anchor: 'middle'})).join('');
+  const matrix = folds.map((f, row) => {
+    const y = 79 + row * 28;
+    const cells = folds.map((part, col) =>
+      part.id === f.id ? ring(109 + 48 * col, y, .82) : tick(109 + 48 * col, y, .91)).join('');
+    return (fold.id === f.id ? straightArrow(7, y, 18) : '')
+      + text(51, y + 6, f.id, {anchor: 'middle'}) + cells;
   }).join('');
   return {
-    title: 'Each fold takes one turn as the validation data',
-    description: `Each of the five fit rounds trains on the four green check-marked folds and scores the one open-circle fold. In round ${fold.id}, ${num.format(fold.trainN)} records train the models and the ${num.format(fold.holdoutN)} records in fold ${fold.id} are held out. Each record receives one held-out score.`,
-    drawing: text(186, 23, 'Data fold', {anchor: 'middle', size: 23}) + text(18, 54, 'Fit', {size: 22}) + columns
-      + stroke('M78 66q103-2 211 0M79 66q-1 76 0 150', ink, 1.6)
-      + matrix
-      + tick(329, 79) + text(346, 87, 'Train', {color: green, size: 25})
-      + text(346, 118, num.format(fold.trainN) + ' records', {size: 21})
-      + ring(329, 160) + text(346, 168, 'Hold out', {color: purple, size: 25})
-      + text(346, 198, num.format(fold.holdoutN) + ' records', {size: 21})
-      + stroke('M19 227q130 2 259 0t236 0', lightInk, 1.5)
-      + text(270, 261, `Fit ${fold.id} scores only fold ${fold.id}`, {anchor: 'middle', color: purple, size: 25})
+    title: 'Each fold takes one turn as the held-out data',
+    description: `Each of the five rounds trains on the four check-marked folds and applies the fitted models to the one open-circle fold. In round ${fold.id}, ${num.format(fold.trainN)} records train the models and the ${num.format(fold.holdoutN)} records in fold ${fold.id} are held out.`,
+    drawing: text(205, 24, 'Data fold', {anchor: 'middle'}) + text(6, 52, 'Round') + columns
+      + stroke('M76 63q125-1 247 0M76 63q-2 67 0 139', ink, 1.6) + matrix
+      + tick(17, 224) + text(34, 231, 'Train ' + num.format(fold.trainN), {color: green})
+      + ring(173, 224, .91) + text(191, 231, 'Hold out ' + num.format(fold.holdoutN), {color: purple})
+      + text(180, 264, `Round ${fold.id} holds out fold ${fold.id}`, {anchor: 'middle', color: purple})
   };
 }
 
-function scoreFold(fold) {
+function correctFold(fold) {
   const training = cousins.dml.folds.filter(f => f.id !== fold.id).map(f => f.id);
   const trainIds = training.map((id, i) =>
-    text(32 + i * 36, 75, id, {color: green, size: 29, anchor: 'middle'})).join('');
+    text(20 + i * 32, 54, id, {color: green, size: 26, anchor: 'middle', hand: true})).join('');
   const held = cousins.tmle.profiles.map((_, group) =>
     fold.holdoutCells.filter(cell => cell.group === group).reduce((count, cell) => count + cell.n, 0));
-  const row = (y, label, value, color) => text(72, y, label, {size: 22})
-    + text(480, y, points(value), {size: 26, color, anchor: 'end'});
+  const row = (y, label, value, color, result = false) => text(9, y, label)
+    + text(349, y, (result ? '≈ ' : '') + points(value), {size: result ? 29 : 26, color, anchor: 'end', hand: true});
   return {
-    title: `Use other-fold fits to correct the mean in held-out fold ${fold.id}`,
-    description: `Folds ${training.join(', ')} train the models. They score the ${held[0]} lower-frailty and ${held[1]} higher-frailty patients in fold ${fold.id}. Its fitted mean risk difference is ${points(fold.initialDifference)} percentage points. Adding its mean weighted error of ${points(fold.meanCorrection)} gives ${points(fold.ate)} percentage points, after rounding.`,
-    drawing: text(17, 32, 'Fit on folds') + trainIds
-      + stroke('M22 83q59 3 127-1', green, 1.8)
-      + straightArrow(168, 66, 58)
-      + text(242, 32, 'Score fold') + ring(270, 66, 1.5)
-      + text(270, 74, fold.id, {color: purple, size: 24, anchor: 'middle'})
-      + text(331, 58, num.format(held[0]) + ' lower', {size: 22})
-      + text(331, 85, num.format(held[1]) + ' higher', {size: 22})
-      + text(479, 117, 'percentage points', {size: 19, anchor: 'end'})
-      + row(151, 'Mean fitted difference', fold.initialDifference, blue)
-      + text(32, 191, '+', {size: 29, color: purple}) + row(191, 'Mean weighted error', fold.meanCorrection, green)
-      + stroke('M29 208q137-2 235 0t224-2', ink, 2)
-      + text(32, 250, '≈', {size: 28, color: purple})
-      + row(249, `Fold ${fold.id} mean`, fold.ate, purple)
+    title: `Correct the fitted difference in held-out fold ${fold.id}`,
+    description: `Folds ${training.join(', ')} train the models. Apply those fits to the ${held[0]} lower-frailty and ${held[1]} higher-frailty patients of fold ${fold.id}. In percentage points, the mean fitted difference is ${points(fold.initialDifference)} and the mean held-out correction is ${points(fold.meanCorrection)}. Adding their unrounded values gives a fold estimate of ${points(fold.ate)}. Each displayed value is rounded separately.`,
+    drawing: text(8, 23, 'Fit on folds') + text(217, 23, 'Held-out fold')
+      + trainIds + straightArrow(140, 45, 73) + ring(278, 45, 1.17)
+      + text(278, 53, fold.id, {size: 23, color: purple, anchor: 'middle', hand: true})
+      + text(180, 84, `${num.format(held[0])} lower · ${num.format(held[1])} higher frailty`, {anchor: 'middle'})
+      + stroke('M8 96q83 2 160 0t182 0', lightInk, 1.5)
+      + text(9, 123, 'Difference in percentage points')
+      + row(155, 'Mean fitted difference', fold.initialDifference, blue)
+      + row(186, 'Add held-out correction', fold.meanCorrection, green)
+      + stroke('M8 198q83-2 160 0t181-1', ink, 1.8)
+      + row(229, `Fold ${fold.id} estimate`, fold.ate, purple, true)
+      + text(180, 263, 'Each value is rounded separately.', {anchor: 'middle'})
   };
 }
 
-function pooledScores(selected) {
+function pooledEstimates() {
   const {folds, ate} = cousins.dml;
   const rows = folds.map((f, i) => {
-    const y = 66 + 37 * i;
-    return (f.id === selected.id ? ring(55, y - 8, 1.04) : '')
-      + text(55, y, f.id, {size: 22, anchor: 'middle'})
-      + text(207, y, points(f.ate), {size: 26, color: blue, anchor: 'end'});
+    const y = 88 + 29 * i;
+    return text(30, y, f.id, {anchor: 'middle'})
+      + text(147, y, points(f.ate), {size: 24, color: blue, anchor: 'end', hand: true});
   }).join('');
   return {
-    title: 'Pool the five held-out fold means',
-    description: folds.map(f => `Fold ${f.id} contributes ${num.format(f.holdoutN)} held-out scores with a mean of ${points(f.ate)} percentage points.`).join(' ')
-      + ` Their population average is ${points(ate)} points across ${num.format(cousins.n)} patients.`,
-    drawing: text(55, 28, 'Fold', {anchor: 'middle'}) + text(207, 28, 'Mean (pp)', {size: 21, anchor: 'end'})
-      + stroke('M22 38q98-1 193 0', lightInk, 1.6)
-      + rows + rightBrace(224, 46, 186) + straightArrow(251, 138, 40)
-      + text(410, 101, 'All ' + num.format(cousins.n) + ' records', {size: 22, anchor: 'middle'})
-      + text(410, 151, points(ate), {color: purple, size: 40, anchor: 'middle'})
-      + stroke('M353 166q59 2 112-1', purple, 2)
-      + text(410, 202, 'percentage points', {size: 22, anchor: 'middle'})
-      + text(259, 268, 'Each person contributes one held-out score', {size: 20, anchor: 'middle'})
+    title: 'Pool the five held-out fold estimates',
+    description: folds.map(f => `Fold ${f.id} contributes ${num.format(f.holdoutN)} held-out records with a mean contribution of ${points(f.ate)} percentage points.`).join(' ')
+      + ` Averaging all ${num.format(cousins.n)} contributions gives ${points(ate)} percentage points.`,
+    drawing: text(180, 25, 'Difference in percentage points', {anchor: 'middle'})
+      + text(30, 57, 'Fold', {anchor: 'middle'}) + text(153, 57, 'Estimate', {anchor: 'end'})
+      + stroke('M9 65q67-1 144 0', lightInk, 1.5) + rows
+      + rightBrace(161, 70, 143) + straightArrow(187, 143, 23)
+      + text(284, 112, 'All ' + num.format(cousins.n), {anchor: 'middle'}) + text(284, 138, 'records', {anchor: 'middle'})
+      + text(284, 180, points(ate), {size: 35, color: purple, anchor: 'middle', hand: true})
+      + stroke('M239 190q40 3 91-1', purple, 2)
+      + stroke('M8 227q83-2 164 0t178-1', lightInk, 1.5)
+      + text(180, 261, num.format(folds[0].holdoutN) + ' held-out records per fold', {anchor: 'middle'})
   };
 }
 
 const drawings = {
   tmle: [startingRisks, targetedRisks, standardizedRisks],
-  dml: [crossFitting, scoreFold, pooledScores]
+  dml: [crossFitting, correctFold, pooledEstimates]
 };
 
 export function renderDrawing(svg, method, step, foldIndex = 0) {
@@ -214,15 +214,12 @@ export function renderDrawing(svg, method, step, foldIndex = 0) {
   const fold = cousins.dml.folds[foldIndex];
   if (!draw || !fold) throw new RangeError('Choose an available method, step and fold.');
   const {title, description, drawing} = draw(fold);
-  svg.setAttribute('viewBox', '0 0 540 284');
+  svg.setAttribute('viewBox', '0 0 360 278');
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
   svg.setAttribute('role', 'img');
   svg.setAttribute('aria-label', title);
   svg.setAttribute('aria-description', description);
   svg.innerHTML = `<title>${title}</title><desc>${description}</desc>
-    <style>@media (max-width: 480px) {
-      .cohort-label {font: 550 22px system-ui, sans-serif;}
-    }</style>
-    <rect width="540" height="284" fill="#fff"/>
-    <g font-family="${pen}" stroke-linecap="round" stroke-linejoin="round">${drawing}</g>`;
+    <rect width="360" height="278" fill="#fff"/>
+    <g font-family="${labels}" stroke-linecap="round" stroke-linejoin="round">${drawing}</g>`;
 }

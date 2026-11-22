@@ -41,7 +41,7 @@
   <header class="intro">
     <h1>Different learners, <em>the same estimate?</em></h1>
     <p>How would five-year mortality change if everyone eligible for both radiotherapy schedules received the short course instead of the standard course?</p>
-    <p>A <strong>learner</strong> fits a pattern in data, such as how mortality risk varies with frailty. An <strong>estimator</strong> is the rule Susan uses to turn her records into a risk difference.</p>
+    <p>A <strong>base learner</strong> fits a pattern, such as how mortality risk varies with frailty. S, T and X are <strong>meta-learners</strong> that arrange those fits to estimate effects. An <strong>estimator</strong> is the rule Susan uses to turn her records into a risk difference.</p>
     <div class="intro-actions"><a class="start" href="worksheet.html">Open the six-patient worksheet</a><a href="guide.html#vocabulary">See the vocabulary</a></div>
     <p class="design-note">In this synthetic clinic, Susan assumes frailty captures the shared causes of schedule choice and mortality, and either course is possible at each frailty level.</p>
   </header>
@@ -97,16 +97,16 @@
           <span class="branch-label"><strong>Weight the observed outcomes</strong><span>IPW</span></span>
         </label>
         <label class="branch"><input type="radio" name="family" value="both" aria-describedby="note-both">
-          <span class="branch-label"><strong>Combine predictions and weights</strong><span>AIPW · TMLE · DML for the ATE</span></span>
+          <span class="branch-label"><strong>Combine predictions and weights</strong><span>TMLE · cross-fitted AIPW</span></span>
         </label>
       </div>
     </fieldset>
     <div class="map-explanation">
       <div class="branch-notes">
         <p id="note-risk">S uses one risk model, T uses two. For P04, T predicts <span class="record-cell is-fitted">40%</span> under standard and <span class="record-cell is-fitted">25%</span> under short. Comparing average predicted risks gives the g-computation estimate.</p>
-        <p id="note-effect">X reuses T’s fits. P04 died on short, so the signed contrast for this row is <span class="record-cell is-observed">1</span> − <span class="record-cell is-fitted">0.40</span> = +0.60. R learns how the effect varies from treatment and outcome residuals.</p>
+        <p id="note-effect">X reuses T’s fits. P04 died on short, so this record’s signed pseudo-outcome is <span class="record-cell is-observed">1</span> − <span class="record-cell is-fitted">0.40</span> = +0.60. R learns how the effect varies from treatment and outcome residuals.</p>
         <p id="note-weight">One in four higher-frailty patients received short. Inverse probability weighting gives P04’s observed outcome a weight of <span class="record-label">1 / 0.25 = 4</span> when estimating short-schedule risk for everyone.</p>
-        <p id="note-both">TMLE updates the predicted risks before averaging. DML adds a weighted prediction error to each held-out record’s fitted risk difference, then averages. <a href="cousins.html">Follow both calculations across the 5,000-patient cohort</a>.</p>
+        <p id="note-both">Targeted maximum likelihood estimation (TMLE) updates the predicted risks before averaging. For the clinic-wide average, the double machine learning (DML) example uses cross-fitted augmented inverse probability weighting (AIPW). It corrects the predicted differences with held-out outcomes, then averages. <a href="cousins.html">Follow both calculations across the 5,000-patient cohort</a>.</p>
       </div>
       <button type="button" class="walk" id="next-branch" hidden>Next branch</button>
       <span id="map-status" class="visually-hidden" role="status"></span>
