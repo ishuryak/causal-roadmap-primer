@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="only light">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="How would five-year mortality change under short-course radiotherapy versus standard for all 5,000 patients in Susan’s synthetic cohort? Double machine learning uses predictions made on held-out patients and their observed outcomes to estimate the difference.">
+  <title>DML with held-out predictions · Causal Roadmap</title>
+  <link rel="stylesheet" href="tutorial.css">
+  <link rel="stylesheet" href="record-figure.css">
+  <link rel="stylesheet" href="cousins.css">
+  <script type="module" src="cousins.mjs"></script>
+</head>
+<body data-method="dml">
+<a class="skip" href="#main">Skip to the example</a>
+<header class="site-head"><div class="frame head-inner">
+  <a class="site-brand" href="../index.html#estimators">Causal Roadmap</a>
+  <nav class="section-nav" aria-label="Estimator tutorial"><a href="index.html">Overview</a><a href="worksheet.html">Worksheet</a><a href="tmle.html">TMLE</a><a href="dml.html" aria-current="page">DML</a><a href="guide.html">Field guide</a><a href="paper.html">Paper</a></nav>
+</div></header>
+<main class="frame cousin-page" id="main">
+  <header class="cousin-heading">
+    <h1>DML with held-out predictions</h1>
+    <p>How would five-year mortality change under short-course radiotherapy versus standard for all 5,000 patients in Susan’s synthetic cohort? Double machine learning uses predictions made on held-out patients and their observed outcomes to estimate the difference.</p>
+  </header>
+  <noscript><p>Train risk and schedule models on four folds and use them to predict for the fifth. Add a signed correction from the held-out outcomes to the predicted differences. Averaging the contributions gives −4.80 percentage points (short minus standard).</p></noscript>
+  <div class="process-book" id="process-book" hidden>
+    <fieldset class="process-stages">
+      <legend class="visually-hidden">Calculation step</legend>
+      <label><input type="radio" name="step" value="1" checked><span><small aria-hidden="true">1</small><b>Split &amp; fit</b></span></label>
+      <label><input type="radio" name="step" value="2"><span><small aria-hidden="true">2</small><b>Correct</b></span></label>
+      <label><input type="radio" name="step" value="3"><span><small aria-hidden="true">3</small><b>Pool</b></span></label>
+    </fieldset>
+    <figure class="process-sheet">
+      <figcaption>
+        <h2 id="stage-title">Train on four folds</h2>
+        <p id="stage-copy"></p>
+        <label class="fold-picker" id="fold-control" hidden>Held-out fold
+          <select id="fold-number"><option value="1">Fold 1</option><option value="2">Fold 2</option><option value="3">Fold 3</option><option value="4">Fold 4</option><option value="5">Fold 5</option></select>
+        </label>
+      </figcaption>
+      <svg id="cohort-drawing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 278" role="img" focusable="false"></svg>
+    </figure>
+    <details class="process-fold" id="math-disclosure">
+      <summary>Show the math for this step</summary>
+      <div class="fold-copy">
+        <p id="notation"></p>
+        <div id="formula" class="equations"></div>
+        <p id="worked-math"></p>
+        <p id="math-extra"></p>
+        <p id="sampling-note" hidden>For an illustration of sampling uncertainty, suppose these patients were sampled independently. The standard error of the mean AIPW contribution is 1.34 percentage points, giving a 95% interval from −7.43 to −2.17 points. <a href="analysis.Rmd">Calculation in R</a>.</p>
+      </div>
+    </details>
+    <p class="visually-hidden" role="status" id="process-status"></p>
+  </div>
+
+  <details class="process-fold" id="fwl">
+    <summary>Partialling out frailty</summary>
+    <div class="fold-copy">
+      <h2>What does “adjust for frailty” do in a regression?</h2>
+      <p>Start with ordinary least squares. Within each frailty group, subtract the group’s short-course proportion from each patient’s schedule and its mortality rate from each patient’s outcome. Fit a line through the two sets of residuals. Its slope equals the schedule coefficient in a regression of mortality on schedule and frailty. This is the Frisch–Waugh–Lovell (FWL) theorem.</p>
+      <figure class="residual-figure" hidden>
+        <svg id="residual-plot" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 236" role="img" aria-label="Residual mortality versus residual schedule for the four groups in Susan’s cohort"></svg>
+        <figcaption><span class="plot-legend"><span><i class="lower-mark" aria-hidden="true"></i>Lower frailty</span><span><i class="higher-mark" aria-hidden="true"></i>Higher frailty</span></span>
+          Each mark shows a group mean. Standard is left of zero and short is right. Larger marks represent more patients. The line fits all 5,000 records.</figcaption>
+      </figure>
+      <h3>The partially linear DML estimate</h3>
+      <p>Now fit the schedule and mortality models on the other folds. For every held-out patient, calculate <var>V</var> = schedule − predicted chance of short and <var>U</var> = outcome − predicted mortality given frailty alone. Pool the residuals and fit the slope.</p>
+      <div class="residual-result">
+        <span>Slope = sum of <var>V</var> × <var>U</var> divided by sum of <var>V</var>²</span>
+        <p class="equation"><span id="residual-ratio">−43.65 ÷ 1,005</span> <span aria-hidden="true">≈</span><span class="visually-hidden"> is approximately </span> <strong id="residual-slope">−0.04343</strong></p>
+      </div>
+      <p>The partial slope is <strong id="residual-points">−4.34 percentage points</strong>. It matches the full-data line here because every fold has the same treatment shares within frailty groups. The exact FWL identity applies to ordinary least squares fitted on the same records.</p>
+      <p>Why does the cohort estimate above give −4.80 points? The lower- and higher-frailty differences are +2 and −15 points. The cohort average weights them by patient counts (60% and 40%). The partial slope weights each group by its size times <var>e</var>(1 − <var>e</var>), where <var>e</var> is its chance of short. That gives <span id="overlap-low">62.69%</span> and <span id="overlap-high">37.31%</span>. In a trial with the same randomization probability in both groups, the two population weightings coincide.</p>
+      <p><a href="https://doi.org/10.1016/j.spl.2020.108945">Read the FWL theorem</a></p>
+    </div>
+  </details>
+  <details class="process-fold" id="how-fit">
+    <summary>Teaching notes and sources</summary>
+    <div class="fold-copy">
+      <p>These 5,000 records are split into five folds balanced by frailty and schedule. Each training set supplies fresh risk and schedule predictions. Andy Wilson’s PBHLT 7115 lecture <cite>From Partialling Out to Orthogonal Learning</cite> pairs out-of-sample prediction with an orthogonal score. The residual plot adapts its FWL exercise to Susan’s cohort.</p>
+      <p class="source-links"><a href="https://doi.org/10.1111/ectj.12097">Chernozhukov et al. on DML, §§4–5</a><a href="https://docs.doubleml.org/stable/guide/scores.html">DML score equations</a><a href="https://docs.doubleml.org/stable/examples/py_double_ml_plm_irm_hetfx.html">Partial regression with varying effects</a></p>
+      <p>A causal interpretation requires comparable groups given frailty, a chance of either schedule in each group, well-defined schedules and complete follow-up. <a href="guide.html#fitting-records">See the counts and assumptions</a>.</p>
+    </div>
+  </details>
+  <footer class="case-links"><a href="analysis.Rmd" download>Download the R workbook</a></footer>
+</main>
+<template id="dml-math-1">
+  <math aria-label="q sub a is the fitted risk under schedule a for this record, trained outside fold k">
+    <msub><mi>q</mi><mi>a</mi></msub><mo>=</mo><msubsup><mover><mi>Q</mi><mo>^</mo></mover><mi>a</mi><mrow><mo>(</mo><mo>−</mo><mi>k</mi><mo>)</mo></mrow></msubsup><mo>(</mo><msub><mi>L</mi><mi>i</mi></msub><mo>)</mo>
+  </math>
+  <math aria-label="e is this record’s fitted chance of short, trained outside fold k">
+    <mi>e</mi><mo>=</mo><msup><mover><mi>e</mi><mo>^</mo></mover><mrow><mo>(</mo><mo>−</mo><mi>k</mi><mo>)</mo></mrow></msup><mo>(</mo><msub><mi>L</mi><mi>i</mi></msub><mo>)</mo>
+  </math>
+</template>
+<template id="dml-math-2">
+  <math aria-label="Gamma for one held-out record equals the predicted difference plus H times its observed outcome minus its predicted risk under the received schedule">
+    <msub><mi>Γ</mi><mi>i</mi></msub><mo>=</mo><mo>(</mo><msub><mi>q</mi><mn>1</mn></msub><mo>−</mo><msub><mi>q</mi><mn>0</mn></msub><mo>)</mo><mo>+</mo><mi>H</mi><mo>(</mo><mi>Y</mi><mo>−</mo><msub><mi>q</mi><mi>A</mi></msub><mo>)</mo>
+  </math>
+  <math aria-label="H equals A over e minus one minus A over one minus e">
+    <mi>H</mi><mo>=</mo><mfrac><mi>A</mi><mi>e</mi></mfrac><mo>−</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>A</mi></mrow><mrow><mn>1</mn><mo>−</mo><mi>e</mi></mrow></mfrac>
+  </math>
+</template>
+<template id="dml-math-3">
+  <math aria-label="Estimated ATE equals the mean of the held-out contributions">
+    <mover><mi>θ</mi><mo>^</mo></mover><mo>=</mo><mi>mean</mi><mo>(</mo><msub><mi>Γ</mi><mi>i</mi></msub><mo>)</mo>
+  </math>
+  <math aria-label="The centered score at theta equals the contribution minus theta">
+    <msub><mi>ψ</mi><mi>i</mi></msub><mo>(</mo><mi>θ</mi><mo>)</mo><mo>=</mo><msub><mi>Γ</mi><mi>i</mi></msub><mo>−</mo><mi>θ</mi>
+  </math>
+</template>
+</body>
+</html>

@@ -3,18 +3,13 @@
 .cousin-heading h1 { margin: 0 0 9px; }
 .cousin-heading > p { max-width: 77ch; margin: 0; }
 .process-book { overflow-anchor: none; }
-.method-line { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 16px; }
-.method-line p { margin: 0; color: var(--secondary); font-size: .93rem; }
-.method-choices, .process-stages { display: flex; min-inline-size: 0; padding: 0; border: 0; margin: 0; }
-.method-choices { gap: 4px; }
-.method-choices label, .process-stages label { position: relative; display: block; cursor: pointer; }
-.method-choices input, .process-stages input {
+.process-stages { display: flex; min-inline-size: 0; padding: 0; border: 0; margin: 0; }
+.process-stages label { position: relative; display: block; cursor: pointer; }
+.process-stages input {
   position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer;
 }
-.method-choices label > span, .process-stages label > span { display: flex; align-items: center; min-height: 44px; }
-.method-choices label > span { padding: 5px 18px; border: 1px solid var(--rule); border-radius: 3px; color: var(--secondary); font-weight: 650; }
-.method-choices input:checked + span { color: var(--teal); background: var(--teal-light); border-color: var(--teal); }
-.method-choices input:focus-visible + span, .process-stages input:focus-visible + span { outline: 2px solid var(--teal); outline-offset: 2px; }
+.process-stages label > span { display: flex; align-items: center; min-height: 44px; }
+.process-stages input:focus-visible + span { outline: 2px solid var(--teal); outline-offset: 2px; }
 .process-stages { margin-top: 13px; border-bottom: 1px solid var(--rule); }
 .process-stages label > span { gap: 7px; padding: 4px 16px; border-bottom: 3px solid transparent; color: var(--secondary); }
 .process-stages b { font-size: 1rem; font-weight: 610; }
@@ -43,6 +38,16 @@
   color: var(--record-ink); font-size: 1.12rem;
 }
 .equations math { math-style: normal; }
+.fold-copy h2 { margin: .25rem 0 .6rem; font-size: 1.5rem; }
+.fold-copy h3 { margin: 1.25rem 0 .4rem; font-size: 1.25rem; }
+.residual-figure { display: grid; grid-template-columns: minmax(0, 22.5rem) minmax(10rem, 1fr); gap: 1rem 1.5rem; align-items: center; margin: 1rem 0; }
+.residual-figure svg { display: block; width: 100%; height: auto; }
+.residual-figure figcaption { max-width: 30ch; font-size: .95rem; }
+.plot-legend { display: flex; flex-wrap: wrap; gap: .25rem .85rem; margin-bottom: .5rem; font-weight: 600; }
+.plot-legend > span { display: inline-flex; align-items: center; gap: .4rem; }
+.plot-legend i { width: .93rem; height: .93rem; border: 2px solid; }
+.lower-mark { border-radius: 50%; color: #216b38; background: #e1efe3; }
+.higher-mark { color: #733e87; background: #eadfec; }
 .residual-result { margin: 15px 0; padding-left: 13px; border-left: 2px solid #73548b; }
 .residual-result > span { color: var(--secondary); font-size: .91rem; }
 .residual-result p { margin: 2px 0 0; }
@@ -55,13 +60,17 @@
   }
   .process-sheet figcaption > p { max-width: 67ch; }
 }
+@media (max-width: 640px) {
+  .residual-figure { grid-template-columns: minmax(0, 1fr); gap: .4rem; }
+  .residual-figure svg { max-width: 24rem; }
+  .residual-figure figcaption { max-width: 55ch; }
+}
 @media (max-width: 740px) {
   .cousin-page { width: calc(100% - 36px); }
   .process-sheet figcaption { min-height: 10.5rem; }
 }
 @media (max-width: 470px) {
   .cousin-heading { margin: 20px 0 14px; }
-  .method-line { display: grid; gap: 6px; }
   .process-stages { margin-top: 8px; }
   .process-stages label { flex: 1; }
   .process-stages label > span { justify-content: center; padding: 4px 1px; gap: 5px; }
@@ -73,6 +82,6 @@
   .process-sheet figcaption { min-height: 13.5rem; }
 }
 @media print {
-  .method-choices input:not(:checked) + span, .process-stages input:not(:checked) + span, .fold-picker { display: none; }
+  .process-stages input:not(:checked) + span, .fold-picker { display: none; }
   .process-sheet { break-inside: avoid; }
 }
