@@ -81,6 +81,29 @@
   .branch-label { min-height: 59px; }
   .map-explanation { margin-top: 12px; }
 }
+@media (max-width: 600px) {
+  .map { --records-width: clamp(124px, 30vw, 136px); }
+  /* Give the source records their own space beside the map heading. */
+  .map h2 {
+    display: grid; align-content: center; box-sizing: border-box;
+    min-height: calc(var(--records-width) * 1.44); margin: 0 0 12px;
+    padding-inline-start: calc(var(--records-width) + 12px);
+  }
+  .branches { grid-template-columns: 32px minmax(0, 1fr); gap: 4px; }
+  .map-drawing { display: block; width: 32px; pointer-events: none; }
+  .map-records { position: absolute; bottom: calc(100% + 12px); left: 0; width: var(--records-width); }
+  .map-drawing::before {
+    content: ""; position: absolute; left: 0; top: -6px; height: calc(50% + 6px);
+    width: calc(var(--records-width) / 2); border-top: 1.5px solid #694382;
+    border-left: 1.5px solid #694382; border-top-left-radius: 6px;
+  }
+  .branch-label { min-height: 54px; padding: 4px 2px 4px 6px; }
+  .branch-label strong { line-height: 1.25; }
+  .branch-label > span { line-height: 1.3; }
+  .map-explanation { margin-top: 8px; padding-top: 0; }
+  /* The walk control stays beside the choices as the reserved note area changes. */
+  .walk { order: -1; padding-block: 6px; }
+}
 @media (max-width: 360px) {
   .branch-label strong { font-size: .96rem; }
   .branch-label > span { font-size: .87rem; }

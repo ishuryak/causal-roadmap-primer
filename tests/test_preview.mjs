@@ -94,6 +94,7 @@ assert(pageHtml('cousins.html').includes('href="analysis.Rmd"'), 'The new estima
 assert(overview.includes('guide.html#vocabulary'), 'The introduction connects learners with the estimator vocabulary');
 assert(!pageHtml('cousins.html').includes('id="case-patient"'), 'The process walk-through uses the cohort');
 // Exercise the same SVG renderer as the interactive board, including every held-out fold.
+let pooledDrawing;
 for (const method of ['tmle', 'dml']) {
   for (const step of [1, 2, 3]) {
     for (const fold of method === 'dml' ? [0, 1, 2, 3, 4] : [0]) {
@@ -101,7 +102,14 @@ for (const method of ['tmle', 'dml']) {
       renderDrawing(svg, method, step, fold);
       assert.match(svg.innerHTML, /<title>[^<]+<\/title><desc>[^<]+<\/desc>/);
       assert.doesNotMatch(svg.innerHTML, /NaN|undefined|Infinity/);
+      if (method === 'tmle' && step === 2) {
+        assert.match(svg.innerHTML, /percentage points, the cohort mean weighted error moves from −4\.80 to 0\.00/);
+      }
       if (method === 'dml' && step < 3) assert.match(svg.innerHTML, new RegExp('fold ' + (fold + 1), 'i'));
+      if (method === 'dml' && step === 3) {
+        if (fold === 0) pooledDrawing = svg.innerHTML;
+        else assert.equal(svg.innerHTML, pooledDrawing, 'Pooling all records is independent of the last selected fold');
+      }
       if (step === 3) assert(svg.innerHTML.includes('−4.80'), 'The cohort figure shows the fitted estimate');
     }
   }

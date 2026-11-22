@@ -43,13 +43,22 @@
     return profileRisks[group];
   }
   function xFits(group) {
-    const p = profiles[group];
-    const [q0,q1] = profileRisks[group];
-    // One fitted mean in each frailty stratum, using the actual arm's event counts.
-    const d0 = (p.standard.deaths * (q1-1) + (p.standard.people-p.standard.deaths) * q1) / p.standard.people;
-    const d1 = (p.short.deaths * (1-q0) + (p.short.people-p.short.deaths) * (-q0)) / p.short.people;
-    const e = p.short.people / eligible[group];
-    return {d0,d1,e,blended:e*d0 + (1-e)*d1};
+    const armFits = schedule.map((name, a) => {
+      const {people: n, deaths} = profiles[group][name];
+      const survivors = n - deaths;
+      const deathValue = rowPseudo({a, y: 1}, profileRisks[group]).value;
+      const survivorValue = rowPseudo({a, y: 0}, profileRisks[group]).value;
+      const mean = (deaths * deathValue + survivors * survivorValue) / n;
+      return {n, deaths, survivors, deathValue, survivorValue, mean};
+    });
+    const [d0, d1] = armFits.map(arm => arm.mean);
+    const e = profiles[group].short.people / eligible[group];
+    return {armFits, d0, d1, e, blended: e*d0 + (1-e)*d1};
+  }
+  function xArmEquation(fit) {
+    return '[' + nf(fit.deaths) + ' × (' + signed(fit.deathValue, 2) + ') + ' +
+      nf(fit.survivors) + ' × (' + signed(fit.survivorValue, 2) + ')] / ' +
+      nf(fit.n) + ' = ' + signed(fit.mean, 2);
   }
   function contrastFor(group) {
     const q = risksFor(group);
@@ -126,13 +135,13 @@
     }
     if (!adjusted) return;
     if (stage === 'x') {
-      const {d0,d1,e,blended} = xFits(p.group);
+      const {armFits,d0,d1,e,blended} = xFits(p.group);
       const pseudo = rowPseudo(p,q);
       byId('math-x-risks').textContent = 'Fitted risk at this frailty is ' + percent(q[0]) + ' under standard and ' + percent(q[1]) + ' under short.';
       byId('math-arm-short').classList.toggle('current', p.a === 1);
       byId('math-arm-standard').classList.toggle('current', p.a === 0);
       byId('math-x-pseudo').textContent = p.id + ' (' + schedule[p.a] + ') uses Eq. ' + (p.a ? '7' : '8') + '. ' + pseudo.subtraction + ' = ' + signed(pseudo.value,2) + '.';
-      byId('math-x-fits').textContent = 'Average training pseudo-outcomes at this frailty within each arm. The standard fit is ' + points(d0) + ' points and the short fit is ' + points(d1) + '. Here g = ' + nf(group.short.people) + ' / ' + nf(eligible[p.group]) + '.';
+      byId('math-x-fits').textContent = 'Average the signed pseudo-outcomes in the ' + schedule[p.a] + ' training arm at this frailty, counting deaths first and survivors second. ' + xArmEquation(armFits[p.a]) + '. For the blend, g = ' + nf(group.short.people) + ' / ' + nf(eligible[p.group]) + '.';
       byId('math-x-blend').textContent = decimal(e) + ' × (' + points(d0) + ') + ' + decimal(1-e) + ' × (' + points(d1) + ') = ' + points(blended) + ' points.';
     } else {
       byId('math-' + stage + '-value').textContent = p.id + ' shares this frailty profile. ' + percent(q[1]) + ' − ' + percent(q[0]) + ' ≈ ' + points(contrastFor(p.group)) + ' percentage points.';
@@ -247,11 +256,20 @@
       const outcome = p.y ? 'died by five years' : 'was alive at five years';
       content = pp(p.id + ' ' + outcome + ' after ' + arm + '. Their observed ' + p.y + ' fills that schedule’s outcome column. What would have happened under ' + alternate + '?');
     } else if (state.stage === 'x') {
-      const {d0,d1} = xFits(p.group);
+      const {armFits} = xFits(p.group);
+      const fit = armFits[p.a];
       const pseudo = rowPseudo(p,q);
-      content = '<h4>Signed pseudo-outcome</h4>' + equation(pseudo.subtraction + ' = ' + signed(pseudo.value,2));
-      content += pp(p.a ? 'Observed short outcome minus predicted standard risk.' : 'Predicted short risk minus observed standard outcome.');
-      content += '<h4>Effect at this frailty</h4>' + pp('Standard fit ' + points(d0) + ' points. Short fit ' + points(d1) + ' points. Their blend gives ' + points(effect) + ' points.');
+      const rowPoints = points(pseudo.value).replace(/\.00$/, '');
+      content = '<h4>Signed pseudo-outcome</h4>' +
+        equation(pseudo.subtraction + ' = ' + signed(pseudo.value, 2) + ' (' + rowPoints + ' percentage points on this scale)');
+      const inputs = p.a ? 'Observed short outcome minus fitted standard risk.' : 'Fitted short risk minus observed standard outcome.';
+      content += pp(inputs + ' The patient’s other outcome is unknown.');
+      content += '<h4>Average the ' + arm + ' training records</h4>' +
+        pp('At this frailty, ' + nf(fit.deaths) + ' patients died (' + signed(fit.deathValue, 2) + ' each) and ' +
+          nf(fit.survivors) + ' survived (' + signed(fit.survivorValue, 2) + ' each).') +
+        equation(xArmEquation(fit) + ' (' + points(fit.mean) + ' percentage points)');
+      content += pp('The ' + alternate + ' arm gives ' + points(armFits[1-p.a].mean) +
+        ' points at this frailty. The blended effect is ' + points(effect) + ' points.');
     } else {
       content = '<h4>' + (state.stage === 'crude' ? 'Observed arm averages' : 'Two predicted risks') + '</h4>';
       content += equation(percent(q[1]) + ' − ' + percent(q[0]) + ' ≈ ' + points(effect) + ' points');

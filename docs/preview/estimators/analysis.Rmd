@@ -106,16 +106,16 @@ knitr::kable(display, digits = 2)
 
 ## X brings the observed outcome back
 
-In the short arm, the pseudo-effect is observed outcome minus fitted standard risk. In the standard arm it is fitted short risk minus observed outcome. Both use the same direction. For a higher-frailty death these are +0.60 (P04) and −0.75 (P05). The two large, noisy pseudo-effects explain why the next step regresses them on baseline characteristics.
+Künzel and colleagues call each **signed pseudo-outcome** an “imputed treatment effect.” In the short arm, subtract fitted standard risk from the observed outcome. In the standard arm, subtract the observed outcome from fitted short risk. The displays for higher-frailty deaths give +0.60 (P04) and −0.75 (P05). In the higher-frailty short training arm, 125 deaths contribute +0.60 each and 375 survivors contribute −0.40 each. Their mean is −0.15, or −15 percentage points for this group.
 
 ```{r x-learner}
-pseudo_effect <- function(rows) {
+signed_pseudo_outcome <- function(rows) {
   observed <- rows[["Y"]]
   ifelse(rows[["A"]] == 1L, observed - risk(t_standard, rows),
                            risk(t_short, rows) - observed)
 }
-train$D <- pseudo_effect(train)
-display$D <- pseudo_effect(display)
+train$D <- signed_pseudo_outcome(train)
+display$D <- signed_pseudo_outcome(display)
 stopifnot(abs(display$D[4] - 0.60) < 1e-6,
           abs(display$D[5] + 0.75) < 1e-6)
 
@@ -385,7 +385,7 @@ Künzel and colleagues write $W$ for the schedule (`A` in this notebook) and $X$
 | In the notebook | On printed page 4158 |
 | --- | --- |
 | T fits one risk model in each arm. S fits one model and predicts twice. | Equation 3 (T) and equation 4 (S) |
-| X fits risks, imputes a signed difference for each training record, then fits those differences within each arm. | Equations 5–6 (risks), 7 (short-arm pseudo-outcome), and 8 (standard-arm pseudo-outcome) |
+| X fits risks, forms a signed pseudo-outcome for each training record, then fits those values within each arm. | Equations 5–6 (risks) and 7–8 (signed pseudo-outcomes for the short and standard arms) |
 | X averages the two fitted effects at the same frailty profile. | Equation 9, with the estimated propensity as the blending weight here |
 
 The final ATE and ATT calculation in this notebook averages the profile effects over the chosen patients. Open the [paper at the equations](https://ishuryak.github.io/causal-roadmap-primer/preview/estimators/kunzel-2019.pdf#page=3) or read the [accessible full-text article](https://pmc.ncbi.nlm.nih.gov/articles/PMC6410831/).

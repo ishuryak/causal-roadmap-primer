@@ -104,7 +104,7 @@
     <div class="map-explanation">
       <div class="branch-notes">
         <p id="note-risk">S uses one risk model, T uses two. For P04, T predicts <span class="record-cell is-fitted">40%</span> under standard and <span class="record-cell is-fitted">25%</span> under short. Comparing average predicted risks gives the g-computation estimate.</p>
-        <p id="note-effect">X reuses T’s fits. P04 died on short, so the signed contrast for this row is <span class="record-cell is-observed">1</span> − <span class="record-cell is-fitted">0.40</span> = +0.60. R learns how the effect varies from treatment and outcome residuals.</p>
+        <p id="note-effect">X reuses T’s fits. P04 died on short, so this record’s signed pseudo-outcome is <span class="record-cell is-observed">1</span> − <span class="record-cell is-fitted">0.40</span> = +0.60. R learns how the effect varies from treatment and outcome residuals.</p>
         <p id="note-weight">One in four higher-frailty patients received short. Inverse probability weighting gives P04’s observed outcome a weight of <span class="record-label">1 / 0.25 = 4</span> when estimating short-schedule risk for everyone.</p>
         <p id="note-both">Targeted maximum likelihood estimation (TMLE) updates the predicted risks before averaging. For the clinic-wide average, the double machine learning (DML) example uses cross-fitted augmented inverse probability weighting (AIPW). It corrects the predicted differences with held-out outcomes, then averages. <a href="cousins.html">Follow both calculations across the 5,000-patient cohort</a>.</p>
       </div>
